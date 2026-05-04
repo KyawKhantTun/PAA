@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logo — Log In</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/responsive.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --teal:#307fff;--teal-dark:#0123ac;--teal-light:rgba(0, 47, 157, 0.12);
+  --orange:#e8500a;
+  --dark:#060809;--dark2:#0d1012;--dark3:#161b1d;
+  --border:rgba(255,255,255,0.09);--muted:rgba(255,255,255,0.45);--faint:rgba(255,255,255,0.05);
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--dark);color:#fff;display:flex;}
+#bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.cursor-glow{position:fixed;pointer-events:none;z-index:1;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(0,151,157,0.04) 0%,transparent 70%);transform:translate(-50%,-50%);}
+.v-divider{width:1px;background:var(--border);position:absolute;left:50%;top:0;bottom:0;z-index:3;pointer-events:none;}
+.split{display:grid;grid-template-columns:1fr 1fr;width:100%;min-height:100vh;position:relative;z-index:2;}
+
+/* LEFT */
+.left{position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:44px 52px;overflow:hidden;background:linear-gradient(145deg,#060c0d 0%,#0a1415 60%,#06080a 100%);}
+.left::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(0,151,157,0.11) 0%,transparent 55%);pointer-events:none;}
+.left::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,151,157,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,151,157,0.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;}
+.left-top,.left-bottom{position:relative;z-index:2;}
+.logo-wrap{display:flex;align-items:center;gap:12px;margin-bottom:44px;}
+.logo-mark{width:40px;height:40px;border-radius:10px;background:var(--teal);display:flex;align-items:center;justify-content:center;box-shadow:0 0 24px var(--teal-glow);font-size:20px;}
+
+
+.tagline{font-family:'Fraunces',serif;font-size:clamp(32px,3.8vw,54px);font-weight:900;line-height:.93;letter-spacing:-2px;margin-bottom:12px;opacity:0;animation:riseUp .8s .15s ease forwards;}
+.tagline .it{font-style:italic;color:var(--teal);} .tagline .ito{font-style:italic;color:var(--orange);}
+.tagline-sub{font-size:13px;color:var(--muted);line-height:1.8;max-width:360px;margin-bottom:28px;opacity:0;animation:riseUp .8s .3s ease forwards;}
+.features{display:flex;flex-direction:column;gap:10px;opacity:0;animation:riseUp .8s .45s ease forwards;}
+.feat{display:flex;align-items:center;gap:11px;}
+.feat-icon{width:33px;height:33px;border-radius:9px;background:rgba(0,151,157,0.09);border:1px solid rgba(0,151,157,0.18);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.feat-text{font-size:12.5px;color:var(--muted);}
+.feat-text strong{color:#fff;}
+.access-note{display:flex;align-items:flex-start;gap:11px;padding:14px 18px;background:rgba(0,151,157,0.06);border:1px solid rgba(0,151,157,0.15);border-radius:13px;opacity:0;animation:riseUp .8s .6s ease forwards;}
+.an-text{font-size:12px;color:var(--muted);line-height:1.6;}
+.an-text strong{color:#fff;}
+
+/* RIGHT */
+.right{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:44px 52px;background:var(--dark2);position:relative;overflow:hidden;}
+.right::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 40%,rgba(0,151,157,0.05) 0%,transparent 60%);pointer-events:none;}
+.form-container{width:100%;max-width:390px;position:relative;z-index:2;}
+.auth-card{background:var(--dark3);border:1px solid var(--border);border-radius:22px;padding:38px;box-shadow:0 32px 80px rgba(0,0,0,0.5);opacity:0;animation:riseUp .7s .2s ease forwards;}
+@keyframes riseUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.card-title{font-family:'Fraunces',serif;font-size:28px;font-weight:900;letter-spacing:-.8px;margin-bottom:5px;text-align:center;}
+.card-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:28px;line-height:1.6;}
+
+/* FORM */
+.form-group{margin-bottom:15px;}
+.form-group label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.field-wrap{position:relative;}
+.field-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;z-index:1;}
+.field-wrap input{width:100%;background:rgba(255,255,255,0.04);border:1.5px solid var(--border);border-radius:11px;padding:13px 14px 13px 42px;font-size:14px;font-family:'DM Sans',sans-serif;color:#fff;outline:none;transition:all .2s;}
+.field-wrap input:focus{border-color:var(--teal);background:rgba(0,151,157,0.05);box-shadow:0 0 0 3px rgba(0,151,157,0.1);}
+.field-wrap input::placeholder{color:rgba(255,255,255,0.2);}
+.field-wrap input.err{border-color:#ef5350;background:rgba(239,83,80,0.05);}
+.field-wrap input.good{border-color:#66bb6a;}
+.field-error{font-size:11px;color:#ef9a9a;margin-top:5px;display:none;align-items:center;gap:4px;}
+.field-error.show{display:flex;}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:3px;transition:color .2s;}
+.eye-btn:hover{color:#fff;}
+.forgot-link{display:block;text-align:right;font-size:12px;color:var(--teal);margin-top:-8px;margin-bottom:18px;cursor:pointer;font-weight:500;transition:opacity .2s;}
+.forgot-link:hover{opacity:.7;}
+.btn-login{width:100%;background:var(--teal);color:#fff;border:none;padding:14px;border-radius:12px;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .25s;box-shadow:0 6px 24px var(--teal-glow);display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:.2px;}
+.btn-login:hover{background:var(--teal-dark);transform:translateY(-2px);box-shadow:0 12px 32px var(--teal-glow);}
+.btn-login:disabled{pointer-events:none;opacity:.7;}
+.spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.bottom-note{text-align:center;margin-top:22px;font-size:12px;color:rgba(255,255,255,0.2);line-height:1.7;}
+
+/* ERROR BANNER */
+.error-banner{display:none;background:rgba(239,83,80,0.1);border:1px solid rgba(239,83,80,0.3);border-radius:11px;padding:12px 16px;font-size:13px;color:#ef9a9a;margin-bottom:18px;text-align:center;}
+.error-banner.show{display:block;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+.modal-overlay.open{display:flex;}
+.modal-box{background:#181c1e;border:1px solid var(--border);border-radius:20px;padding:32px;width:100%;max-width:340px;animation:riseUp .3s ease;box-shadow:0 32px 80px rgba(0,0,0,0.6);}
+.modal-title{font-family:'Fraunces',serif;font-size:22px;font-weight:900;margin-bottom:6px;}
+.modal-desc{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.modal-actions{display:flex;gap:10px;margin-top:8px;}
+.btn-cancel{flex:1;background:rgba(255,255,255,0.05);color:var(--muted);border:1.5px solid var(--border);padding:12px;border-radius:11px;font-size:13.5px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+.btn-cancel:hover{background:rgba(255,255,255,0.09);color:#fff;}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(70px);background:#181c1e;border:1px solid rgba(0,151,157,0.35);border-radius:12px;padding:12px 24px;font-size:13px;font-weight:600;color:#fff;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.5);transition:transform .35s cubic-bezier(.34,1.1,.64,1),opacity .35s;opacity:0;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+.nav-logo { font-family:'Fraunces',serif;  font-weight:900; font-style:italic; color:var(--teal); letter-spacing:-1px; text-decoration:none; text-shadow:0 0 30px rgba(0,151,157,0.35); }
+.nav-logo .orange{ color: var(--orange);font-size:100px;}
+.nav-logo .blue{ color: var(--teal);font-size:100px;}
+.nav-logo .white{ color: white;font-size:30px;}
+</style>
+</head>
+<body>
+<div class="cursor-glow" id="cg"></div>
+<canvas id="bgCanvas"></canvas>
+<div class="v-divider"></div>
+
+<div class="split">
+  <!-- LEFT BRAND -->
+  <div class="left">
+    <div class="left-top">
+      <div class="logo-wrap">
+        <div class="logo-mark">⚡</div>
+        <div><a class="nav-logo" href="#"><span class = "blue">Learn</span> <span class = "white">with</span> <span class="orange">Ace</span></a></div>
+      </div>
+
+      <h1 class="tagline">Learn <span class="it">Arduino.</span><br>Build <span class="ito">Anything.</span></h1>
+      <p class="tagline-sub">The complete Arduino learning platform — from your first LED to full robotics projects, guided step by step.</p>
+      <div class="features">
+        <div class="feat"><div class="feat-icon">💡</div><div class="feat-text"><strong>25+ Components</strong> with wiring diagrams & real code</div></div>
+        <div class="feat"><div class="feat-icon">🔧</div><div class="feat-text"><strong>11 Projects</strong> from basic circuits to smart systems</div></div>
+        <div class="feat"><div class="feat-icon">🧩</div><div class="feat-text"><strong>mBlock + C++</strong> — start visual, graduate to real code</div></div>
+        <div class="feat"><div class="feat-icon">🏆</div><div class="feat-text"><strong>Quizzes & Achievements</strong> to track every milestone</div></div>
+      </div>
+    </div>
+    <div class="left-bottom">
+      <div class="access-note">
+        <div class="an-text">ℹ️ <strong>Access by invitation only.</strong> Your account is set up by your teacher. Contact your instructor if you don't have login credentials yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: LOGIN FORM -->
+  <div class="right">
+    <div class="form-container">
+      <div class="auth-card">
+        <div class="card-title">Welcome back 👋</div>
+        <div class="card-sub">Log in with the credentials your teacher gave you.</div>
+
+        <!-- Error banner (shown on failed login) -->
+        <div class="error-banner" id="errorBanner"></div>
+
+        <!-- USERNAME -->
+        <div class="form-group">
+          <label>Username</label>
+          <div class="field-wrap">
+            <span class="field-icon">👤</span>
+            <input type="text" id="username" placeholder="e.g. alex_tan"
+              autocomplete="username"
+              oninput="clearErr()"
+              onkeydown="if(event.key==='Enter')document.getElementById('password').focus()">
+          </div>
+          <div class="field-error" id="errUser">⚠ Please enter your username.</div>
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="form-group">
+          <label>Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔑</span>
+            <input type="password" id="password" placeholder="Your password"
+              autocomplete="current-password"
+              oninput="clearErr()"
+              onkeydown="if(event.key==='Enter')doLogin()">
+            <button class="eye-btn" id="eyeBtn" onclick="togglePw()" type="button">👁</button>
+          </div>
+          <div class="field-error" id="errPass">⚠ Please enter your password.</div>
+        </div>
+
+        <div class="forgot-link" onclick="openForgot()">Forgot your password?</div>
+
+        <button class="btn-login" id="btnLogin" onclick="doLogin()">
+          <span id="btnLabel">Log In →</span>
+        </button>
+
+        <div class="bottom-note">Having trouble? Ask your teacher or administrator for help.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal-box">
+    <div class="modal-title">Forgot Password?</div>
+    <div class="modal-desc">Enter your username and your teacher will reset your password and send you new credentials.</div>
+    <div class="form-group">
+      <label>Username</label>
+      <div class="field-wrap">
+        <span class="field-icon">👤</span>
+        <input type="text" id="forgotUser" placeholder="e.g. alex_tan">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeForgot()">Cancel</button>
+      <button class="btn-login" style="flex:1;margin-top:0;" onclick="sendReset()">Send Request →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Three.js CDN (required for background particles) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// ── CONFIG — paste your real values here ──────────────────────
+const SUPABASE_URL      = 'https://rfuvffajmaufoptgwtnd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmdXZmZmFqbWF1Zm9wdGd3dG5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3Nzk5NjQsImV4cCI6MjA5MzM1NTk2NH0.E7HVW6uDxctpepxzspvpYmutJRvxBSYMl1nZ9mCKt9s';
+const API_BASE          = 'https://learnarduinowithace-production.up.railway.app';
+// ──────────────────────────────────────────────────────────────
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true }
+});
+
+async function getSession() {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session;
+}
+
+async function getCurrentProfile() {
+  const session = await getSession();
+  if (!session) return null;
+  const { data } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+  return data;
+}
+
+async function apiFetch(path, options = {}) {
+  const session = await getSession();
+  const token   = session?.access_token;
+  const res = await fetch(`${API_BASE}${path}`, {
+    method:  options.method || 'GET',
+    headers: {
+      'Content-Type':  'application/json',
+      'Authorization': token ? `Bearer ${token}` : '',
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+  return json;
+}
+
+async function signOut() {
+  await supabase.auth.signOut();
+  window.location.href = 'index.html';
+}
+
+/* If user is already logged in, redirect straight to the dashboard */
+(async function checkAlreadyLoggedIn(){
+  const session = await getSession();
+  if (session) {
+    const profile = await getCurrentProfile();
+    window.location.replace(profile?.role === 'admin' ? 'admin.html' : 'arduino.html');
+  }
+})();
+
+/* CURSOR */
+document.addEventListener('mousemove', e => {
+  const c = document.getElementById('cg');
+  c.style.left = e.clientX + 'px';
+  c.style.top  = e.clientY + 'px';
+});
+
+/* THREE.JS PARTICLES */
+(function(){
+  const canvas=document.getElementById('bgCanvas'),renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,100);
+  camera.position.z=16;
+  scene.add(new THREE.AmbientLight(0xffffff,.25));
+  const l1=new THREE.PointLight(0x00979d,2,30);l1.position.set(8,6,4);scene.add(l1);
+  const l2=new THREE.PointLight(0xe8500a,1.5,25);l2.position.set(-8,-4,5);scene.add(l2);
+  const particles=[],cols=[0x00979d,0xe8500a,0xffdd00,0x66bb6a,0x42a5f5];
+  for(let i=0;i<22;i++){
+    const geo=[new THREE.OctahedronGeometry(.17,0),new THREE.TetrahedronGeometry(.14,0),new THREE.BoxGeometry(.19,.19,.19)][i%3];
+    const col=cols[i%cols.length];
+    const mat=new THREE.MeshPhongMaterial({color:col,emissive:col,emissiveIntensity:.4,shininess:80,opacity:.5,transparent:true});
+    const mesh=new THREE.Mesh(geo,mat);
+    const px=(Math.random()-.5)*24,py=(Math.random()-.5)*14,pz=(Math.random()-.5)*4-4;
+    mesh.position.set(px,py,pz);scene.add(mesh);
+    particles.push({mesh,by:py,sp:.2+Math.random()*.4,off:Math.random()*Math.PI*2});
+  }
+  const lm=new THREE.LineBasicMaterial({color:0x00979d,opacity:.03,transparent:true});
+  for(let i=0;i<12;i++){const y=-6+i;scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-14,y,-5),new THREE.Vector3(14,y,-5)]),lm));}
+  for(let i=0;i<20;i++){const x=-10+i;scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x,-7,-5),new THREE.Vector3(x,7,-5)]),lm));}
+  let t=0;(function animate(){requestAnimationFrame(animate);t+=.01;particles.forEach(p=>{p.mesh.position.y=p.by+Math.sin(t*p.sp+p.off)*.4;p.mesh.rotation.x+=.006;p.mesh.rotation.y+=.009;});renderer.render(scene,camera);})();
+  function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
+  resize();addEventListener('resize',resize);
+})();
+
+/* HELPERS */
+function clearErr(){
+  document.getElementById('errorBanner').classList.remove('show');
+  ['username','password'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.classList.remove('err','good');
+  });
+  document.getElementById('errUser').classList.remove('show');
+  document.getElementById('errPass').classList.remove('show');
+}
+function showBanner(msg){const b=document.getElementById('errorBanner');b.textContent=msg;b.classList.add('show');}
+function togglePw(){const i=document.getElementById('password'),b=document.getElementById('eyeBtn');if(i.type==='password'){i.type='text';b.textContent='🙈';}else{i.type='password';b.textContent='👁';}}
+function setLoading(on){
+  const btn=document.getElementById('btnLogin');
+  btn.disabled=on;
+  btn.innerHTML=on?'<div class="spinner"></div><span>Logging in…</span>':'<span id="btnLabel">Log In →</span>';
+}
+
+/* LOGIN — real Supabase auth */
+async function doLogin(){
+  const username=document.getElementById('username').value.trim();
+  const password=document.getElementById('password').value;
+  let valid=true;
+  if(!username){document.getElementById('username').classList.add('err');document.getElementById('errUser').classList.add('show');valid=false;}
+  if(!password){document.getElementById('password').classList.add('err');document.getElementById('errPass').classList.add('show');valid=false;}
+  if(!valid) return;
+
+  setLoading(true);
+  try {
+    // Step 1: Look up email from username via our backend
+    const lookup = await apiFetch('/api/auth/lookup', {
+      method: 'POST',
+      body:   { username },
+    });
+
+    // Step 2: Sign in via Supabase with email + password
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email:    lookup.email,
+      password,
+    });
+
+    if (error) throw new Error(error.message);
+
+    // Step 3: Redirect based on role
+    showToast('✓ Welcome back! Redirecting…');
+    setTimeout(() => {
+      window.location.replace(lookup.role === 'admin' ? 'admin.html' : 'arduino.html');
+    }, 900);
+
+  } catch (err) {
+    setLoading(false);
+    if (err.message === 'Username not found.') {
+      document.getElementById('username').classList.add('err');
+      showBanner('Username not found. Check your username and try again.');
+    } else if (err.message.toLowerCase().includes('invalid')) {
+      document.getElementById('password').classList.add('err');
+      showBanner('Incorrect password. Try again or contact your teacher.');
+    } else {
+      showBanner('Something went wrong: ' + err.message);
+    }
+  }
+}
+
+/* FORGOT */
+function openForgot(){document.getElementById('forgotModal').classList.add('open');}
+function closeForgot(){document.getElementById('forgotModal').classList.remove('open');}
+function sendReset(){
+  const u=document.getElementById('forgotUser').value.trim();
+  if(!u){showToast('⚠ Enter your username first.');return;}
+  closeForgot();
+  showToast('📧 Request sent! Your teacher will reset your password.');
+}
+document.getElementById('forgotModal').addEventListener('click',e=>{if(e.target===document.getElementById('forgotModal'))closeForgot();});
+
+/* TOAST */
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),3200);}
+</script>
+</body>
+</html>

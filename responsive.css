@@ -1,0 +1,620 @@
+/* ============================================================
+   responsive.css — shared across ALL pages
+   Add this to every HTML file, just before </head>:
+   <link rel="stylesheet" href="css/responsive.css">
+   ============================================================ */
+
+/* ── GLOBAL RESETS ─────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+img, video, canvas { max-width: 100%; }
+* { -webkit-tap-highlight-color: transparent; }
+
+/* ============================================================
+   BREAKPOINTS USED
+   lg : max-width 1024px  (small laptop / large tablet)
+   md : max-width 768px   (tablet / large phone landscape)
+   sm : max-width 480px   (phone portrait)
+   ============================================================ */
+
+
+/* ============================================================
+   NAVIGATION — all pages
+   ============================================================ */
+@media (max-width: 1024px) {
+  nav {
+    grid-template-columns: 1fr auto !important;
+    padding: 0 20px !important;
+    gap: 12px !important;
+  }
+  /* hide the centre nav links — shown in hamburger instead */
+  nav > div:nth-child(2) { display: none !important; }
+  .nav-search { width: 140px !important; }
+}
+
+@media (max-width: 768px) {
+  nav { grid-template-columns: 1fr auto !important; }
+  .nav-search { display: none !important; }
+  .nav-account span { display: none; } /* hide "Account" text, keep avatar */
+  .nav-account { padding: 7px 10px !important; }
+}
+
+/* Hamburger button (added by JS below) */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: 1px solid var(--border, rgba(255,255,255,0.09));
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.hamburger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: all .25s;
+}
+@media (max-width: 1024px) { .hamburger { display: flex; } }
+
+/* Mobile nav drawer */
+.mobile-nav {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  background: rgba(10, 12, 13, 0.98);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  z-index: 90;
+  transform: translateY(-110%);
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  padding: 16px 0 20px;
+}
+.mobile-nav.open { transform: translateY(0); }
+.mobile-nav a {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  padding: 12px 24px;
+  border-left: 2px solid transparent;
+  transition: all .18s;
+}
+.mobile-nav a:hover, .mobile-nav a.active {
+  color: #00979d;
+  border-left-color: #00979d;
+  background: rgba(0,151,157,0.07);
+}
+.mobile-nav-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 24px 4px;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 100px;
+  padding: 0 14px;
+  height: 38px;
+}
+.mobile-nav-search input {
+  background: none;
+  border: none;
+  outline: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #fff;
+  width: 100%;
+}
+.mobile-nav-search input::placeholder { color: rgba(255,255,255,0.2); }
+.back-btn { top: 72px !important; left: 16px !important; }
+
+
+/* ============================================================
+   INDEX.HTML — login split screen
+   ============================================================ */
+@media (max-width: 900px) {
+  /* Stack the two panels vertically */
+  .split {
+    grid-template-columns: 1fr !important;
+    overflow-y: auto !important;
+  }
+  .v-divider { display: none !important; }
+
+  /* Left panel: collapse and shrink */
+  .left {
+    padding: 36px 28px 28px !important;
+    min-height: auto !important;
+  }
+  .logo-wrap { margin-bottom: 28px !important; }
+  .hero-visual { margin-bottom: 20px !important; aspect-ratio: 16/8 !important; }
+  .tagline { font-size: clamp(28px, 7vw, 48px) !important; letter-spacing: -1.5px !important; }
+  .tagline-sub { font-size: 13px !important; margin-bottom: 18px !important; }
+  .features { gap: 8px !important; }
+  .feat-text { font-size: 12px !important; }
+  .access-note { margin-top: 20px !important; }
+  .left-bottom { margin-top: 20px; }
+
+  /* Right panel: full width */
+  .right {
+    padding: 28px 20px 48px !important;
+    min-height: auto !important;
+  }
+  .auth-card { padding: 26px 20px !important; border-radius: 18px !important; }
+}
+
+@media (max-width: 480px) {
+  .left { padding: 24px 16px 20px !important; }
+  .right { padding: 20px 12px 40px !important; }
+  .auth-card { padding: 22px 16px !important; }
+  .card-title { font-size: 22px !important; }
+  .btn-login { font-size: 14px !important; padding: 13px !important; }
+}
+
+
+/* ============================================================
+   ARDUINO_3D.HTML — homepage
+   ============================================================ */
+@media (max-width: 1024px) {
+  /* Hero: hide right-side 3D canvas, go full width */
+  #hero-canvas { width: 100% !important; opacity: .3 !important; }
+  .hero-inner { padding: 0 36px !important; max-width: 100% !important; }
+  .hero-title { font-size: clamp(44px, 8vw, 72px) !important; }
+
+  /* Components grid: 2 cols */
+  .cards-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Learn section */
+  #learn { grid-template-columns: 1fr !important; padding: 60px 36px !important; }
+  #learn-canvas-wrap { height: 300px !important; }
+  .learn-stat-card.s-top { right: 0 !important; }
+  .learn-stat-card.s-bot { left: 0 !important; }
+  .path-cards { grid-template-columns: 1fr 1fr !important; }
+
+  /* Contact */
+  #contact { padding: 60px 36px !important; }
+  .contact-grid { grid-template-columns: 1fr !important; gap: 36px !important; }
+  .filter-bar { display: none; }
+}
+
+@media (max-width: 768px) {
+  .hero-inner { padding: 0 20px !important; }
+  .hero-title { font-size: clamp(38px, 10vw, 60px) !important; letter-spacing: -2px !important; }
+  .hero-sub { font-size: 13px !important; }
+  .hero-actions { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
+  .stat-chips { gap: 8px !important; }
+  .stat-chip { padding: 8px 12px !important; }
+
+  #components { padding: 60px 20px !important; }
+  .cards-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+
+  #learn { padding: 48px 20px !important; }
+  #contact { padding: 48px 20px !important; }
+  .section-title { font-size: clamp(28px, 7vw, 44px) !important; }
+}
+
+@media (max-width: 480px) {
+  .cards-grid { grid-template-columns: 1fr !important; }
+  .path-cards { grid-template-columns: 1fr !important; }
+  #hero { padding: 66px 0 60px !important; }
+  .scroll-cue { display: none !important; }
+}
+
+
+/* ============================================================
+   COMPONENTS_3D.HTML — components explorer
+   ============================================================ */
+@media (max-width: 1024px) {
+  /* Collapse the two-panel explorer into one scrollable layout */
+  #app { flex-direction: column !important; overflow-y: auto !important; }
+  #heroPanel { flex: none !important; height: auto !important; min-height: 100vh !important; }
+  #heroCanvas { opacity: .25 !important; }
+
+  .left-panel {
+    padding: 0 24px 160px !important;
+    width: 100% !important;
+    position: relative !important;
+  }
+  .comp-name { font-size: clamp(36px, 8vw, 60px) !important; }
+  .comp-num { font-size: 80px !important; right: 20px !important; bottom: 120px !important; }
+
+  .right-panel {
+    display: none !important; /* cards hidden on mobile — swipe to navigate */
+  }
+
+  .nav-arrows {
+    bottom: 40px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .filter-bar {
+    top: auto !important;
+    bottom: 100px !important;
+    left: 20px !important;
+    right: 20px !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+  }
+  .filter-pill { font-size: 10px !important; padding: 4px 11px !important; }
+
+  /* Detail panel */
+  #detailPanel { overflow-y: auto !important; }
+  .detail-content-wrap {
+    grid-template-columns: 1fr !important;
+    padding: 24px 20px 48px !important;
+    gap: 20px !important;
+  }
+  .detail-topbar { padding: 14px 20px !important; }
+  .circuit-grid { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 480px) {
+  .left-panel { padding: 0 16px 160px !important; }
+  .comp-name { font-size: clamp(30px, 9vw, 50px) !important; letter-spacing: -1.5px !important; }
+  .comp-desc { font-size: 12px !important; }
+  .comp-tags { gap: 5px !important; }
+  .comp-tag { font-size: 9px !important; padding: 2px 9px !important; }
+}
+
+
+/* ============================================================
+   MBLOCK_3D.HTML / CPP_3D.HTML — learn pages
+   ============================================================ */
+@media (max-width: 1024px) {
+  .page-hero { padding: 100px 36px 60px !important; }
+  #hero-canvas { opacity: .2 !important; }
+  .hero-title { font-size: clamp(42px, 8vw, 70px) !important; }
+  .toc-bar { padding: 14px 24px !important; gap: 6px !important; }
+  .toc-link { font-size: 10px !important; padding: 4px 10px !important; }
+  .section { padding: 48px 36px !important; }
+  .two-col { grid-template-columns: 1fr !important; gap: 24px !important; }
+  .three-col { grid-template-columns: 1fr 1fr !important; }
+  .code-compare { grid-template-columns: 1fr !important; }
+  .op-grid { grid-template-columns: 1fr 1fr !important; }
+  .cheat-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
+@media (max-width: 768px) {
+  .page-hero { padding: 90px 20px 48px !important; }
+  .hero-sub { font-size: 13px !important; }
+  .hero-ctas { flex-direction: column !important; gap: 10px !important; }
+  .section { padding: 36px 20px !important; }
+  .three-col { grid-template-columns: 1fr !important; }
+  .op-grid { grid-template-columns: 1fr !important; }
+  .cheat-grid { grid-template-columns: 1fr !important; }
+  .section-title { font-size: clamp(24px, 6vw, 38px) !important; }
+}
+
+@media (max-width: 480px) {
+  .form-row { grid-template-columns: 1fr !important; }
+  .sub-tabs { flex-wrap: wrap !important; gap: 6px !important; }
+  .sub-tab { font-size: 11px !important; padding: 6px 12px !important; }
+  pre.code-pre { font-size: 10.5px !important; }
+}
+
+
+/* ============================================================
+   PROJECTS_3D.HTML — projects page
+   ============================================================ */
+@media (max-width: 1024px) {
+  /* Remove sticky sidebar — make it a top bar */
+  .layout {
+    grid-template-columns: 1fr !important;
+  }
+  .sidebar {
+    position: static !important;
+    height: auto !important;
+    overflow: visible !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border, rgba(255,255,255,0.08)) !important;
+    padding: 12px 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    align-items: center !important;
+    padding: 10px 16px !important;
+  }
+  .sidebar-title { display: none !important; }
+  .toc-proj-btn {
+    border-left: none !important;
+    border-radius: 100px !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    padding: 5px 13px !important;
+    font-size: 11px !important;
+    white-space: nowrap !important;
+  }
+  .toc-proj-btn.active {
+    background: rgba(0,151,157,0.12) !important;
+    border-color: rgba(0,151,157,0.3) !important;
+  }
+  .toc-section-hd { display: none !important; }
+
+  .page-hero { padding: 100px 36px 60px !important; }
+  #hero-canvas { opacity: .18 !important; }
+  .tier-band { padding: 40px 24px 20px !important; }
+  .project-card { margin: 0 24px 32px !important; }
+  .proj-section { padding: 20px 20px !important; }
+  .intro-grid { grid-template-columns: 1fr !important; }
+  .circuit-grid { grid-template-columns: 1fr !important; }
+  .code-compare { grid-template-columns: 1fr !important; gap: 16px !important; }
+  .coming-grid { grid-template-columns: 1fr 1fr !important; padding: 0 24px 40px !important; }
+  .next-strip { margin: 0 24px 32px !important; flex-direction: column !important; gap: 14px !important; align-items: flex-start !important; }
+}
+
+@media (max-width: 768px) {
+  .page-hero { padding: 90px 20px 48px !important; }
+  .project-card { margin: 0 16px 24px !important; }
+  .proj-section { padding: 18px 16px !important; }
+  .tier-band { padding: 32px 16px 16px !important; }
+  .coming-grid { grid-template-columns: 1fr !important; padding: 0 16px 32px !important; }
+  .next-strip { margin: 0 16px 24px !important; }
+  .proj-title { font-size: clamp(18px, 5vw, 26px) !important; }
+}
+
+@media (max-width: 480px) {
+  .proj-header { flex-direction: column !important; gap: 10px !important; align-items: flex-start !important; }
+  .proj-chevron { align-self: flex-end !important; margin-top: -36px !important; }
+  .quiz-options { gap: 6px !important; }
+  .bonus-box { flex-direction: column !important; }
+}
+
+
+/* ============================================================
+   PROFILE.HTML
+   ============================================================ */
+@media (max-width: 1024px) {
+  .page { padding: 100px 36px 60px !important; }
+  .profile-hero { grid-template-columns: auto 1fr !important; gap: 20px !important; padding: 26px !important; }
+  .profile-mini-stats { display: none !important; }
+  .profile-grid { grid-template-columns: 1fr 1fr !important; }
+  .profile-grid.two { grid-template-columns: 1fr !important; }
+  .achievements-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  .projects-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
+@media (max-width: 768px) {
+  .page { padding: 88px 16px 48px !important; }
+  .profile-hero {
+    grid-template-columns: 1fr !important;
+    text-align: center !important;
+    gap: 16px !important;
+    padding: 22px 18px !important;
+  }
+  .avatar-wrap { margin: 0 auto; }
+  .profile-badges { justify-content: center !important; }
+  .profile-grid { grid-template-columns: 1fr !important; }
+  .achievements-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .projects-grid { grid-template-columns: 1fr 1fr !important; }
+  .full-card { padding: 18px 16px !important; }
+  .stat-card { padding: 18px 16px !important; }
+  .stat-val { font-size: 28px !important; }
+}
+
+@media (max-width: 480px) {
+  .profile-name { font-size: 24px !important; }
+  .achievements-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .projects-grid { grid-template-columns: 1fr !important; }
+  .progress-row { gap: 10px !important; }
+  .progress-icon { display: none !important; }
+}
+
+
+/* ============================================================
+   SETTINGS.HTML
+   ============================================================ */
+@media (max-width: 1024px) {
+  .settings-layout {
+    grid-template-columns: 1fr !important;
+    margin-top: 64px !important;
+  }
+  .settings-sidebar {
+    position: static !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    padding: 12px 16px !important;
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+  }
+  .settings-sidebar::-webkit-scrollbar { display: none; }
+  .sidebar-heading { display: none !important; }
+  .sidebar-divider { display: none !important; }
+  .sidebar-link {
+    border-left: none !important;
+    border-radius: 100px !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    padding: 7px 14px !important;
+    white-space: nowrap !important;
+    font-size: 12px !important;
+  }
+  .sidebar-link.active {
+    background: rgba(0,151,157,0.12) !important;
+    border-color: rgba(0,151,157,0.3) !important;
+  }
+  .sidebar-link-icon { display: none !important; }
+  .settings-main { padding: 24px 20px 60px !important; }
+  .form-row { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 768px) {
+  .settings-main { padding: 20px 16px 48px !important; }
+  .section-block { padding: 18px 16px !important; }
+  .settings-page-title { font-size: clamp(22px, 6vw, 32px) !important; }
+  .danger-row { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+}
+
+
+/* ============================================================
+   ADMIN.HTML
+   ============================================================ */
+@media (max-width: 1024px) {
+  /* Collapse sidebar into top bar */
+  body > aside.sidebar,
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: -220px !important;
+    height: 100vh !important;
+    z-index: 200 !important;
+    transition: left .3s ease !important;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5) !important;
+  }
+  .sidebar.mobile-open { left: 0 !important; }
+  .main { margin-left: 0 !important; }
+  .topbar { padding: 0 16px !important; gap: 8px !important; }
+  .topbar-search { width: 160px !important; }
+  .content { padding: 20px 16px 48px !important; }
+  .stats-row { grid-template-columns: 1fr 1fr !important; }
+
+  /* Hamburger for admin sidebar */
+  .admin-hamburger {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+    flex-direction: column;
+    gap: 4px;
+    margin-right: 8px;
+  }
+  .admin-hamburger span {
+    display: block;
+    width: 16px; height: 2px;
+    background: #fff;
+    border-radius: 2px;
+    transition: all .22s;
+  }
+
+  /* Admin sidebar overlay */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 199;
+  }
+  .sidebar-overlay.active { display: block; }
+
+  /* Table horizontal scroll */
+  .table-wrap { overflow-x: auto !important; }
+  table { min-width: 540px !important; }
+  .modal-box { margin: 16px !important; max-width: calc(100vw - 32px) !important; }
+}
+
+@media (max-width: 768px) {
+  .stats-row { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  .stat-val { font-size: 26px !important; }
+  .topbar-search { display: none !important; }
+  .content { padding: 16px 12px 40px !important; }
+  .table-toolbar { padding: 12px 14px !important; }
+  thead th, tbody td { padding: 10px 12px !important; font-size: 12px !important; }
+}
+
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr !important; }
+  .btn-new span { display: none; }
+  .btn-new::before { content: '＋'; }
+}
+
+
+/* ============================================================
+   ACCOUNT DROPDOWN — all pages
+   ============================================================ */
+@media (max-width: 480px) {
+  .account-dropdown {
+    width: calc(100vw - 24px) !important;
+    right: -8px !important;
+  }
+}
+
+
+/* ============================================================
+   FOOTER — arduino_3d.html
+   ============================================================ */
+@media (max-width: 1024px) {
+  footer { padding: 40px 36px 28px !important; }
+  .footer-top { grid-template-columns: 1fr 1fr !important; gap: 28px !important; }
+}
+
+@media (max-width: 768px) {
+  footer { padding: 32px 20px 24px !important; }
+  .footer-top { grid-template-columns: 1fr !important; gap: 20px !important; }
+  .footer-bottom { flex-direction: column !important; gap: 6px !important; text-align: center !important; }
+}
+
+
+/* ============================================================
+   MODALS — all pages
+   ============================================================ */
+@media (max-width: 600px) {
+  .modal-overlay { align-items: flex-end !important; }
+  .modal-box {
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 24px 20px !important;
+  }
+  .confirm-modal { align-items: flex-end !important; }
+  .confirm-box {
+    border-radius: 20px 20px 0 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+
+/* ============================================================
+   TOAST — all pages
+   ============================================================ */
+@media (max-width: 480px) {
+  .toast {
+    left: 12px !important;
+    right: 12px !important;
+    transform: translateX(0) translateY(70px) !important;
+    white-space: normal !important;
+    text-align: center !important;
+  }
+  .toast.show { transform: translateX(0) translateY(0) !important; }
+}
+
+
+/* ============================================================
+   TOUCH IMPROVEMENTS — all pages
+   ============================================================ */
+@media (max-width: 1024px) {
+  /* Larger tap targets */
+  .btn-submit, .btn-login, .btn-new, .btn-save,
+  .btn-create, .btn-primary, .nav-account {
+    min-height: 44px;
+  }
+  .nav-item, .acc-item, .sidebar-link { min-height: 44px; }
+
+  /* Remove hover-only effects that don't work on touch */
+  .comp-card:hover { transform: none !important; }
+  .info-card:hover { transform: none !important; }
+  .stat-card:hover { transform: none !important; }
+  .proj-mini:hover { transform: none !important; }
+  .coming-card:hover { transform: none !important; }
+}
+
+/* Prevent font size zoom on iOS when focusing inputs */
+@media (max-width: 768px) {
+  input, select, textarea { font-size: 16px !important; }
+}

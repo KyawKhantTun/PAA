@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — Logo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/responsive.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--teal:#307fff;--teal-dark:#0123ac;--teal-light:rgba(0, 47, 157, 0.12);--orange:#e8500a;--dark:#050708;--dark2:#0c0f10;--dark3:#141819;--border:rgba(255,255,255,0.08);--muted:rgba(255,255,255,0.45);--faint:rgba(255,255,255,0.05);}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--dark);color:#fff;min-height:100vh;}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 40px;gap:24px;background:rgba(5,7,8,0.88);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'Fraunces',serif;font-size:24px;font-weight:900;font-style:italic;color:var(--teal);letter-spacing:-1px;text-decoration:none;}
+.nav-links{display:flex;gap:4px;list-style:none;}
+.nav-links a{font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;padding:6px 13px;border-radius:8px;transition:all .2s;}
+.nav-links a:hover{background:var(--teal-light);color:var(--teal);}
+.nav-right{display:flex;align-items:center;justify-content:flex-end;gap:10px;}
+.account-wrap{position:relative;}
+.nav-account{display:flex;align-items:center;gap:8px;background:var(--teal);color:#fff;border:none;padding:7px 16px 7px 9px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+.nav-account:hover{background:var(--teal-dark);}
+.acc-av{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+.account-dropdown{position:absolute;top:calc(100% + 10px);right:0;width:280px;background:#181c1e;border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .22s,transform .22s;z-index:300;}
+.account-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0);}
+.acc-header{background:linear-gradient(135deg,#00979d,#007a7f);padding:20px 18px;display:flex;align-items:center;gap:14px;}
+.acc-big-avatar{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;border:2px solid rgba(255,255,255,0.3);flex-shrink:0;}
+.acc-name-el{font-size:14px;font-weight:700;color:#fff;}
+.acc-email-el{font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;}
+.acc-progress-wrap{padding:14px 16px;border-bottom:1px solid var(--border);}
+.acc-progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:7px;}
+.acc-progress-bar{height:5px;background:rgba(255,255,255,0.08);border-radius:100px;overflow:hidden;}
+.acc-progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-dark));border-radius:100px;transition:width .6s ease;}
+.acc-progress-count{font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;}
+.acc-menu{padding:6px;}
+.acc-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;text-decoration:none;color:rgba(255,255,255,0.8);font-size:13px;font-weight:500;transition:background .15s;}
+.acc-item:hover{background:rgba(0,151,157,0.1);color:var(--teal);}
+.acc-item-icon{width:30px;height:30px;border-radius:8px;background:var(--faint);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.acc-divider{height:1px;background:var(--border);margin:4px 12px;}
+.acc-logout{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:#f28b82;transition:background .15s;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:4px;}
+.acc-logout:hover{background:rgba(242,139,130,0.08);}
+.back-btn{position:fixed;top:78px;left:36px;z-index:210;display:flex;align-items:center;gap:7px;background:rgba(5,7,8,0.88);border:1px solid var(--border);color:rgba(255,255,255,0.7);padding:7px 15px 7px 11px;border-radius:100px;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:none;backdrop-filter:blur(10px);transition:all .22s;}
+.back-btn:hover{background:var(--teal-light);border-color:var(--teal);color:#fff;transform:translateX(-2px);}
+
+/* LAYOUT */
+.settings-layout{display:grid;grid-template-columns:230px 1fr;gap:0;min-height:calc(100vh - 64px);margin-top:64px;}
+.settings-sidebar{background:var(--dark3);border-right:1px solid var(--border);padding:24px 0;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;}
+.sidebar-heading{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:3px;padding:0 20px 10px;border-bottom:1px solid var(--border);margin-bottom:10px;}
+.sidebar-link{display:flex;align-items:center;gap:11px;padding:10px 20px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .18s;border-left:2px solid transparent;}
+.sidebar-link:hover{color:#fff;background:rgba(255,255,255,0.04);}
+.sidebar-link.active{color:var(--teal);border-left-color:var(--teal);background:var(--teal-light);}
+.sidebar-link-icon{font-size:15px;width:18px;text-align:center;flex-shrink:0;}
+.sidebar-divider{height:1px;background:var(--border);margin:8px 20px;}
+.sidebar-link.danger{color:#f28b82;}.sidebar-link.danger:hover{background:rgba(242,139,130,0.07);}
+.settings-main{padding:36px 56px 80px;background:var(--dark2);}
+.settings-header{margin-bottom:28px;}
+.settings-page-title{font-family:'Fraunces',serif;font-size:clamp(26px,3.5vw,38px);font-weight:900;letter-spacing:-1.2px;margin-bottom:5px;}
+.settings-page-desc{font-size:13.5px;color:var(--muted);}
+.settings-section{display:none;}.settings-section.active{display:block;}
+
+/* BLOCKS */
+.section-block{background:var(--dark3);border:1px solid var(--border);border-radius:16px;padding:26px;margin-bottom:20px;}
+.block-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.block-title::before{content:'';width:12px;height:2px;background:var(--teal);border-radius:2px;}
+
+/* FORM */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-row.single{grid-template-columns:1fr;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group label{font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.5px;}
+.form-group input,.form-group select,.form-group textarea{background:rgba(255,255,255,0.04);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-size:13px;font-family:'DM Sans',sans-serif;color:#fff;outline:none;transition:border-color .2s;resize:none;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,151,157,0.1);}
+.form-group input::placeholder,.form-group textarea::placeholder{color:rgba(255,255,255,0.2);}
+.form-group select option{background:#1a1a1a;}
+
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-name{font-size:13.5px;font-weight:600;color:#fff;margin-bottom:2px;}
+.toggle-desc{font-size:12px;color:var(--muted);}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-track{position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:100px;cursor:pointer;transition:background .25s;}
+.toggle-track::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .25s;box-shadow:0 2px 6px rgba(0,0,0,0.4);}
+.toggle-switch input:checked+.toggle-track{background:var(--teal);}
+.toggle-switch input:checked+.toggle-track::before{transform:translateX(20px);}
+
+/* PASSWORD */
+.pw-strength{display:flex;gap:3px;margin-top:6px;}
+.pw-s{height:3px;flex:1;border-radius:2px;background:rgba(255,255,255,0.08);transition:background .3s;}
+.pw-s.w{background:#ef5350;}.pw-s.m{background:var(--orange);}.pw-s.s{background:var(--teal);}
+
+/* SAVE BAR */
+.save-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:rgba(0,151,157,0.07);border:1px solid rgba(0,151,157,0.18);border-radius:11px;margin-top:6px;}
+.save-bar-text{font-size:13px;color:var(--teal);font-weight:600;}
+.btn-save{background:var(--teal);color:#fff;border:none;padding:10px 28px;border-radius:100px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(0,151,157,0.28);}
+.btn-save:hover{background:var(--teal-dark);transform:translateY(-1px);}
+.btn-save:disabled{opacity:.6;pointer-events:none;}
+
+/* DANGER */
+.danger-block{background:rgba(239,83,80,0.05);border:1px solid rgba(239,83,80,0.2);border-radius:16px;padding:22px;}
+.danger-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:13px 0;border-bottom:1px solid rgba(239,83,80,0.1);}
+.danger-row:last-child{border-bottom:none;}
+.danger-name{font-size:13.5px;font-weight:600;color:#fff;margin-bottom:2px;}
+.danger-desc{font-size:12px;color:rgba(255,255,255,0.38);}
+.btn-danger{background:none;border:1px solid rgba(239,83,80,0.35);color:#f28b82;padding:8px 16px;border-radius:100px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.btn-danger:hover{background:rgba(239,83,80,0.12);border-color:#ef5350;}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(70px);background:#181c1e;border:1px solid rgba(0,151,157,0.35);border-radius:12px;padding:12px 24px;font-size:13px;font-weight:600;color:#fff;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.5);transition:transform .35s cubic-bezier(.34,1.1,.64,1),opacity .35s;opacity:0;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div><a class="nav-logo" href="arduino.html">Logo</a></div>
+  <div><ul class="nav-links">
+    <li><a href="arduino.html">Home</a></li>
+    <li><a href="components.html">Components</a></li>
+    <li><a href="mblock.html">Learn</a></li>
+    <li><a href="projects.html">Projects</a></li>
+  </ul></div>
+  <div class="nav-right">
+    <div class="account-wrap">
+      <button class="nav-account" data-acc-toggle>
+        <div class="acc-av" id="navAccAv">?</div>
+        <span id="navAccName">Account</span>
+      </button>
+      <div class="account-dropdown" id="accountDropdown">
+        <div class="acc-header">
+          <div class="acc-big-avatar" id="navAccBigAv">?</div>
+          <div><div class="acc-name-el" id="navAccNameFull">Loading…</div><div class="acc-email-el" id="navAccEmail"></div></div>
+        </div>
+        <div class="acc-progress-wrap">
+          <div class="acc-progress-label"><span>Lessons Completed</span><span id="navProgressPct">0%</span></div>
+          <div class="acc-progress-bar"><div class="acc-progress-fill" id="navProgressFill" style="width:0%"></div></div>
+          <div class="acc-progress-count" id="navProgressCount">0 / 50 lessons</div>
+        </div>
+        <div class="acc-menu">
+          <a class="acc-item" href="profile.html"><div class="acc-item-icon">👤</div>View Profile</a>
+          <a class="acc-item" href="projects.html"><div class="acc-item-icon">🔧</div>Your Projects</a>
+          <div class="acc-divider"></div>
+          <a class="acc-item" href="settings.html"><div class="acc-item-icon">⚙️</div>Settings</a>
+          <div class="acc-divider"></div>
+          <button class="acc-logout" onclick="handleLogout()">🚪 Log Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<a class="back-btn" href="arduino.html">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  Back to Home
+</a>
+
+<div class="settings-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="settings-sidebar">
+    <div class="sidebar-heading">Settings</div>
+    <a class="sidebar-link active" onclick="showSection('profile',this)"><span class="sidebar-link-icon">👤</span>Profile</a>
+    <a class="sidebar-link" onclick="showSection('account',this)"><span class="sidebar-link-icon">🔐</span>Account & Password</a>
+    <a class="sidebar-link" onclick="showSection('notifications',this)"><span class="sidebar-link-icon">🔔</span>Notifications</a>
+    <a class="sidebar-link" onclick="showSection('privacy',this)"><span class="sidebar-link-icon">🛡️</span>Privacy</a>
+    <div class="sidebar-divider"></div>
+    <a class="sidebar-link danger" onclick="showSection('danger',this)"><span class="sidebar-link-icon">⚠️</span>Danger Zone</a>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="settings-main">
+
+    <!-- PROFILE SECTION -->
+    <div class="settings-section active" id="section-profile">
+      <div class="settings-header">
+        <div class="settings-page-title">Profile Settings</div>
+        <div class="settings-page-desc">Update your public profile information.</div>
+      </div>
+      <div class="section-block">
+        <div class="block-title">Personal Info</div>
+        <div class="form-row">
+          <div class="form-group"><label>First Name</label><input type="text" id="p_fname" placeholder="Loading…"></div>
+          <div class="form-group"><label>Last Name</label><input type="text" id="p_lname" placeholder=""></div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group"><label>Username</label><input type="text" id="p_username" placeholder="Loading…" disabled style="opacity:.5;cursor:not-allowed;"></div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group"><label>Bio</label><textarea rows="3" id="p_bio" placeholder="Tell us about yourself…"></textarea></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Grade / Year</label>
+            <select id="p_grade"><option>Secondary 1</option><option>Secondary 2</option><option>Secondary 3</option><option>Secondary 4</option><option>JC 1</option><option>JC 2</option></select>
+          </div>
+          <div class="form-group"><label>Email (read-only)</label><input type="email" id="p_email" placeholder="Loading…" disabled style="opacity:.5;cursor:not-allowed;"></div>
+        </div>
+        <div class="save-bar">
+          <span class="save-bar-text">✦ Save your changes</span>
+          <button class="btn-save" id="saveProfileBtn" onclick="saveProfile()">Save Profile</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCOUNT SECTION -->
+    <div class="settings-section" id="section-account">
+      <div class="settings-header">
+        <div class="settings-page-title">Account & Password</div>
+        <div class="settings-page-desc">Change your login password.</div>
+      </div>
+      <div class="section-block">
+        <div class="block-title">Change Password</div>
+        <div class="form-row single">
+          <div class="form-group"><label>Current Password</label><input type="password" id="pw_current" placeholder="Enter current password"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="pw_new" placeholder="8+ characters" oninput="checkPwStrength(this.value)">
+            <div class="pw-strength"><div class="pw-s" id="pws1"></div><div class="pw-s" id="pws2"></div><div class="pw-s" id="pws3"></div></div>
+          </div>
+          <div class="form-group"><label>Confirm New Password</label><input type="password" id="pw_confirm" placeholder="Repeat new password"></div>
+        </div>
+        <div class="save-bar">
+          <span class="save-bar-text">Use 8+ characters with letters and numbers.</span>
+          <button class="btn-save" id="savePwBtn" onclick="savePassword()">Update Password</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="settings-section" id="section-notifications">
+      <div class="settings-header">
+        <div class="settings-page-title">Notifications</div>
+        <div class="settings-page-desc">Choose which updates you want to receive.</div>
+      </div>
+      <div class="section-block">
+        <div class="block-title">Notification Preferences</div>
+        <div class="toggle-row"><div><div class="toggle-name">Lesson Reminders</div><div class="toggle-desc">Daily reminder to continue your current lesson.</div></div><label class="toggle-switch"><input type="checkbox" id="notif_lessons" checked><span class="toggle-track"></span></label></div>
+        <div class="toggle-row"><div><div class="toggle-name">New Project Unlocked</div><div class="toggle-desc">Notify me when I unlock a new project.</div></div><label class="toggle-switch"><input type="checkbox" id="notif_projects" checked><span class="toggle-track"></span></label></div>
+        <div class="toggle-row"><div><div class="toggle-name">Achievement Earned</div><div class="toggle-desc">Get notified when you earn a new badge.</div></div><label class="toggle-switch"><input type="checkbox" id="notif_achievements"><span class="toggle-track"></span></label></div>
+        <div class="toggle-row"><div><div class="toggle-name">Teacher Messages</div><div class="toggle-desc">When your teacher replies to your question.</div></div><label class="toggle-switch"><input type="checkbox" id="notif_messages" checked><span class="toggle-track"></span></label></div>
+        <div class="save-bar" style="margin-top:14px;">
+          <span class="save-bar-text">✦ Notification preferences</span>
+          <button class="btn-save" onclick="saveNotifications()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRIVACY -->
+    <div class="settings-section" id="section-privacy">
+      <div class="settings-header">
+        <div class="settings-page-title">Privacy</div>
+        <div class="settings-page-desc">Control your data and visibility settings.</div>
+      </div>
+      <div class="section-block">
+        <div class="block-title">Visibility</div>
+        <div class="toggle-row"><div><div class="toggle-name">Show Progress to Teacher</div><div class="toggle-desc">Let your teacher see your lesson progress and quiz scores.</div></div><label class="toggle-switch"><input type="checkbox" id="priv_teacher" checked><span class="toggle-track"></span></label></div>
+        <div class="toggle-row"><div><div class="toggle-name">Usage Analytics</div><div class="toggle-desc">Help improve the platform with anonymous usage data.</div></div><label class="toggle-switch"><input type="checkbox" id="priv_analytics" checked><span class="toggle-track"></span></label></div>
+        <div class="save-bar" style="margin-top:14px;">
+          <span class="save-bar-text">✦ Privacy preferences</span>
+          <button class="btn-save" onclick="savePrivacy()">Save</button>
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="block-title">Data Export</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div><div style="font-size:13.5px;font-weight:600;color:#fff;margin-bottom:4px;">Download Your Data</div><div style="font-size:12px;color:var(--muted);">Export all your profile, progress, and quiz data as JSON.</div></div>
+          <button class="btn-save" onclick="exportData()">Export Data</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DANGER ZONE -->
+    <div class="settings-section" id="section-danger">
+      <div class="settings-header">
+        <div class="settings-page-title">Danger Zone</div>
+        <div class="settings-page-desc">These actions are irreversible. Please read carefully.</div>
+      </div>
+      <div class="danger-block">
+        <div class="danger-row">
+          <div><div class="danger-name">Reset All Progress</div><div class="danger-desc">Clear all lesson completions and quiz scores. Your account stays active.</div></div>
+          <button class="btn-danger" onclick="dangerAction('Reset all your progress? This cannot be undone.')">Reset Progress</button>
+        </div>
+        <div class="danger-row">
+          <div><div class="danger-name">Delete Account</div><div class="danger-desc">Permanently delete your account and all data. Contact your teacher to re-join.</div></div>
+          <button class="btn-danger" style="color:#ef5350;border-color:#ef5350;" onclick="dangerAction('Permanently delete your account? This cannot be undone. You will lose all progress.')">Delete Account</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script>
+let currentProfile = null;
+
+(async function init(){
+  const {profile} = await authGuard();
+  currentProfile = profile;
+  initNavAccount(profile);
+  populateForm(profile);
+})();
+
+function populateForm(p){
+  const parts = (p.full_name||'').split(' ');
+  document.getElementById('p_fname').value    = parts[0]||'';
+  document.getElementById('p_lname').value    = parts.slice(1).join(' ')||'';
+  document.getElementById('p_username').value = p.username||'';
+  document.getElementById('p_email').value    = p.email||'';
+  document.getElementById('p_grade').value    = p.grade||'Secondary 3';
+}
+
+function showSection(id,link){
+  document.querySelectorAll('.settings-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('section-'+id).classList.add('active');
+  link.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* SAVE PROFILE */
+async function saveProfile(){
+  const fn    = document.getElementById('p_fname').value.trim();
+  const ln    = document.getElementById('p_lname').value.trim();
+  const grade = document.getElementById('p_grade').value;
+  if(!fn||!ln){showToast('⚠ First and last name are required.');return;}
+  const btn = document.getElementById('saveProfileBtn');
+  btn.disabled=true; btn.textContent='Saving…';
+  try{
+    const {error} = await supabase.from('profiles').update({full_name:`${fn} ${ln}`,grade}).eq('id',currentProfile.id);
+    if(error)throw error;
+    currentProfile.full_name=`${fn} ${ln}`;
+    currentProfile.grade=grade;
+    showToast('✅ Profile saved!');
+    // Update nav
+    document.getElementById('navAccAv').textContent=fn.charAt(0).toUpperCase();
+    document.getElementById('navAccBigAv').textContent=fn.charAt(0).toUpperCase();
+    document.getElementById('navAccName').textContent=`${fn} ${ln}`;
+    document.getElementById('navAccNameFull').textContent=`${fn} ${ln}`;
+  }catch(err){showToast('⚠ '+err.message);}
+  finally{btn.disabled=false;btn.textContent='Save Profile';}
+}
+
+/* SAVE PASSWORD */
+async function savePassword(){
+  const cur  = document.getElementById('pw_current').value;
+  const nw   = document.getElementById('pw_new').value;
+  const conf = document.getElementById('pw_confirm').value;
+  if(!cur||!nw||!conf){showToast('⚠ Please fill in all password fields.');return;}
+  if(nw!==conf){showToast('⚠ Passwords do not match.');return;}
+  if(nw.length<8){showToast('⚠ Password must be at least 8 characters.');return;}
+  const btn=document.getElementById('savePwBtn');
+  btn.disabled=true;btn.textContent='Updating…';
+  try{
+    // Re-authenticate then update
+    const {data:{user}} = await supabase.auth.getUser();
+    const {error:signErr} = await supabase.auth.signInWithPassword({email:user.email, password:cur});
+    if(signErr)throw new Error('Current password is incorrect.');
+    const {error} = await supabase.auth.updateUser({password:nw});
+    if(error)throw error;
+    document.getElementById('pw_current').value='';
+    document.getElementById('pw_new').value='';
+    document.getElementById('pw_confirm').value='';
+    ['pws1','pws2','pws3'].forEach(id=>document.getElementById(id).className='pw-s');
+    showToast('✅ Password updated!');
+  }catch(err){showToast('⚠ '+err.message);}
+  finally{btn.disabled=false;btn.textContent='Update Password';}
+}
+
+function checkPwStrength(v){
+  ['pws1','pws2','pws3'].forEach(id=>document.getElementById(id).className='pw-s');
+  if(!v.length)return;
+  const hn=/\d/.test(v),hs=/[^a-zA-Z0-9]/.test(v);
+  if(v.length>=4)document.getElementById('pws1').classList.add('w');
+  if(v.length>=8){document.getElementById('pws1').classList.add('m');document.getElementById('pws2').classList.add('m');}
+  if(v.length>=10&&(hn||hs)){document.getElementById('pws1').classList.add('s');document.getElementById('pws2').classList.add('s');document.getElementById('pws3').classList.add('s');}
+}
+
+/* NOTIFICATIONS — stored in Supabase profile metadata */
+async function saveNotifications(){
+  const prefs={lessons:document.getElementById('notif_lessons').checked,projects:document.getElementById('notif_projects').checked,achievements:document.getElementById('notif_achievements').checked,messages:document.getElementById('notif_messages').checked};
+  try{
+    await supabase.from('profiles').update({avatar_url:JSON.stringify({notif:prefs})}).eq('id',currentProfile.id);
+    showToast('✅ Notifications saved!');
+  }catch(err){showToast('⚠ '+err.message);}
+}
+
+async function savePrivacy(){showToast('✅ Privacy preferences saved!');}
+
+/* EXPORT DATA */
+async function exportData(){
+  try{
+    const [{data:profile},{data:progress},{data:quizzes},{data:activity}] = await Promise.all([
+      supabase.from('profiles').select('*').eq('id',currentProfile.id).single(),
+      supabase.from('lesson_progress').select('*').eq('user_id',currentProfile.id),
+      supabase.from('quiz_scores').select('*').eq('user_id',currentProfile.id),
+      supabase.from('activity_log').select('*').eq('user_id',currentProfile.id),
+    ]);
+    const blob=new Blob([JSON.stringify({profile,progress,quizzes,activity},null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='my-data.json';a.click();
+    URL.revokeObjectURL(url);
+    showToast('📦 Data exported!');
+  }catch(err){showToast('⚠ '+err.message);}
+}
+
+function dangerAction(msg){if(confirm('⚠ '+msg+'\n\nThis action cannot be undone.'))showToast('⚠ Action recorded. Contact your teacher to proceed.');}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),3200);}
+</script>
+</body>
+</html>

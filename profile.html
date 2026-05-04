@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile — Logo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/responsive.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--teal:#307fff;--teal-dark:#0123ac;--teal-light:rgba(0, 47, 157, 0.12);--orange:#e8500a;--dark:#050708;--dark2:#0c0f10;--dark3:#141819;--border:rgba(255,255,255,0.08);--muted:rgba(255,255,255,0.45);--faint:rgba(255,255,255,0.05);}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--dark);color:#fff;min-height:100vh;}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 40px;gap:24px;background:rgba(5,7,8,0.88);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'Fraunces',serif;font-size:24px;font-weight:900;font-style:italic;color:var(--teal);letter-spacing:-1px;text-decoration:none;text-shadow:0 0 28px rgba(0,151,157,0.35);}
+.nav-links{display:flex;gap:4px;list-style:none;}
+.nav-links a{font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;padding:6px 13px;border-radius:8px;transition:all .2s;}
+.nav-links a:hover{background:var(--teal-light);color:var(--teal);}
+.nav-right{display:flex;align-items:center;justify-content:flex-end;gap:10px;}
+.account-wrap{position:relative;}
+.nav-account{display:flex;align-items:center;gap:8px;background:var(--teal);color:#fff;border:none;padding:7px 16px 7px 9px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+.nav-account:hover{background:var(--teal-dark);}
+.acc-av{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+.account-dropdown{position:absolute;top:calc(100% + 10px);right:0;width:280px;background:#181c1e;border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .22s,transform .22s;z-index:300;}
+.account-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0);}
+.acc-header{background:linear-gradient(135deg,#00979d,#007a7f);padding:20px 18px;display:flex;align-items:center;gap:14px;}
+.acc-big-avatar{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;border:2px solid rgba(255,255,255,0.3);flex-shrink:0;}
+.acc-name-el{font-size:14px;font-weight:700;color:#fff;}
+.acc-email-el{font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;}
+.acc-progress-wrap{padding:14px 16px;border-bottom:1px solid var(--border);}
+.acc-progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:7px;}
+.acc-progress-bar{height:5px;background:rgba(255,255,255,0.08);border-radius:100px;overflow:hidden;}
+.acc-progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-dark));border-radius:100px;transition:width .6s ease;}
+.acc-progress-count{font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;}
+.acc-menu{padding:6px;}
+.acc-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;text-decoration:none;color:rgba(255,255,255,0.8);font-size:13px;font-weight:500;transition:background .15s;}
+.acc-item:hover{background:rgba(0,151,157,0.1);color:var(--teal);}
+.acc-item-icon{width:30px;height:30px;border-radius:8px;background:var(--faint);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.acc-divider{height:1px;background:var(--border);margin:4px 12px;}
+.acc-logout{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:#f28b82;transition:background .15s;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:4px;}
+.acc-logout:hover{background:rgba(242,139,130,0.08);}
+.back-btn{position:fixed;top:78px;left:36px;z-index:210;display:flex;align-items:center;gap:7px;background:rgba(5,7,8,0.88);border:1px solid var(--border);color:rgba(255,255,255,0.7);padding:7px 15px 7px 11px;border-radius:100px;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:none;backdrop-filter:blur(10px);transition:all .22s;}
+.back-btn:hover{background:var(--teal-light);border-color:var(--teal);color:#fff;transform:translateX(-2px);}
+.back-btn svg{width:13px;}
+
+.page{padding:120px 80px 80px;max-width:1100px;margin:0 auto;}
+
+/* HERO */
+.profile-hero{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:28px;padding:36px;background:var(--dark3);border:1px solid var(--border);border-radius:24px;margin-bottom:24px;position:relative;overflow:hidden;}
+.profile-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(0,151,157,0.07) 0%,transparent 60%);pointer-events:none;}
+.avatar-wrap{position:relative;z-index:1;}
+.avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-dark));display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;border:3px solid rgba(0,151,157,0.35);box-shadow:0 0 0 6px rgba(0,151,157,0.07);}
+.profile-info{position:relative;z-index:1;}
+.profile-name{font-family:'Fraunces',serif;font-size:30px;font-weight:900;letter-spacing:-1px;margin-bottom:3px;}
+.profile-handle{font-size:13px;color:var(--teal);font-family:'DM Mono',monospace;margin-bottom:10px;}
+.profile-badges{display:flex;gap:8px;flex-wrap:wrap;}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 12px;border-radius:100px;border:1px solid;}
+.badge.teal{background:var(--teal-light);border-color:rgba(0,151,157,0.3);color:var(--teal);}
+.badge.orange{background:rgba(232,80,10,0.12);border-color:rgba(232,80,10,0.3);color:#ff8a65;}
+.profile-mini-stats{display:flex;flex-direction:column;gap:10px;align-items:flex-end;position:relative;z-index:1;}
+.mini-stat{text-align:right;}
+.mini-stat-val{font-family:'Fraunces',serif;font-size:26px;font-weight:900;color:var(--teal);line-height:1;}
+.mini-stat-label{font-size:11px;color:var(--muted);margin-top:1px;}
+
+/* GRID */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:24px;}
+.profile-grid.two{grid-template-columns:1.4fr 1fr;}
+
+/* STAT CARDS */
+.stat-card{background:var(--dark3);border:1px solid var(--border);border-radius:16px;padding:22px;transition:all .3s;}
+.stat-card:hover{border-color:rgba(0,151,157,0.2);transform:translateY(-2px);box-shadow:0 10px 36px rgba(0,0,0,0.3);}
+.stat-icon{font-size:26px;margin-bottom:10px;}
+.stat-val{font-family:'Fraunces',serif;font-size:36px;font-weight:900;color:#fff;line-height:1;margin-bottom:3px;}
+.stat-label{font-size:12px;color:var(--muted);}
+.stat-sub{font-size:11px;color:rgba(0,151,157,0.7);margin-top:5px;font-family:'DM Mono',monospace;}
+
+/* FULL CARD */
+.full-card{background:var(--dark3);border:1px solid var(--border);border-radius:16px;padding:26px;margin-bottom:24px;}
+.section-title{font-family:'Fraunces',serif;font-size:20px;font-weight:900;letter-spacing:-.4px;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.section-title::before{content:'';width:14px;height:3px;background:var(--teal);border-radius:2px;flex-shrink:0;}
+
+/* PROGRESS ROWS */
+.progress-row{display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.progress-row:last-child{border-bottom:none;}
+.progress-icon{font-size:20px;width:38px;text-align:center;flex-shrink:0;}
+.progress-info{flex:1;}
+.progress-name{font-size:13px;font-weight:600;color:#fff;margin-bottom:5px;}
+.progress-bar-wrap{height:5px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;}
+.progress-bar-fill{height:100%;border-radius:100px;transition:width .8s ease;}
+.progress-bar-fill.teal{background:linear-gradient(90deg,var(--teal),#00bfbf);}
+.progress-bar-fill.orange{background:linear-gradient(90deg,var(--orange),#ff8a65);}
+.progress-bar-fill.gray{background:rgba(255,255,255,0.12);}
+.progress-pct{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;width:36px;text-align:right;flex-shrink:0;}
+
+/* PROJECTS */
+.projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.proj-mini{background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:16px;transition:all .22s;cursor:pointer;}
+.proj-mini:hover{border-color:rgba(0,151,157,0.25);transform:translateY(-2px);}
+.proj-mini-icon{font-size:26px;margin-bottom:8px;}
+.proj-mini-name{font-size:12.5px;font-weight:700;color:#fff;margin-bottom:6px;}
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;}
+.status-badge.done{background:rgba(102,187,106,0.12);color:#66bb6a;border:1px solid rgba(102,187,106,0.22);}
+.status-badge.wip{background:rgba(255,152,0,0.12);color:#ffa726;border:1px solid rgba(255,152,0,0.22);}
+.status-badge.locked{background:var(--faint);color:var(--muted);border:1px solid var(--border);}
+
+/* ACTIVITY */
+.activity-list{display:flex;flex-direction:column;gap:10px;}
+.activity-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--dark2);border:1px solid var(--border);border-radius:11px;transition:all .2s;}
+.activity-item:hover{border-color:rgba(0,151,157,0.18);}
+.act-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.act-dot.teal{background:var(--teal);box-shadow:0 0 6px rgba(0,151,157,0.5);}
+.act-dot.orange{background:var(--orange);}
+.act-dot.purple{background:#7c3aed;}
+.act-text{font-size:13px;color:#fff;flex:1;} .act-text span{color:var(--teal);font-weight:600;}
+.act-time{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap;}
+
+/* ACHIEVEMENTS */
+.achievements-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.achievement{background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:center;transition:all .22s;}
+.achievement:hover{border-color:rgba(0,151,157,0.22);transform:translateY(-2px);}
+.achievement.locked{opacity:.35;filter:grayscale(1);}
+.achievement-icon{font-size:34px;margin-bottom:7px;}
+.achievement-name{font-size:11px;font-weight:700;color:#fff;margin-bottom:3px;}
+.achievement-desc{font-size:10px;color:var(--muted);line-height:1.4;}
+
+/* SKELETON */
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.04) 75%);background-size:200% 100%;animation:skel 1.5s infinite;border-radius:8px;}
+@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(70px);background:#181c1e;border:1px solid rgba(0,151,157,0.35);border-radius:12px;padding:12px 24px;font-size:13px;font-weight:600;color:#fff;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.5);transition:transform .35s cubic-bezier(.34,1.1,.64,1),opacity .35s;opacity:0;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div><a class="nav-logo" href="arduino.html">Logo</a></div>
+  <div><ul class="nav-links">
+    <li><a href="arduino.html">Home</a></li>
+    <li><a href="components.html">Components</a></li>
+    <li><a href="mblock.html">Learn</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="arduino.html#contact">Contact</a></li>
+  </ul></div>
+  <div class="nav-right">
+    <div class="account-wrap">
+      <button class="nav-account" data-acc-toggle>
+        <div class="acc-av" id="navAccAv">?</div>
+        <span id="navAccName">Account</span>
+      </button>
+      <div class="account-dropdown" id="accountDropdown">
+        <div class="acc-header">
+          <div class="acc-big-avatar" id="navAccBigAv">?</div>
+          <div>
+            <div class="acc-name-el" id="navAccNameFull">Loading…</div>
+            <div class="acc-email-el" id="navAccEmail"></div>
+          </div>
+        </div>
+        <div class="acc-progress-wrap">
+          <div class="acc-progress-label"><span>Lessons Completed</span><span id="navProgressPct">0%</span></div>
+          <div class="acc-progress-bar"><div class="acc-progress-fill" id="navProgressFill" style="width:0%"></div></div>
+          <div class="acc-progress-count" id="navProgressCount">0 / 50 lessons</div>
+        </div>
+        <div class="acc-menu">
+          <a class="acc-item" href="profile.html"><div class="acc-item-icon">👤</div>View Profile</a>
+          <a class="acc-item" href="projects.html"><div class="acc-item-icon">🔧</div>Your Projects</a>
+          <div class="acc-divider"></div>
+          <a class="acc-item" href="settings.html"><div class="acc-item-icon">⚙️</div>Settings</a>
+          <div class="acc-divider"></div>
+          <button class="acc-logout" onclick="handleLogout()">🚪 Log Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<a class="back-btn" href="arduino.html">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  Back to Home
+</a>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="profile-hero reveal" id="profileHero">
+    <div class="avatar-wrap">
+      <div class="avatar" id="profileAv">?</div>
+    </div>
+    <div class="profile-info">
+      <div class="profile-name" id="profileName"><div class="skeleton" style="height:32px;width:200px;"></div></div>
+      <div class="profile-handle" id="profileHandle"></div>
+      <div class="profile-badges" id="profileBadges"></div>
+    </div>
+    <div class="profile-mini-stats">
+      <div class="mini-stat"><div class="mini-stat-val" id="miniPct">—</div><div class="mini-stat-label">Overall Progress</div></div>
+      <div class="mini-stat"><div class="mini-stat-val" id="miniProj">—</div><div class="mini-stat-label">Projects Done</div></div>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="profile-grid reveal" style="margin-bottom:24px;">
+    <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-val" id="statLessons">—</div><div class="stat-label">Lessons Completed</div><div class="stat-sub" id="statLessonsSub">out of 50 total</div></div>
+    <div class="stat-card"><div class="stat-icon">🔧</div><div class="stat-val" id="statProjs">—</div><div class="stat-label">Projects Finished</div><div class="stat-sub" id="statProjsSub"></div></div>
+    <div class="stat-card"><div class="stat-icon">🧠</div><div class="stat-val" id="statQuizzes">—</div><div class="stat-label">Quizzes Taken</div><div class="stat-sub" id="statQuizSub"></div></div>
+  </div>
+
+  <!-- LEARNING PROGRESS -->
+  <div class="full-card reveal">
+    <div class="section-title">Learning Progress</div>
+    <div id="progressRows"><div class="skeleton" style="height:44px;margin-bottom:8px;"></div><div class="skeleton" style="height:44px;margin-bottom:8px;"></div><div class="skeleton" style="height:44px;"></div></div>
+  </div>
+
+  <!-- PROJECTS + ACTIVITY -->
+  <div class="profile-grid two reveal" style="margin-bottom:24px;">
+    <div class="full-card" style="margin-bottom:0;">
+      <div class="section-title">Your Projects</div>
+      <div class="projects-grid" id="projectsGrid"><div class="skeleton" style="height:80px;"></div></div>
+    </div>
+    <div class="full-card" style="margin-bottom:0;">
+      <div class="section-title">Recent Activity</div>
+      <div class="activity-list" id="activityList"><div class="skeleton" style="height:44px;margin-bottom:8px;"></div></div>
+    </div>
+  </div>
+
+  <!-- QUIZ SCORES -->
+  <div class="full-card reveal">
+    <div class="section-title">Quiz History</div>
+    <div id="quizHistory"><div class="skeleton" style="height:44px;"></div></div>
+  </div>
+
+  <!-- ACHIEVEMENTS -->
+  <div class="full-card reveal">
+    <div class="section-title">Achievements</div>
+    <div class="achievements-grid" id="achievementGrid"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script>
+const LESSONS = [
+  {id:'proj1', name:'Light It Up',     icon:'💡'},
+  {id:'proj2', name:'Light Coding',    icon:'✨'},
+  {id:'proj3', name:'Switch It Up',    icon:'🔘'},
+  {id:'proj4', name:'Electric Piano',  icon:'🎹'},
+  {id:'proj5', name:'Reaction Race',   icon:'🏁'},
+  {id:'cpp_vars',    name:'C++ Variables',   icon:'💻'},
+  {id:'cpp_loops',   name:'C++ Loops',       icon:'💻'},
+  {id:'cpp_funcs',   name:'C++ Functions',   icon:'💻'},
+];
+
+const ACHIEVEMENTS = [
+  {icon:'⚡', name:'First Blink',    desc:'Made your first LED blink',       key:'first_blink'},
+  {icon:'🔥', name:'5-Day Streak',   desc:'Logged in 5 days in a row',       key:'streak_5'},
+  {icon:'🏆', name:'Quiz Master',    desc:'Scored 100% on a quiz',           key:'quiz_100'},
+  {icon:'🎹', name:'Music Maker',    desc:'Built the Electric Piano',        key:'piano_done'},
+  {icon:'🤖', name:'Robot Builder',  desc:'Complete the Robot Car project',  key:'robot_done'},
+  {icon:'📡', name:'Wireless Wizard',desc:'Use Bluetooth in a project',      key:'bt_done'},
+  {icon:'🚀', name:'C++ Pro',        desc:'Complete all C++ lessons',        key:'cpp_done'},
+  {icon:'🎓', name:'Graduate',       desc:'Finish all 50 lessons',           key:'graduate'},
+];
+
+function timeAgo(ts){
+  if(!ts)return '—';
+  const d=Date.now()-new Date(ts).getTime(),m=Math.floor(d/60000);
+  if(m<2)return 'Just now';if(m<60)return m+'m ago';
+  const h=Math.floor(m/60);if(h<24)return h+'h ago';
+  return Math.floor(h/24)+'d ago';
+}
+
+(async function init(){
+  const {session, profile} = await authGuard();
+  initNavAccount(profile);
+  await loadProfile(profile, session);
+})();
+
+async function loadProfile(profile, session){
+  // Set hero
+  const letter = (profile.full_name||profile.username||'?').charAt(0).toUpperCase();
+  document.getElementById('profileAv').textContent      = letter;
+  document.getElementById('profileName').textContent    = profile.full_name || profile.username;
+  document.getElementById('profileHandle').textContent  = '@'+profile.username+' · '+profile.email;
+
+  // Fetch progress + quizzes + activity in parallel
+  const [progressRes, quizRes, activityRes] = await Promise.all([
+    apiFetch('/api/progress'),
+    apiFetch('/api/quiz/scores'),
+    supabase.from('activity_log').select('*').eq('user_id', profile.id).order('created_at',{ascending:false}).limit(8),
+  ]);
+
+  const progressRows = progressRes.progress || [];
+  const quizScores   = quizRes.scores || [];
+  const activityRows = activityRes.data || [];
+
+  // Aggregate stats
+  const completed   = progressRows.filter(r=>r.completed).length;
+  const totalPct    = progressRows.length ? Math.round(progressRows.reduce((s,r)=>s+r.progress_pct,0)/Math.max(progressRows.length,1)) : 0;
+  const projsDone   = progressRows.filter(r=>r.lesson_id.startsWith('proj')&&r.completed).length;
+
+  document.getElementById('miniPct').textContent        = totalPct+'%';
+  document.getElementById('miniProj').textContent       = projsDone;
+  document.getElementById('statLessons').textContent    = completed;
+  document.getElementById('statLessonsSub').textContent = 'out of 50 total lessons';
+  document.getElementById('statProjs').textContent      = projsDone;
+  document.getElementById('statProjsSub').textContent   = (LESSONS.filter(l=>l.id.startsWith('proj')).length - projsDone)+' in progress';
+  document.getElementById('statQuizzes').textContent    = quizScores.length;
+  document.getElementById('statQuizSub').textContent    = quizScores.length ? 'avg '+ Math.round(quizScores.reduce((s,q)=>s+(q.score/q.max_score)*100,0)/quizScores.length)+'%' : '—';
+
+  // Streak badge
+  const badges = [`<span class="badge teal">⚡ Arduino Learner</span>`];
+  if(profile.streak_days>=5) badges.push(`<span class="badge orange">🔥 ${profile.streak_days}-Day Streak</span>`);
+  if(completed>=10) badges.push(`<span class="badge teal">📚 Dedicated Learner</span>`);
+  document.getElementById('profileBadges').innerHTML = badges.join('');
+
+  // Progress rows
+  const progressMap = Object.fromEntries(progressRows.map(r=>[r.lesson_id, r]));
+  document.getElementById('progressRows').innerHTML = LESSONS.map(l=>{
+    const row = progressMap[l.id];
+    const pct = row?.progress_pct || 0;
+    const colorClass = pct===100 ? 'teal' : pct>0 ? 'orange' : 'gray';
+    const color      = pct===100 ? 'var(--teal)' : pct>0 ? '#ffa726' : 'var(--muted)';
+    return `<div class="progress-row">
+      <div class="progress-icon">${l.icon}</div>
+      <div class="progress-info">
+        <div class="progress-name">${l.name}</div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill ${colorClass}" style="width:${pct}%"></div></div>
+      </div>
+      <div class="progress-pct" style="color:${color};">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  // Projects grid
+  const projDefs = [
+    {id:'proj1',icon:'💡',name:'Light It Up'},
+    {id:'proj2',icon:'✨',name:'Light Coding'},
+    {id:'proj3',icon:'🔘',name:'Switch It Up'},
+    {id:'proj4',icon:'🎹',name:'Electric Piano'},
+    {id:'proj5',icon:'🏁',name:'Reaction Race'},
+    {id:'proj6',icon:'🌡️',name:'Weather Station'},
+  ];
+  document.getElementById('projectsGrid').innerHTML = projDefs.map(p=>{
+    const row=progressMap[p.id];
+    const pct=row?.progress_pct||0;
+    let cls='locked', lbl='🔒 Locked';
+    if(pct>=100){cls='done';lbl='✓ Done';}
+    else if(pct>0){cls='wip';lbl='⏳ In Progress';}
+    else if(p.id==='proj1'||progressMap['proj'+( parseInt(p.id.replace('proj',''))-1)]?.completed){cls='';lbl='Start →';}
+    return `<div class="proj-mini"><div class="proj-mini-icon">${p.icon}</div><div class="proj-mini-name">${p.name}</div><span class="status-badge ${cls}">${lbl}</span></div>`;
+  }).join('');
+
+  // Activity
+  const dotMap={lesson_completed:'teal',quiz_submitted:'teal',login:'teal',account_created:'purple'};
+  document.getElementById('activityList').innerHTML = activityRows.length
+    ? activityRows.map(a=>`<div class="activity-item"><div class="act-dot ${dotMap[a.action]||'orange'}"></div><div class="act-text">${a.details||a.action}</div><div class="act-time">${timeAgo(a.created_at)}</div></div>`).join('')
+    : `<div style="color:var(--muted);font-size:13px;padding:12px 0;">No activity yet — start a lesson!</div>`;
+
+  // Quiz history
+  document.getElementById('quizHistory').innerHTML = quizScores.length
+    ? `<table style="width:100%;border-collapse:collapse;">
+        <thead><tr>
+          <th style="text-align:left;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;padding:8px 12px;background:rgba(0,151,157,0.05);border-bottom:1px solid var(--border);">Quiz</th>
+          <th style="text-align:left;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;padding:8px 12px;background:rgba(0,151,157,0.05);border-bottom:1px solid var(--border);">Score</th>
+          <th style="text-align:left;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;padding:8px 12px;background:rgba(0,151,157,0.05);border-bottom:1px solid var(--border);">When</th>
+        </tr></thead>
+        <tbody>${quizScores.map(q=>{
+          const pct=Math.round((q.score/q.max_score)*100);
+          const col=pct>=80?'#66bb6a':pct>=50?'#ffa726':'#ef9a9a';
+          return `<tr>
+            <td style="padding:10px 12px;font-size:13px;color:#fff;border-bottom:1px solid rgba(255,255,255,0.04);">${q.quiz_name}</td>
+            <td style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04);"><span style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:${col};">${q.score}/${q.max_score} (${pct}%)</span></td>
+            <td style="padding:10px 12px;font-size:12px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.04);font-family:'DM Mono',monospace;">${timeAgo(q.taken_at)}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>`
+    : `<div style="color:var(--muted);font-size:13px;padding:12px 0;">No quizzes taken yet — complete a lesson to unlock quizzes.</div>`;
+
+  // Achievements — determine which are unlocked
+  const unlocked = new Set();
+  if(progressRows.some(r=>r.lesson_id==='proj1'&&r.completed)) unlocked.add('first_blink');
+  if(profile.streak_days>=5) unlocked.add('streak_5');
+  if(quizScores.some(q=>q.score===q.max_score)) unlocked.add('quiz_100');
+  if(progressRows.some(r=>r.lesson_id==='proj4'&&r.completed)) unlocked.add('piano_done');
+
+  document.getElementById('achievementGrid').innerHTML = ACHIEVEMENTS.map(a=>`
+    <div class="achievement ${unlocked.has(a.key)?'':'locked'}">
+      <div class="achievement-icon">${a.icon}</div>
+      <div class="achievement-name">${a.name}</div>
+      <div class="achievement-desc">${a.desc}</div>
+    </div>`).join('');
+
+  // Reveal animations
+  const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.08});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),3200);}
+</script>
+</body>
+</html>

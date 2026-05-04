@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arduino Components — Logo 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/responsive.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --teal:#307fff;--teal-dark:#0123ac;--teal-light:rgba(0, 47, 157, 0.12);
+  --orange:#e8500a;--dark:#0a0c0d;--dark2:#111416;--dark3:#181c1e;
+  --border:rgba(255,255,255,0.08);--muted:rgba(255,255,255,0.55);--faint:rgba(255,255,255,0.06);
+}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--dark);color:#fff;height:100vh;overflow:hidden;position:relative;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 40px;background:rgba(10,12,13,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);gap:24px;}
+.nav-logo{font-family:'Fraunces',serif;font-size:24px;font-weight:900;font-style:italic;color:var(--teal);letter-spacing:-1px;text-decoration:none;text-shadow:0 0 28px rgba(0,151,157,0.4);}
+.nav-links{display:flex;gap:4px;list-style:none;}
+.nav-links a{font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;padding:6px 13px;border-radius:8px;transition:all .2s;white-space:nowrap;}
+.nav-links a:hover,.nav-links a.active{background:var(--teal-light);color:var(--teal);}
+.nav-right{display:flex;align-items:center;justify-content:flex-end;gap:10px;}
+.nav-search{display:flex;align-items:center;background:var(--faint);border:1.5px solid var(--border);border-radius:100px;padding:0 14px;height:34px;gap:8px;transition:border-color .2s;width:200px;}
+.nav-search:focus-within{border-color:var(--teal);background:rgba(0,151,157,0.06);}
+.nav-search svg{width:13px;color:var(--muted);flex-shrink:0;}
+.nav-search input{background:none;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:12.5px;color:#fff;width:100%;}
+.nav-search input::placeholder{color:rgba(255,255,255,0.25);}
+.nav-account{display:flex;align-items:center;gap:8px;background:var(--teal);color:#fff;border:none;padding:7px 16px 7px 9px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+.nav-account:hover{background:var(--teal-dark);}
+.acc-av{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;}
+.nav-logo .orange{ color: var(--orange);}
+.back-btn{position:fixed;top:78px;left:36px;z-index:210;display:flex;align-items:center;gap:7px;background:rgba(10,12,13,0.88);border:1px solid var(--border);color:rgba(255,255,255,0.7);padding:7px 15px 7px 11px;border-radius:100px;font-size:12.5px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;text-decoration:none;backdrop-filter:blur(10px);transition:all .22s;}
+.back-btn:hover{background:var(--teal-light);border-color:var(--teal);color:#fff;transform:translateX(-2px);}
+.back-btn svg{width:13px;}
+
+.account-wrap{position:relative;}
+.nav-account{display:flex;align-items:center;gap:8px;background:var(--teal);color:#fff;border:none;padding:7px 16px 7px 9px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+.nav-account:hover{background:var(--teal-dark);}
+.acc-av{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;}
+.account-dropdown{position:absolute;top:calc(100% + 10px);right:0;width:280px;background:#181c1e;border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .22s,transform .22s;z-index:300;}
+.account-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0);}
+.acc-header{background:linear-gradient(135deg,#307fff,#0123ac);padding:20px 18px;display:flex;align-items:center;gap:14px;}
+.acc-big-avatar{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid rgba(255,255,255,0.3);flex-shrink:0;}
+.acc-name{font-size:14px;font-weight:700;color:#fff;}
+.acc-email{font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;}
+.acc-progress-wrap{padding:14px 16px;border-bottom:1px solid var(--border);}
+.acc-progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:7px;}
+.acc-progress-bar{height:5px;background:rgba(255,255,255,0.08);border-radius:100px;overflow:hidden;}
+.acc-progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-dark));border-radius:100px;}
+.acc-menu{padding:6px;}
+.acc-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;text-decoration:none;color:rgba(255,255,255,0.8);font-size:13px;font-weight:500;transition:background .15s;}
+.acc-item:hover{background:rgba(0,151,157,0.1);color:var(--teal);}
+.acc-item-icon{width:30px;height:30px;border-radius:8px;background:var(--faint);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.acc-divider{height:1px;background:var(--border);margin:4px 12px;}
+.acc-logout{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:#f28b82;transition:background .15s;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:4px;}
+.acc-logout:hover{background:rgba(242,139,130,0.08);}
+.back-btn{position:fixed;top:78px;left:36px;z-index:210;display:flex;align-items:center;gap:7px;background:rgba(5,7,8,0.88);border:1px solid var(--border);color:rgba(255,255,255,0.7);padding:7px 15px 7px 11px;border-radius:100px;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:none;backdrop-filter:blur(10px);transition:all .22s;}
+.back-btn:hover{background:var(--teal-light);border-color:var(--teal);color:#fff;transform:translateX(-2px);}
+.back-btn svg{width:13px;}
+
+/* APP LAYOUT */
+#app{position:fixed;inset:64px 0 0 0;display:flex;flex-direction:column;overflow:hidden;}
+
+/* HERO PANEL */
+#heroPanel{position:relative;flex:1;display:flex;min-height:0;transition:flex .55s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+#app.detail-open #heroPanel{flex:0 0 0px;opacity:0;pointer-events:none;}
+
+#bgLayer{position:absolute;inset:0;transition:background-color .7s ease;background-color:#0d1214;}
+#bgLayer::before{content:'';position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,0.9) 0%,rgba(0,0,0,0.55) 38%,rgba(0,0,0,0.18) 65%,rgba(0,0,0,0.35) 100%);z-index:1;}
+#bgLayer::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,151,157,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,151,157,0.03) 1px,transparent 1px);background-size:50px 50px;z-index:0;}
+#heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;}
+
+.bg-emoji{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:320px;opacity:0.04;z-index:0;user-select:none;pointer-events:none;filter:blur(2px);transition:all .6s ease;}
+
+/* LEFT PANEL */
+.left-panel{position:absolute;left:0;top:0;bottom:0;width:42%;z-index:10;display:flex;flex-direction:column;justify-content:flex-end;padding:0 52px 80px 52px;}
+.comp-category{font-size:11px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:3px;margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.comp-category::before{content:'';display:block;width:26px;height:2px;background:var(--teal);border-radius:2px;}
+.comp-name{font-family:'Fraunces',serif;font-size:clamp(40px,6vw,75px);font-weight:900;line-height:.92;letter-spacing:-2px;color:#fff;text-transform:uppercase;text-shadow:0 4px 40px rgba(0,0,0,0.5);margin-bottom:16px;}
+.comp-desc{font-size:13px;color:var(--muted);line-height:1.75;max-width:320px;margin-bottom:22px;}
+.comp-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:28px;}
+.comp-tag{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:var(--muted);border:1px solid rgba(255,255,255,0.18);padding:3px 11px;border-radius:100px;}
+.comp-tag.teal{border-color:var(--teal);color:var(--teal);background:rgba(0,151,157,0.1);}
+.comp-actions{display:flex;align-items:center;gap:20px;}
+.diff-wrap{display:flex;flex-direction:column;gap:5px;}
+.diff-label{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.diff-dots{display:flex;gap:5px;}
+.diff-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.15);}
+.diff-dot.on{background:var(--teal);box-shadow:0 0 7px rgba(0,151,157,0.6);}
+.btn-learn{background:var(--teal);color:#fff;border:none;padding:12px 28px;border-radius:100px;font-size:13.5px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .22s;box-shadow:0 6px 22px rgba(0,151,157,0.38);}
+.btn-learn:hover{background:var(--teal-dark);transform:translateY(-2px);}
+
+/* counter */
+.comp-counter-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.comp-num{font-family:'Fraunces',serif;font-size:64px;font-weight:900;color:rgba(255,255,255,0.07);line-height:1;letter-spacing:-2px;position:absolute;right:52px;bottom:80px;z-index:10;}
+.progress-bar{width:100%;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;margin-top:8px;}
+.progress-fill{height:100%;background:var(--teal);border-radius:2px;transition:width .4s;}
+
+/* PANEL SWAP */
+@keyframes panelSwap{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.panel-swap{animation:panelSwap .35s ease forwards;}
+
+/* RIGHT CARDS */
+.right-panel{position:absolute;right:0;top:0;bottom:0;width:46%;z-index:10;display:flex;align-items:center;padding:20px 0 80px 20px;overflow:hidden;}
+.cards-track{display:flex;gap:14px;height:100%;align-items:center;will-change:transform;transition:transform .5s cubic-bezier(.34,1.1,.64,1);}
+.comp-card{flex-shrink:0;width:190px;height:290px;border-radius:20px;background:var(--dark3);border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:all .35s cubic-bezier(.34,1.2,.64,1);position:relative;display:flex;flex-direction:column;justify-content:flex-end;transform-style:preserve-3d;}
+.comp-card:hover{transform:translateY(-8px) scale(1.02);border-color:rgba(255,255,255,0.2);box-shadow:0 16px 48px rgba(0,0,0,0.5);}
+.comp-card.active{width:230px;height:360px;border-color:var(--teal);box-shadow:0 0 0 2px var(--teal),0 20px 56px rgba(0,151,157,0.3);transform:translateY(-14px);}
+.comp-card.active:hover{transform:translateY(-18px) scale(1.02);}
+
+.card-visual{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:80px;height:80px;pointer-events:none;transition:all .35s;display:flex;align-items:center;justify-content:center;}
+.card-visual .card-emoji{font-size:72px;line-height:1;opacity:0.6;filter:drop-shadow(0 8px 20px rgba(0,0,0,0.4));transition:all .35s;}
+.card-visual img{width:200%;object-fit:contain;opacity:0.75;filter:drop-shadow(0 8px 20px rgba(0,0,0,0.5)) brightness(0.95);transition:all .35s;}
+.comp-card.active .card-visual{width:100px;height:100px;}
+.comp-card.active .card-visual .card-emoji{font-size:90px;opacity:0.75;}
+.comp-card:hover .card-visual .card-emoji{transform:scale(1.1) rotate(-5deg);}
+
+.card-badge{position:absolute;top:12px;right:12px;background:var(--teal);color:#fff;font-family:'DM Mono',monospace;font-size:9px;font-weight:700;padding:3px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:.5px;}
+.card-badge.hot{background:var(--orange);}
+
+.card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.3) 50%,transparent 100%);z-index:1;}
+.card-info{position:relative;z-index:2;padding:14px;}
+.card-category{font-size:9px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;}
+.card-name{font-family:'Fraunces',serif;font-size:17px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:8px;}
+.card-dots{display:flex;gap:4px;}
+.card-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.12);}
+.card-dot.on{background:var(--teal);box-shadow:0 0 6px rgba(0,151,157,0.5);}
+
+/* NAV ARROWS */
+.nav-arrows{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:10;display:flex;align-items:center;gap:10px;}
+.nav-arrow{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;color:var(--muted);}
+.nav-arrow:hover{background:var(--teal-light);border-color:var(--teal);color:#fff;}
+.nav-arrow svg{width:16px;}
+.nav-hint{font-size:11px;color:rgba(255,255,255,0.2);letter-spacing:1px;}
+
+/* FILTER PILLS */
+.filter-bar{position:absolute;top:50px;left:52px;right:52px;z-index:10;display:flex;gap:8px;flex-wrap:wrap;}
+.filter-pill{font-size:11px;font-weight:600;font-family:'DM Mono',monospace;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:5px 14px;border-radius:100px;cursor:pointer;transition:all .18s;white-space:nowrap;}
+.filter-pill:hover{border-color:var(--teal);color:var(--teal);}
+.filter-pill.active{background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:0 3px 14px rgba(0,151,157,0.3);}
+
+/* DETAIL PANEL */
+#detailPanel{flex:1;background:var(--dark2);overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:var(--teal) transparent;}
+.detail-topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid var(--border);background:var(--dark3);position:sticky;top:0;z-index:20;flex-shrink:0;}
+.detail-crumb{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted); padding-left: 200px;}
+.btn-close-detail{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--muted);padding:7px 16px;border-radius:100px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.btn-close-detail:hover{background:rgba(232,80,10,0.1);border-color:rgba(232,80,10,0.3);color:#ff8a65;}
+.btn-close-detail svg{width:13px;}
+
+.detail-content-wrap{flex:1;padding:40px 48px 60px;display:grid;grid-template-columns:1fr 1fr;gap:36px;max-width:1200px;margin:0 auto;width:100%;}
+.detail-visual{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:28px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;}
+.detail-visual-badge{background:var(--teal-light);border:1px solid rgba(0,151,157,0.3);color:var(--teal);font-size:11px;font-weight:700;padding:5px 14px;border-radius:100px;letter-spacing:1px;text-transform:uppercase;}
+.detail-section-title{font-size:15px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.detail-section-title::before{content:'';width:18px;height:2px;background:var(--teal);border-radius:2px;flex-shrink:0;}
+.detail-component-name{font-family:'Fraunces',serif;font-size:clamp(28px,3vw,40px);font-weight:900;letter-spacing:-1.5px;margin-bottom:8px;}
+.detail-category-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:15px;font-weight:700;color:var(--teal);background:var(--teal-light);border:1px solid rgba(0,151,157,0.25);padding:3px 12px;border-radius:100px;margin-bottom:16px;}
+.detail-desc-full{font-size:15.5px;color:var(--muted);line-height:1.8;margin-bottom:20px;}
+.detail-uses-title{font-size:25px;font-weight:700;color:#fff;margin-bottom:10px;}
+.use-row{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.5;}
+.use-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:6px;}
+
+/* Pinout table */
+.pinout-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px;}
+.pinout-table th{text-align:left;font-size:10.5px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;padding:8px 12px;background:rgba(0,151,157,0.08);border-bottom:1px solid var(--border);}
+.pinout-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--muted);}
+.pinout-table tr:last-child td{border-bottom:none;}
+.pinout-table td:first-child{font-family:'DM Mono',monospace;font-weight:600;color:#fff;font-size:15px;}
+.pin-badge{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:2px 9px;border-radius:6px;white-space:nowrap;}
+.pin-badge.teal{background:var(--teal-light);color:var(--teal);}
+.pin-badge.orange{background:rgba(232,80,10,0.15);color:#ff8a65;}
+.pin-badge{background:var(--faint);color:var(--muted);}
+
+/* Code block */
+.code-block{background:#0d1117;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:0;transition:box-shadow .2s;}
+.code-block:hover{box-shadow:0 0 0 1px rgba(0,151,157,0.25);}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border);}
+.code-lang{font-family:'DM Mono',monospace;font-size:15.5px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:1px;}
+.copy-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:2px 9px;border-radius:5px;font-size:15.5px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .18s;}
+.copy-btn:hover{background:var(--teal-light);border-color:var(--teal);color:var(--teal);}
+pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-size:13px;line-height:1.8;color:#c9d1d9;margin:0;scrollbar-width:thin;}
+.kw{color:#ff7b72;}.fn{color:#d2a8ff;}.cm{color:#8b949e;}.st{color:#a5d6ff;}.nm{color:#79c0ff;}
+
+/* Tip box */
+.tip-box{background:rgba(0,151,157,0.07);border:1px solid rgba(0,151,157,0.2);border-radius:12px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;margin-top:16px;}
+.tip-icon{font-size:20px;flex-shrink:0;}
+.tip-text{font-size:15.5px;color:var(--muted);line-height:1.7;}
+.tip-text strong{color:#fff;}
+
+/* Circuit section */
+.circuit-section{grid-column:1/-1;border-top:1px solid var(--border);padding-top:28px;}
+.circuit-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;}
+.circuit-img-wrap{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all .25s;}
+.circuit-img-wrap:hover{border-color:rgba(0,151,157,0.25);}
+.circuit-img-wrap img{width:100%;display:block;object-fit:cover;}
+.circuit-caption{font-size:15px;color:var(--muted);text-align:center;padding:8px 12px;background:rgba(0,0,0,0.3);font-family:'DM Mono',monospace;}
+.circuit-placeholder{background:rgba(0,151,157,0.04);border:1.5px dashed rgba(0,151,157,0.2);border-radius:12px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;}
+.circuit-placeholder-icon{font-size:28px;}
+.circuit-placeholder-text{font-size:12px;color:var(--muted);line-height:1.6;}
+.circuit-placeholder-text code{display:block;font-family:'DM Mono',monospace;font-size:10px;color:rgba(0,151,157,0.7);margin-top:6px;word-break:break-all;}
+
+/* Bottom nav */
+.detail-bottom-nav{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding-top:28px;border-top:1px solid var(--border);}
+.btn-detail-prev,.btn-detail-next{display:flex;align-items:center;gap:8px;padding:12px 24px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .22s;border:1.5px solid var(--border);background:var(--faint);color:var(--muted);}
+.btn-detail-prev:hover,.btn-detail-next:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-light);}
+.btn-detail-next{background:var(--teal);border-color:var(--teal);color:#fff;}
+.btn-detail-next:hover{background:var(--teal-dark);}
+.btn-detail-next.is-last{background:var(--faint);border-color:var(--border);color:var(--muted);}
+.btn-detail-next.is-last:hover{border-color:var(--teal);color:var(--teal);}
+.btn-detail-prev svg,.btn-detail-next svg{width:14px;}
+
+.cursor-glow{position:fixed;pointer-events:none;z-index:5;width:400px;height:400px;background:radial-gradient(circle,rgba(0,151,157,0.05) 0%,transparent 70%);border-radius:50%;transform:translate(-50%,-50%);}
+</style>
+</head>
+<body>
+<div class="cursor-glow" id="cg"></div>
+
+<nav>
+  <div><a class="nav-logo" href="#">L<span class="orange">A</span></a></div>
+  <div><ul class="nav-links">
+    <li><a href="arduino.html">Home</a></li>
+    <li><a href="components.html" class="active">Components</a></li>
+    <li><a href="mblock.html">Learn</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="arduino.html#contact">Contact</a></li>
+  </ul></div>
+  <div class="nav-right">
+    <div class="nav-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input placeholder="Search…" oninput="navSearch(this.value)">
+    </div>
+    <!-- Account button + dropdown -->
+<div class="account-wrap">
+      <button class="nav-account" onclick="toggleAccount(event)">
+        <div class="acc-av">👤</div>Account
+      </button>
+      <div class="account-dropdown" id="accountDropdown">
+        <div class="acc-header">
+          <div class="acc-big-avatar">👤</div>
+          <div><div class="acc-name">Student Name</div><div class="acc-email">student@school.edu</div></div>
+        </div>
+        <div class="acc-progress-wrap">
+          <div class="acc-progress-label"><span>Lessons Completed</span><span>42%</span></div>
+          <div class="acc-progress-bar"><div class="acc-progress-fill" style="width:42%"></div></div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;">21 / 50 lessons</div>
+        </div>
+        <div class="acc-menu">
+          <a class="acc-item" href="profile.html"><div class="acc-item-icon">👤</div>View Profile</a>
+          <a class="acc-item" href="projects.html"><div class="acc-item-icon">🔧</div>Your Projects</a>
+          <div class="acc-divider"></div>
+          <a class="acc-item" href="settings.html"><div class="acc-item-icon">⚙️</div>Settings</a>
+          <div class="acc-divider"></div>
+          <button class="acc-logout" onclick="logout()">🚪 Log Out</button>
+        </div>
+      </div>
+    </div>
+</nav>
+
+<a class="back-btn" href="arduino.html">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  Back to Home
+</a>
+
+<div id="app">
+  <!-- HERO PANEL -->
+  <div id="heroPanel">
+    <div id="bgLayer"></div>
+    <canvas id="heroCanvas"></canvas>
+    <div class="bg-emoji" id="bgEmoji"></div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="filter-pill active" onclick="filterComps('all',this)">All</div>
+      <div class="filter-pill" onclick="filterComps('input',this)">Input</div>
+      <div class="filter-pill" onclick="filterComps('output',this)">Output</div>
+      <div class="filter-pill" onclick="filterComps('sensor',this)">Sensors</div>
+      <div class="filter-pill" onclick="filterComps('module',this)">Modules</div>
+      <div class="filter-pill" onclick="filterComps('power',this)">Power</div>
+    </div>
+
+    <!-- Left info -->
+    <div class="left-panel">
+      <p class="comp-category" id="compCategory"></p>
+      <h1 class="comp-name" id="compName"></h1>
+      <p class="comp-desc" id="compDesc"></p>
+      <div class="comp-tags" id="compTags"></div>
+      <div class="comp-actions">
+        <div class="diff-wrap">
+          <div class="diff-label">Difficulty</div>
+          <div class="diff-dots" id="diffDots">
+            <div class="diff-dot"></div>
+            <div class="diff-dot"></div>
+            <div class="diff-dot"></div>
+          </div>
+        </div>
+        <button class="btn-learn" onclick="openDetail()">Learn This →</button>
+      </div>
+      <div class="progress-bar" style="margin-top:22px;">
+        <div class="progress-fill" id="progressFill" style="width:3%;"></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:6px;font-family:'DM Mono',monospace;">
+        <span id="counterInline">01</span> <span id="totalCount">/ 29</span>
+      </div>
+    </div>
+
+    <!-- Right cards -->
+    <div class="right-panel">
+      <div class="cards-track" id="cardsTrack"></div>
+    </div>
+
+    <!-- Large background number -->
+    <div class="comp-num" id="compCounter">01</div>
+
+    <!-- Nav arrows -->
+    <div class="nav-arrows">
+      <div class="nav-arrow" onclick="navigate(-1)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </div>
+      <span class="nav-hint">← → or scroll</span>
+      <div class="nav-arrow" onclick="navigate(1)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL PANEL -->
+  <div id="detailPanel" style="display:none;">
+    <div class="detail-topbar">
+      <span class="detail-crumb" id="detailCrumb">Components</span>
+      <button class="btn-close-detail" onclick="closeDetail()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        Close
+      </button>
+    </div>
+    <div class="detail-content-wrap" id="detailContent"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+document.addEventListener('mousemove', e => {
+  document.getElementById('cg').style.cssText=`left:${e.clientX}px;top:${e.clientY}px;`;
+});
+
+/* ════════ COMPONENT DATA ════════ */
+const components = [
+  {emoji:'🟦',image:'images/ArduinoUno.png',name:'Arduino Uno',category:'Board · Main Controller',desc:'The brain of many Arduino projects. Reads inputs and controls outputs.',tags:['ATmega328P','USB Powered','Digital + Analog'],tagTeal:'Essential',level:1,badge:'Starter',badgeClass:'',color:'#00212a',descFull:'Arduino Uno is a beginner-friendly microcontroller board based on the ATmega328P. It has digital pins, analog inputs, PWM outputs, USB programming, and power options.',uses:['Robotics','Sensors','Automation','Learning electronics'],pinout:[{pin:'5V',arduino:'Power Out',notes:'Supply modules',type:'orange'},{pin:'GND',arduino:'Ground',notes:'Common ground',type:''},{pin:'D0-D13',arduino:'Digital Pins',notes:'Input / Output',type:'teal'},{pin:'A0-A5',arduino:'Analog Pins',notes:'Sensor reading',type:'teal'}],code:`<span class="cm">// Arduino Uno — the main board</span>\n<span class="kw">void</span> <span class="fn">setup</span>() {\n  <span class="cm">// runs once at power-on</span>\n}\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="cm">// runs forever</span>\n}`,tip:'Always use common ground when connecting external modules to your Arduino.',circuits:[{src:'images/arduino-uno-top.png',caption:'Arduino Uno Front View',height:'300px',objectFit:'contain'},{src:'images/arduino-uno-pins.png',caption:'Pin Layout Diagram',height:'300px',objectFit:'contain',cols:2}]},
+  {emoji:'🔌',image:'images/breadboard.png',name:'Breadboard',category:'Power · Prototyping',desc:'Solderless board for quick circuit building. The backbone of every prototype.',tags:['No soldering','5V / 3.3V rails','Prototyping'],tagTeal:'Essential',level:1,badge:'Must Have',badgeClass:'',color:'#0c0c0c',descFull:'A breadboard is a solderless prototyping board that lets you build and modify circuits instantly. The rows in the middle are connected horizontally (5 holes per row), while the long columns on each side are the power rails (+ and −).',uses:['Prototyping circuits before soldering','Testing component values','Building temporary test rigs','Learning circuit layouts quickly'],pinout:[{pin:'Power Rail (+)',arduino:'5V or 3.3V',notes:'Red column',type:'orange'},{pin:'Ground Rail (−)',arduino:'GND',notes:'Blue/Black column',type:''},{pin:'Middle Rows (a–e)',arduino:'Component leads',notes:'Horizontal connection',type:'teal'},{pin:'Middle Rows (f–j)',arduino:'Component leads',notes:'Horizontal connection',type:'teal'}],code:`<span class="cm">// No code needed — breadboard is a hardware tool!</span>\n<span class="cm">// Tip: RED = 5V, BLUE = GND, other = signal</span>\n<span class="kw">void</span> <span class="fn">setup</span>() { }\n<span class="kw">void</span> <span class="fn">loop</span>() { }`,tip:'Color-code your jumper wires: RED for power, BLACK for ground, any other color for signal lines.',circuits:[{src:'images/BreadBoard1.png',caption:'Breadboard Layout & Rails',height:'300px',objectFit:'contain',cols:2},{src:'images/breadboard (1).png',caption:'Breadboard Wiring Example',height:'300px',objectFit:'contain',cols:2}]},
+  {emoji:'🟫',image:'images/resistor.png',name:'Resistors',category:'Component · Basic',desc:'Limits current and divides voltage. Essential in every circuit.',tags:['220Ω','1kΩ','Basic'],tagTeal:'Essential',level:1,badge:'Must Have',badgeClass:'',color:'#1a1208',descFull:'Resistors control current flow in circuits. They obey Ohm\'s Law: V = I × R. For an LED with 5V supply and a 2V forward voltage, a 220Ω resistor limits current to a safe ~13mA. Read the color bands to identify the resistance value.',uses:['LED current protection','Pull-up/pull-down inputs','Voltage divider circuits','I2C line biasing'],pinout:[{pin:'Leg 1',arduino:'Any direction',notes:'No polarity — works both ways',type:'teal'},{pin:'Leg 2',arduino:'Any direction',notes:'No polarity — works both ways',type:'teal'}],code:`<span class="cm">// Hardware component — no code needed</span>\n<span class="cm">// 220Ω for LEDs: (5-2)/220 ≈ 13mA (safe)</span>\n<span class="cm">// 10kΩ pull-up: keeps input pin HIGH</span>\n<span class="kw">void</span> <span class="fn">setup</span>() { }\n<span class="kw">void</span> <span class="fn">loop</span>() { }`,tip:'220Ω is standard for LEDs. 10kΩ is used for pull-up/pull-down resistors on buttons and sensors.',circuits:[{src:'images/led-with-resistors.png',caption:'LED With Resistor',height:'350px',objectFit:'contain',cols:2},{src:'images/resistor-color-code.png',caption:'Color Code Chart',height:'300px',objectFit:'contain',cols:2}]},
+  {emoji:'💡',image:'images/led.png',name:'LED',category:'Output · Basic',desc:'Light Emitting Diode — the very first component every Arduino learner uses.',tags:['digitalWrite()','PWM','Resistor needed'],tagTeal:'Starter',level:1,badge:'Start Here',badgeClass:'',color:'#0e1008',descFull:'An LED converts electrical current into light. The longer leg (anode) connects to a digital pin through a 220Ω resistor, and the shorter leg (cathode) connects to GND. Use digitalWrite() to turn it on/off, or analogWrite() on a PWM pin to dim it.',uses:['Indicator lights for power, status, or alerts','Traffic light simulations','Blinking patterns for visual feedback','RGB lighting when using red, green, blue LEDs separately'],pinout:[{pin:'Anode (+)',arduino:'Digital Pin (e.g. 13)',notes:'Through 220Ω resistor',type:'teal'},{pin:'Cathode (−)',arduino:'GND',notes:'Ground connection',type:''}],code:`<span class="cm">// Blink LED on pin 13</span>\n<span class="kw">const</span> <span class="st">int</span> ledPin = <span class="nm">13</span>;\n<span class="kw">void</span> <span class="fn">setup</span>() { <span class="fn">pinMode</span>(ledPin, OUTPUT); }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="fn">digitalWrite</span>(ledPin, HIGH); <span class="fn">delay</span>(<span class="nm">1000</span>);\n  <span class="fn">digitalWrite</span>(ledPin, LOW);  <span class="fn">delay</span>(<span class="nm">1000</span>);\n}`,tip:'Always use a current-limiting resistor (220Ω–470Ω) in series with an LED. Without it, you risk burning out both the LED and the Arduino pin.',circuits:[{src:'images/led-with-resistors.png',caption:'LED With Resistor (No Code)',height:'350px',objectFit:'contain',cols:2},{src:'images/p2s2.png',caption:'LED With Resistor (With Code)',height:'350px',objectFit:'contain',cols:2}]},
+  {emoji:'🎚️',image:'images/potentiometer.png',name:'Potentiometer',category:'Input · Analog',desc:'Rotary analog knob — varies resistance smoothly from 0 to max.',tags:['analogRead()','Knob','Variable resistor'],tagTeal:'Input',level:1,badge:'',badgeClass:'',color:'#181818',descFull:'A potentiometer is a variable resistor with three pins. The outer two pins connect to power and ground; the middle (wiper) pin gives an analog voltage between 0V and 5V as you turn the knob. Arduino reads this as a value 0–1023 with analogRead().',uses:['Volume/brightness control','Servo position control','Menu navigation','Calibration input'],pinout:[{pin:'Left pin',arduino:'5V',notes:'Power supply end',type:'orange'},{pin:'Middle (wiper)',arduino:'A0–A5',notes:'Analog signal 0–1023',type:'teal'},{pin:'Right pin',arduino:'GND',notes:'Ground end',type:''}],code:`<span class="kw">const</span> <span class="st">int</span> pot = A0;\n<span class="kw">void</span> <span class="fn">setup</span>() { Serial.<span class="fn">begin</span>(<span class="nm">9600</span>); }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="st">int</span> val = <span class="fn">analogRead</span>(pot);\n  <span class="st">int</span> mapped = <span class="fn">map</span>(val,<span class="nm">0</span>,<span class="nm">1023</span>,<span class="nm">0</span>,<span class="nm">180</span>);\n  Serial.<span class="fn">println</span>(mapped);\n  <span class="fn">delay</span>(<span class="nm">100</span>);\n}`,tip:'Use map(val, 0, 1023, minOut, maxOut) to convert the 0–1023 range to whatever range you need.',circuits:[{src:'images/potentiometer-ON.png',caption:'Pot Wiring — ON (No Code)',height:'350px',objectFit:'contain',cols:2},{src:'images/potentiometer-OFF.png',caption:'Pot Wiring — OFF (No Code)',height:'350px',objectFit:'contain',cols:2},{src:'images/potentiometer-Data.png',caption:'Pot Wiring — Data Reading',height:'350px',objectFit:'contain'}]},
+  {emoji:'🔘',image:'images/push-button.png',name:'Push Button',category:'Input · Digital',desc:'Reads HIGH or LOW when pressed. Use digitalRead() to detect button presses.',tags:['digitalRead()','Pull-up resistor','Debouncing'],tagTeal:'Input',level:1,badge:'Basic',badgeClass:'',color:'#080e08',descFull:'A push button is a momentary switch that connects two circuit points when pressed. Arduino\'s internal pull-up resistor (INPUT_PULLUP) keeps the pin HIGH when not pressed and reads LOW when pressed.',uses:['Triggering actions (start/stop, toggle, select)','Menu navigation in LCD projects','Resetting a counter or timer','Debounced input for reliable readings'],pinout:[{pin:'Pin 1 (one side)',arduino:'Digital Pin (e.g. 2)',notes:'With INPUT_PULLUP',type:'teal'},{pin:'Pin 2 (other side)',arduino:'GND',notes:'Direct ground',type:''}],code:`<span class="kw">const</span> <span class="st">int</span> btnPin = <span class="nm">2</span>, ledPin = <span class="nm">13</span>;\n<span class="kw">void</span> <span class="fn">setup</span>() {\n  <span class="fn">pinMode</span>(btnPin, INPUT_PULLUP);\n  <span class="fn">pinMode</span>(ledPin, OUTPUT);\n}\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="kw">if</span> (<span class="fn">digitalRead</span>(btnPin) == LOW) <span class="fn">digitalWrite</span>(ledPin, HIGH);\n  <span class="kw">else</span> <span class="fn">digitalWrite</span>(ledPin, LOW);\n}`,tip:'Add a small delay (10–50ms) after detecting a press to debounce the button and prevent multiple readings from one physical press.',circuits:[{src:'images/p1s3.png',caption:'Button Wiring',height:'300px',objectFit:'contain',cols:2}, {src:'images/button-wiring-code.png',caption:'Button Wiring with code',height:'300px',objectFit:'contain',cols:2}]},
+  {emoji:'🌈',image:'images/rgb.png',name:'RGB LED',category:'Output · Light',desc:'Mix red, green, blue with PWM to make any color from a single component.',tags:['analogWrite()','PWM mixing','Common cathode'],tagTeal:'Output',level:1,badge:'',badgeClass:'',color:'#100a1a',descFull:'An RGB LED contains three separate LEDs (red, green, blue) in one package. By mixing the brightness of each color using PWM (0–255), you can produce millions of colors.',uses:['Status indicator with color coding','Mood lighting projects','Color mixing demonstrations','Visual feedback in games'],pinout:[{pin:'Red leg',arduino:'PWM Pin (e.g. 9)',notes:'220Ω resistor',type:'teal'},{pin:'Common (longest)',arduino:'GND',notes:'Common cathode',type:''},{pin:'Green leg',arduino:'PWM Pin (e.g. 10)',notes:'220Ω resistor',type:'teal'},{pin:'Blue leg',arduino:'PWM Pin (e.g. 11)',notes:'220Ω resistor',type:'teal'}],code:`<span class="kw">void</span> <span class="fn">setColor</span>(<span class="st">int</span> r, <span class="st">int</span> g, <span class="st">int</span> b) {\n  <span class="fn">analogWrite</span>(<span class="nm">9</span>,r); <span class="fn">analogWrite</span>(<span class="nm">10</span>,g); <span class="fn">analogWrite</span>(<span class="nm">11</span>,b);\n}\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="fn">setColor</span>(<span class="nm">255</span>,<span class="nm">0</span>,<span class="nm">0</span>); <span class="fn">delay</span>(<span class="nm">500</span>); <span class="cm">// Red</span>\n  <span class="fn">setColor</span>(<span class="nm">0</span>,<span class="nm">255</span>,<span class="nm">0</span>); <span class="fn">delay</span>(<span class="nm">500</span>); <span class="cm">// Green</span>\n  <span class="fn">setColor</span>(<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">255</span>); <span class="fn">delay</span>(<span class="nm">500</span>); <span class="cm">// Blue</span>\n}`,tip:'PWM pins on Uno: 3, 5, 6, 9, 10, 11. Use those for RGB to enable full 0–255 brightness control.',circuits:[{src:'images/rgb-wiring.png',caption:'RGB LED Wiring',height:'300px',cols:1,objectFit:'contain'},{src:'images/rgb-code.png',caption:'RGB with Code',height:'300px',cols:1,objectFit:'contain'}]},
+  {emoji:'🔊',image:'images/buzzer.png',name:'Buzzer',category:'Output · Audio',desc:'Piezo buzzer for tones, alarms, and melodies using tone() and frequency.',tags:['tone()','PWM freq','noTone()'],tagTeal:'Audio',level:1,badge:'',badgeClass:'',color:'#100008',descFull:'A passive piezo buzzer vibrates at the frequency you give it, letting you play musical notes and custom tones. Use tone(pin, frequency, duration) to play a note and noTone(pin) to stop.',uses:['Alarm and alert systems','Melodies for notifications','Morse code signaling','Game sound effects'],pinout:[{pin:'Positive (+)',arduino:'Digital Pin (e.g. 8)',notes:'PWM preferred',type:'teal'},{pin:'Negative (−)',arduino:'GND',notes:'Ground',type:''}],code:`<span class="kw">const</span> <span class="st">int</span> buzzer = <span class="nm">8</span>;\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="fn">tone</span>(buzzer, <span class="nm">262</span>, <span class="nm">300</span>); <span class="fn">delay</span>(<span class="nm">350</span>); <span class="cm">// C4</span>\n  <span class="fn">tone</span>(buzzer, <span class="nm">330</span>, <span class="nm">300</span>); <span class="fn">delay</span>(<span class="nm">350</span>); <span class="cm">// E4</span>\n  <span class="fn">tone</span>(buzzer, <span class="nm">392</span>, <span class="nm">300</span>); <span class="fn">delay</span>(<span class="nm">350</span>); <span class="cm">// G4</span>\n  <span class="fn">noTone</span>(buzzer); <span class="fn">delay</span>(<span class="nm">1000</span>);\n}`,tip:'tone() uses Arduino Timer 2, which affects PWM on pins 3 and 11. Avoid using those pins for analogWrite() when tone() is active.',circuits:[{src:'images/buzzer-wiring.png',caption:'Buzzer Wiring',height:'300px',objectFit:'contain',cols:2}]},
+  {emoji:'☀️',image:'images/light-sensor.png',name:'Light Sensor',category:'Sensor · Light',desc:'Detects brightness using an LDR (Light Dependent Resistor).',tags:['analogRead()','LDR','Day/Night'],tagTeal:'Sensor',level:1,badge:'',badgeClass:'',color:'#1a1800',descFull:'An LDR (photoresistor) changes resistance based on light intensity. Used in a voltage divider with a fixed resistor, it produces an analog voltage that Arduino reads. Bright light = low resistance = high voltage reading.',uses:['Automatic street lamp','Solar tracker','Day/night alarm','Light-controlled LED dimmer'],pinout:[{pin:'Signal',arduino:'A0',notes:'Analog 0–1023',type:'teal'},{pin:'VCC',arduino:'5V',notes:'Power',type:'orange'},{pin:'GND',arduino:'GND',notes:'Ground',type:''}],code:`<span class="kw">const</span> <span class="st">int</span> ldr = A0;\n<span class="kw">void</span> <span class="fn">setup</span>() { Serial.<span class="fn">begin</span>(<span class="nm">9600</span>); }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="st">int</span> value = <span class="fn">analogRead</span>(ldr);\n  Serial.<span class="fn">println</span>(value);\n  <span class="fn">delay</span>(<span class="nm">500</span>);\n}`,tip:'The reading direction depends on how you wire the voltage divider. Test both ways and use the one that makes sense for your project.',circuits:[{src:'images/light-sensor-positive.png',caption:'Voltage Divider Positive Diagram',cols:2,objectFit:'fill',height:'550px'},{src:'images/light-sensor-negative.png',caption:'Voltage Divider Negative Diagram',cols:2,objectFit:'fill',height:'550px'}]},
+  {emoji:'🎤',image:'images/sound-sensor.png',name:'Sound Sensor',category:'Sensor · Audio',desc:'Detects sound level with a microphone module.',tags:['Mic','analogRead()','Clap detect'],tagTeal:'Sensor',level:1,badge:'',badgeClass:'',color:'#14000c',descFull:'The sound sensor module has a small electret microphone and an amplifier. The analog output gives the sound level (0–1023) and the digital output triggers HIGH or LOW when sound crosses a threshold.',uses:['Clap switch (clap to toggle light)','Noise level monitoring','Sound-triggered camera','Robot that reacts to sound'],pinout:[{pin:'AOUT',arduino:'A0',notes:'Analog sound level',type:'teal'},{pin:'DOUT',arduino:'Digital pin',notes:'HIGH/LOW at threshold',type:'teal'},{pin:'VCC',arduino:'5V',notes:'Power',type:'orange'},{pin:'GND',arduino:'GND',notes:'Ground',type:''}],code:`<span class="kw">const</span> <span class="st">int</span> mic = A0, led = <span class="nm">13</span>;\n<span class="kw">const</span> <span class="st">int</span> threshold = <span class="nm">600</span>;\n<span class="kw">void</span> <span class="fn">setup</span>() { <span class="fn">pinMode</span>(led, OUTPUT); Serial.<span class="fn">begin</span>(<span class="nm">9600</span>); }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="st">int</span> sound = <span class="fn">analogRead</span>(mic);\n  <span class="kw">if</span> (sound > threshold) { <span class="fn">digitalWrite</span>(led,HIGH); <span class="fn">delay</span>(<span class="nm">500</span>); <span class="fn">digitalWrite</span>(led,LOW); }\n}`,tip:'Adjust the potentiometer on the module to set the sensitivity threshold for the digital output.',circuits:[{src:'images/sound-sensor1.webp',caption:'Microphone Module V1',objectFit:'contain'},{src:'images/sound-sensor2.avif',caption:'Microphone Module V2',objectFit:'contain'},{src:'images/sound-sensor-wiring.jpg',caption:'Microphone Module Wiring',cols:2,objectFit:'fill',height:'550px'}]},
+  {emoji:'🔥',image:'images/flame-sensor.png',name:'Flame Sensor',category:'Sensor · Safety',desc:'Detects infrared light from a flame. Build fire alert systems.',tags:['IR','Alarm','Safety'],tagTeal:'Sensor',level:2,badge:'',badgeClass:'',color:'#1a0500',descFull:'The flame sensor detects infrared (IR) light emitted by a flame. It has both analog and digital outputs. The digital output goes LOW when flame is detected (active LOW). Detection range is ~80cm at a 60° angle.',uses:['Fire alert system','Safety robot that avoids fire','Candle-following robot','Industrial safety shutdown'],pinout:[{pin:'DOUT',arduino:'Digital pin (e.g. 2)',notes:'LOW when flame detected',type:'teal'},{pin:'AOUT',arduino:'A0',notes:'Analog intensity level',type:'teal'},{pin:'VCC',arduino:'5V',notes:'Power',type:'orange'},{pin:'GND',arduino:'GND',notes:'Ground',type:''}],code:`<span class="kw">const</span> <span class="st">int</span> flame = <span class="nm">2</span>, led = <span class="nm">13</span>;\n<span class="kw">void</span> <span class="fn">setup</span>() { <span class="fn">pinMode</span>(flame,INPUT); <span class="fn">pinMode</span>(led,OUTPUT); Serial.<span class="fn">begin</span>(<span class="nm">9600</span>); }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="kw">if</span> (<span class="fn">digitalRead</span>(flame)==LOW) {\n    <span class="fn">digitalWrite</span>(led,HIGH); Serial.<span class="fn">println</span>(<span class="st">"FLAME!"</span>);\n  } <span class="kw">else</span> <span class="fn">digitalWrite</span>(led,LOW);\n}`,tip:'Many flame sensor modules trigger LOW (not HIGH) when flame is detected — active LOW logic. Test with a lighter at arm\'s length first.',circuits:[{src:'images/flame-wiring.jpg',caption:'Flame Sensor Wiring',cols:2,objectFit:'fill', height:'700px'}]},
+  {emoji:'🌡️',image:'images/DHT11.png',name:'Temp Sensor',category:'Sensor · Environment',desc:'DHT11/DHT22 reads temperature and humidity. Perfect for weather stations.',tags:['DHT library','I2C','Analog read'],tagTeal:'Sensor',level:2,badge:'Popular',badgeClass:'',color:'#08080e',descFull:'The DHT11 and DHT22 are digital temperature and humidity sensors. DHT22 is more accurate (±0.5°C) vs DHT11 (±2°C). Install the "DHT sensor library" by Adafruit via the Arduino Library Manager before using.',uses:['Weather station displays','Smart greenhouse climate control','Indoor air quality monitoring','HVAC control systems'],pinout:[{pin:'VCC (Pin 1)',arduino:'5V',notes:'Power supply',type:'orange'},{pin:'DATA (Pin 2)',arduino:'Digital Pin (e.g. 4)',notes:'With 10kΩ pull-up to VCC',type:'teal'},{pin:'NC (Pin 3)',arduino:'—',notes:'Not connected',type:''},{pin:'GND (Pin 4)',arduino:'GND',notes:'Ground',type:''}],code:`<span class="kw">#include</span> <span class="st">&lt;DHT.h&gt;</span>\n<span class="kw">#define</span> DHTPIN <span class="nm">6</span>\n<span class="kw">#define</span> DHTTYPE DHT22\nDHT <span class="fn">dht</span>(DHTPIN, DHTTYPE);\n<span class="kw">void</span> <span class="fn">setup</span>() { Serial.<span class="fn">begin</span>(<span class="nm">9600</span>); dht.<span class="fn">begin</span>(); }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  Serial.<span class="fn">print</span>(<span class="st">"T:"</span>); Serial.<span class="fn">print</span>(dht.<span class="fn">readTemperature</span>());\n  Serial.<span class="fn">print</span>(<span class="st">" H:"</span>); Serial.<span class="fn">println</span>(dht.<span class="fn">readHumidity</span>());\n  <span class="fn">delay</span>(<span class="nm">2000</span>);\n}`,tip:'Wait at least 2 seconds between readings — the DHT sensor needs time to sample. Faster polling returns NaN errors.',circuits:[{src:'images/dht-wiring.png',caption:'DHT11/22 Wiring',cols:2,objectFit:'fill',height:'550px'}]},
+  {emoji:'💧',image:'images/moisture.png',name:'Moisture Sensor',category:'Sensor · Environment',desc:'Measures soil water content. Build automatic plant watering systems.',tags:['analogRead()','Soil probe','Threshold logic'],tagTeal:'Sensor',level:2,badge:'',badgeClass:'',color:'#001a10',descFull:'The soil moisture sensor has two probes that measure electrical resistance through soil. Wet soil = lower resistance → lower analogRead value. Dry soil = higher resistance → higher analogRead value.',uses:['Automatic plant irrigation systems','Agricultural monitoring','Hydroponics water level detection','Smart garden alerts'],pinout:[{pin:'VCC',arduino:'3.3V or 5V',notes:'Power only when reading',type:'orange'},{pin:'GND',arduino:'GND',notes:'Ground',type:''},{pin:'AOUT (Analog)',arduino:'A0–A5',notes:'0=wet, 1023=dry',type:'teal'},{pin:'DOUT (Digital)',arduino:'Digital pin',notes:'HIGH when dry',type:'teal'}],code:`<span class="kw">const</span> <span class="st">int</span> sensorPin=A0, pumpPin=<span class="nm">7</span>;\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="st">int</span> val = <span class="fn">analogRead</span>(sensorPin);\n  <span class="kw">if</span> (val > <span class="nm">600</span>) <span class="fn">digitalWrite</span>(pumpPin,HIGH); <span class="cm">// dry → pump on</span>\n  <span class="kw">else</span> <span class="fn">digitalWrite</span>(pumpPin,LOW);\n  <span class="fn">delay</span>(<span class="nm">1000</span>);\n}`,tip:'Power the sensor only during readings — leaving it powered continuously oxidizes the probes and shortens their life.',circuits:[{src:'images/moisture-wiring.png',caption:'Moisture Sensor Wiring',cols:2 , objectFit:'contain', height:'800px'}]},
+  {emoji:'🧲',image:'images/ir.png',name:'IR Sensor',category:'Sensor · Input',desc:'Detects infrared light. Decode remote controls or build line-following robots.',tags:['IRremote lib','Object detect','Line follower'],tagTeal:'Sensor',level:2,badge:'',badgeClass:'',color:'#1a0010',descFull:'The IR sensor module includes an infrared LED emitter and a photodetector. The reflective type detects objects by bouncing IR off surfaces. The receiver module decodes signals from TV remotes.',uses:['TV/AC remote control input','Line-following robot sensors','Object proximity detection','Obstacle avoidance at short range'],pinout:[{pin:'VCC',arduino:'5V',notes:'Power',type:'orange'},{pin:'GND',arduino:'GND',notes:'Ground',type:''},{pin:'OUT (receiver)',arduino:'Digital Pin (e.g. 11)',notes:'Signal output',type:'teal'}],code:`<span class="kw">#include</span> <span class="st">&lt;IRremote.h&gt;</span>\nIRrecv <span class="fn">ir</span>(<span class="nm">11</span>);\n<span class="kw">void</span> <span class="fn">setup</span>() { Serial.<span class="fn">begin</span>(<span class="nm">9600</span>); ir.<span class="fn">enableIRIn</span>(); }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="kw">if</span> (ir.<span class="fn">decode</span>()) {\n    Serial.<span class="fn">println</span>(ir.decodedIRData.decodedRawData, HEX);\n    ir.<span class="fn">resume</span>();\n  }\n}`,tip:'IR sensors are sensitive to ambient light (sunlight, fluorescent bulbs). Shield the sensor from direct light sources.',circuits:[{src:'images/ir-wiring.png',caption:'IR Receiver Wiring',cols:2,height:'500px',objectFit:'contain'}]},
+  {emoji:'🌬️',image:'images/mq2.png',name:'Gas Sensor MQ-2',category:'Sensor · Safety',desc:'Detects flammable gases and smoke. Build fire alarms and gas leak detectors.',tags:['MQ-2','analogRead()','Safety system'],tagTeal:'Safety',level:2,badge:'Hot',badgeClass:'hot',color:'#0a1a00',descFull:'The MQ-2 gas sensor detects LPG, smoke, alcohol, propane, hydrogen, methane, and carbon monoxide. It has a warm-up time of about 20 seconds.',uses:['Gas leak detectors','Fire and smoke alarms','Air quality monitoring','Safety shutdown systems'],pinout:[{pin:'VCC',arduino:'5V',notes:'Power (draws ~150mA)',type:'orange'},{pin:'GND',arduino:'GND',notes:'Ground',type:''},{pin:'AOUT',arduino:'A0',notes:'Analog concentration reading',type:'teal'},{pin:'DOUT',arduino:'Digital pin',notes:'HIGH when gas detected',type:'teal'}],code:`<span class="kw">const</span> <span class="st">int</span> mq2=A0, buz=<span class="nm">8</span>;\n<span class="kw">const</span> <span class="st">int</span> threshold=<span class="nm">400</span>;\n<span class="kw">void</span> <span class="fn">setup</span>() { Serial.<span class="fn">begin</span>(<span class="nm">9600</span>); <span class="fn">delay</span>(<span class="nm">20000</span>); <span class="cm">// warm-up</span> }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="st">int</span> val=<span class="fn">analogRead</span>(mq2);\n  <span class="fn">digitalWrite</span>(buz, val>threshold?HIGH:LOW);\n  <span class="fn">delay</span>(<span class="nm">200</span>);\n}`,tip:'MQ-2 requires a 20-second warm-up before accurate readings. Add a startup delay() or "warming up…" message.',circuits:[{src:'images/mq2-wiring.png',caption:'MQ-2 Wiring',cols:2,height:'500px',objectFit:'contain' }]},
+  {emoji:'🏃',image:'images/pir.png',name:'PIR Motion',category:'Sensor · Security',desc:'Detects human movement with passive infrared. Build motion-activated systems.',tags:['PIR module','digitalRead()','Security'],tagTeal:'Sensor',level:1,badge:'',badgeClass:'',color:'#001a18',descFull:'A PIR (Passive Infrared) sensor detects movement by measuring changes in infrared radiation emitted by warm bodies. Detection angle ~110° with range 3–7 meters. Sensitivity and hold time adjustable.',uses:['Motion-activated lights','Security camera triggers','Occupancy detection for HVAC','Intruder alarm systems'],pinout:[{pin:'VCC',arduino:'5V',notes:'Power',type:'orange'},{pin:'OUT',arduino:'Digital Pin (e.g. 3)',notes:'HIGH when motion detected',type:'teal'},{pin:'GND',arduino:'GND',notes:'Ground',type:''}],code:`<span class="kw">const</span> <span class="st">int</span> pirPin=<span class="nm">3</span>, ledPin=<span class="nm">13</span>;\n<span class="kw">void</span> <span class="fn">setup</span>() {\n  <span class="fn">pinMode</span>(pirPin,INPUT); <span class="fn">pinMode</span>(ledPin,OUTPUT);\n  <span class="fn">delay</span>(<span class="nm">30000</span>); <span class="cm">// calibration</span>\n}\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="kw">if</span>(<span class="fn">digitalRead</span>(pirPin)==HIGH) { <span class="fn">digitalWrite</span>(ledPin,HIGH); Serial.<span class="fn">println</span>(<span class="st">"Motion!"</span>); }\n  <span class="kw">else</span> <span class="fn">digitalWrite</span>(ledPin,LOW);\n}`,tip:'Give the PIR sensor a 30-second warm-up time in setup for accurate calibration.',circuits:[{src:'images/pir1.png',caption:'PIR Sensor Pin Out',height:'500px',objectFit:'contain' },{src:'images/pir-wiring.png',caption:'PIR Sensor Wiring',cols:2,height:'500px',objectFit:'contain' }]},
+  {emoji:'📷',image:'images/rifd.png',name:'RFID RC522',category:'Module · Security',desc:'Read/write RFID cards. Build door locks, access control, attendance systems.',tags:['RC522','SPI bus','MFRC522 lib'],tagTeal:'Module',level:3,badge:'New',badgeClass:'',color:'#00101a',descFull:'The MFRC522 RFID module reads and writes 13.56 MHz RFID/NFC cards and key fobs using SPI communication. Each card has a unique 4-byte UID.',uses:['Door lock access control','Student/employee attendance','Library card management','Product authentication'],pinout:[{pin:'3.3V',arduino:'3.3V',notes:'⚠️ NOT 5V — will damage module',type:'orange'},{pin:'GND',arduino:'GND',notes:'Ground',type:''},{pin:'RST',arduino:'Pin 9',notes:'Reset',type:'teal'},{pin:'SDA (SS)',arduino:'Pin 10',notes:'SPI chip select',type:'teal'},{pin:'MOSI',arduino:'Pin 11',notes:'SPI data out',type:'teal'},{pin:'MISO',arduino:'Pin 12',notes:'SPI data in',type:'teal'},{pin:'SCK',arduino:'Pin 13',notes:'SPI clock',type:'teal'}],code:`<span class="kw">#include</span> <span class="st">&lt;SPI.h&gt;</span>\n<span class="kw">#include</span> <span class="st">&lt;MFRC522.h&gt;</span>\nMFRC522 <span class="fn">rfid</span>(<span class="nm">10</span>,<span class="nm">9</span>);\n<span class="kw">void</span> <span class="fn">setup</span>() { SPI.<span class="fn">begin</span>(); rfid.<span class="fn">PCD_Init</span>(); Serial.<span class="fn">begin</span>(<span class="nm">9600</span>); }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="kw">if</span>(!rfid.<span class="fn">PICC_IsNewCardPresent</span>()) <span class="kw">return</span>;\n  rfid.<span class="fn">PICC_ReadCardSerial</span>();\n  <span class="kw">for</span>(<span class="st">byte</span> i=<span class="nm">0</span>;i&lt;rfid.uid.size;i++) Serial.<span class="fn">print</span>(rfid.uid.uidByte[i],HEX);\n  rfid.<span class="fn">PICC_HaltA</span>();\n}`,tip:'The RC522 runs on 3.3V logic only. Never connect it to 5V — it will be permanently damaged.',circuits:[{src:'images/rfid.webp',caption:'RFID RC522 Pin outs',cols:2,objectFit:'contain', height:'500px'},{src:'images/rfid-wiring.png',caption:'RFID RC522 Wiring',cols:2,objectFit:'contain', height:'500px'}]},
+  {emoji:'🌊',image:'images/water.png',name:'Water Level',category:'Sensor · Environment',desc:'Detects water depth with exposed traces. Build flood alarms and tank monitors.',tags:['analogRead()','Threshold','Pump control'],tagTeal:'Sensor',level:2,badge:'',badgeClass:'',color:'#001020',descFull:'The water level sensor has exposed parallel conductive traces that partially short-circuit when submerged. The more traces submerged, the lower the resistance and the higher the analog reading.',uses:['Flood early-warning systems','Aquarium water level monitoring','Automatic pump controllers','Rain collection measurement'],pinout:[{pin:'S (Signal)',arduino:'A0',notes:'Analog depth reading',type:'teal'},{pin:'+ (Power)',arduino:'Digital pin (power when reading)',notes:'Prevents corrosion',type:'orange'},{pin:'− (GND)',arduino:'GND',notes:'Ground',type:''}],code:`<span class="kw">const</span> <span class="st">int</span> sPin=A5, pwrPin=<span class="nm">7</span>;\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="fn">digitalWrite</span>(pwrPin,HIGH); <span class="fn">delay</span>(<span class="nm">10</span>);\n  <span class="st">int</span> val=<span class="fn">analogRead</span>(sPin);\n  <span class="fn">digitalWrite</span>(pwrPin,LOW);\n  <span class="kw">if</span>(val&lt;<span class="nm">300</span>) Serial.<span class="fn">println</span>(<span class="st">"Empty"</span>);\n  <span class="kw">else if</span>(val&lt;<span class="nm">600</span>) Serial.<span class="fn">println</span>(<span class="st">"Half"</span>);\n  <span class="kw">else</span> Serial.<span class="fn">println</span>(<span class="st">"Full"</span>);\n  <span class="fn">delay</span>(<span class="nm">1000</span>);\n}`,tip:'Power the sensor through a digital pin and turn it on only during readings. Constant power causes electrolytic corrosion.',circuits:[{src:'images/water-wiring.jpg',caption:'Water Level Sensor Wiring',cols:2,objectFit:'fill',height:'550px'}]},
+  {emoji:'📡',image:'images/ultrasonic.png',name:'Ultrasonic',category:'Sensor · Distance',desc:'HC-SR04 measures distance with sound pulses. Powers obstacle-avoidance robots.',tags:['HC-SR04','pulseIn()','Trigger/Echo'],tagTeal:'Sensor',level:2,badge:'',badgeClass:'',color:'#001414',descFull:'The HC-SR04 ultrasonic sensor measures distance by sending a 40kHz sound pulse and timing the echo. Range: 2cm to 400cm with ±3mm accuracy.',uses:['Obstacle detection for robots','Smart parking sensors','Liquid level monitoring','Proximity-based automation'],pinout:[{pin:'VCC',arduino:'5V',notes:'Power',type:'orange'},{pin:'Trig',arduino:'Digital Pin (e.g. 9)',notes:'Trigger pulse out',type:'teal'},{pin:'Echo',arduino:'Digital Pin (e.g. 10)',notes:'Echo pulse in',type:'teal'},{pin:'GND',arduino:'GND',notes:'Ground',type:''}],code:`<span class="kw">const</span> <span class="st">int</span> trig=<span class="nm">9</span>, echo=<span class="nm">10</span>;\n<span class="kw">void</span> <span class="fn">setup</span>() { Serial.<span class="fn">begin</span>(<span class="nm">9600</span>); <span class="fn">pinMode</span>(trig,OUTPUT); <span class="fn">pinMode</span>(echo,INPUT); }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="fn">digitalWrite</span>(trig,LOW); <span class="fn">delayMicroseconds</span>(<span class="nm">2</span>);\n  <span class="fn">digitalWrite</span>(trig,HIGH); <span class="fn">delayMicroseconds</span>(<span class="nm">10</span>);\n  <span class="fn">digitalWrite</span>(trig,LOW);\n  <span class="st">float</span> cm = <span class="fn">pulseIn</span>(echo,HIGH)*<span class="nm">0.034</span>/<span class="nm">2</span>;\n  Serial.<span class="fn">println</span>(cm);\n  <span class="fn">delay</span>(<span class="nm">500</span>);\n}`,tip:'The HC-SR04 operates at 5V. If using a 3.3V board, add a voltage divider on the Echo pin to protect it.',circuits:[{src:'images/ultrasonic-wiring.png',caption:'HC-SR04 Wiring',cols:2,objectFit:'contain', height:'500px'}]},
+  {emoji:'⚙️',image:'images/servo.png',name:'Servo Motor',category:'Output · Motion',desc:'Rotate to precise angles 0°–180°. Great for robot arms and camera mounts.',tags:['Servo library','0°–180°','PWM signal'],tagTeal:'Actuator',level:2,badge:'Hot',badgeClass:'hot',color:'#120800',descFull:'A servo motor is a DC motor with a built-in gearbox and position feedback. It uses PWM signals to rotate to exact positions (0° to 180°). The Arduino Servo library makes this very easy.',uses:['Robot arm joints','Camera pan/tilt rigs','Steering mechanism in RC cars','Door lock mechanisms'],pinout:[{pin:'Signal (Orange/Yellow)',arduino:'PWM Pin (e.g. 9)',notes:'Control signal',type:'teal'},{pin:'Power (Red)',arduino:'5V or External 5V',notes:'Up to 1A per servo',type:'orange'},{pin:'Ground (Brown/Black)',arduino:'GND',notes:'Shared ground',type:''}],code:`<span class="kw">#include</span> <span class="st">&lt;Servo.h&gt;</span>\nServo myServo;\n<span class="kw">void</span> <span class="fn">setup</span>() { myServo.<span class="fn">attach</span>(<span class="nm">9</span>); }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  myServo.<span class="fn">write</span>(<span class="nm">0</span>);   <span class="fn">delay</span>(<span class="nm">1000</span>);\n  myServo.<span class="fn">write</span>(<span class="nm">90</span>);  <span class="fn">delay</span>(<span class="nm">1000</span>);\n  myServo.<span class="fn">write</span>(<span class="nm">180</span>); <span class="fn">delay</span>(<span class="nm">1000</span>);\n}`,tip:'Multiple servos can brown-out your Arduino\'s 5V pin. Power them from a separate regulated 5V supply with a shared ground.',circuits:[{src:'images/servo-wiring.png',caption:'Servo Wiring',cols:2,objectFit:'contain', height:'500px'}]},
+  {emoji:'🔄',image:'images/dcmotor.png',name:'DC Motor + L298N',category:'Output · Motion',desc:'L298N driver controls speed and direction of DC motors. Foundation for robots.',tags:['L298N driver','analogWrite()','H-Bridge'],tagTeal:'Motor',level:3,badge:'Robot',badgeClass:'',color:'#1a1200',descFull:'DC motors spin freely in both directions and at variable speed. The L298N motor driver module uses an H-Bridge circuit to reverse current direction. ENA/ENB pins accept PWM for speed control.',uses:['Wheeled robot chassis','Conveyor belt systems','Electric fan speed control','Automated sliding doors'],pinout:[{pin:'ENA',arduino:'PWM Pin (e.g. 5)',notes:'Speed control Motor A',type:'teal'},{pin:'IN1',arduino:'Digital Pin (e.g. 6)',notes:'Direction control',type:'teal'},{pin:'IN2',arduino:'Digital Pin (e.g. 7)',notes:'Direction control',type:'teal'},{pin:'VCC (+12V)',arduino:'External power 6–12V',notes:'Motor power supply',type:'orange'},{pin:'GND',arduino:'GND (shared)',notes:'Common ground',type:''}],code:`<span class="kw">const</span> <span class="st">int</span> ENA=<span class="nm">5</span>,IN1=<span class="nm">6</span>,IN2=<span class="nm">7</span>;\n<span class="kw">void</span> <span class="fn">forward</span>(<span class="st">int</span> spd) {\n  <span class="fn">analogWrite</span>(ENA,spd);\n  <span class="fn">digitalWrite</span>(IN1,HIGH); <span class="fn">digitalWrite</span>(IN2,LOW);\n}\n<span class="kw">void</span> <span class="fn">loop</span>() { <span class="fn">forward</span>(<span class="nm">200</span>); <span class="fn">delay</span>(<span class="nm">2000</span>); }`,tip:'Always use a separate power supply for motors — they draw too much current for Arduino\'s 5V pin. Share only the GND.',circuits:[{src:'images/l298n.webp',caption:'L298N Motor Driver',objectFit:'contain', height:'400px'},{src:'images/l298n-wiring.png',caption:'L298N Motor Driver Pin Out',objectFit:'fill', height:'400px'},{src:'images/l298n-with- dc.jpg',caption:'L298N Motor Driver with DC motor Wiring',cols:2,objectFit:'fill', height:'700px'}]},
+  {emoji:'⚙️',image:'images/stepper.svg',name:'Stepper Motor',category:'Output · Motion',desc:'Moves in precise steps instead of free-spinning. Used in CNC and robot arms.',tags:['Stepper lib','ULN2003','Precise steps'],tagTeal:'Motor',level:3,badge:'Hot',badgeClass:'hot',color:'#1a1000',descFull:'A stepper motor rotates in discrete steps (e.g. 2048 steps per full revolution for the 28BYJ-48). Unlike servo motors, steppers can rotate continuously in both directions and be positioned precisely.',uses:['CNC machine axes','3D printer movement','Robot arm precise joints','Camera slider'],pinout:[{pin:'IN1',arduino:'Pin 8',notes:'Step signal',type:'teal'},{pin:'IN2',arduino:'Pin 9',notes:'Step signal',type:'teal'},{pin:'IN3',arduino:'Pin 10',notes:'Step signal',type:'teal'},{pin:'IN4',arduino:'Pin 11',notes:'Step signal',type:'teal'},{pin:'5V–12V',arduino:'External power',notes:'Motor power',type:'orange'}],code:`<span class="kw">#include</span> <span class="st">&lt;Stepper.h&gt;</span>\nStepper motor(<span class="nm">2048</span>,<span class="nm">8</span>,<span class="nm">10</span>,<span class="nm">9</span>,<span class="nm">11</span>);\n<span class="kw">void</span> <span class="fn">setup</span>() { motor.<span class="fn">setSpeed</span>(<span class="nm">10</span>); }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  motor.<span class="fn">step</span>(<span class="nm">2048</span>);  <span class="fn">delay</span>(<span class="nm">500</span>); <span class="cm">// 1 full revolution</span>\n  motor.<span class="fn">step</span>(-<span class="nm">2048</span>); <span class="fn">delay</span>(<span class="nm">500</span>); <span class="cm">// reverse</span>\n}`,tip:'Use external power for the stepper — the ULN2003 driver draws too much for the Arduino 5V pin. Share GND with Arduino.',circuits:[{src:'images/stepper-wiring.webp',caption:'ULN2003 Stepper Wiring',cols:2,objectFit:'contain', height:'500px'}]},
+  {emoji:'⚡',image:'images/relay.webp',name:'Relay Module',category:'Output · Power',desc:'Switch high-voltage devices with a 5V signal. Control lights, fans, motors.',tags:['HIGH/LOW signal','AC control','5V coil'],tagTeal:'Power',level:3,badge:'',badgeClass:'',color:'#1a1000',descFull:'A relay is an electrically operated switch that lets a low-voltage Arduino pin control high-voltage AC/DC loads (up to 250V AC / 30V DC). Most modules are active LOW.',uses:['Controlling mains-powered lights','Automated power strips','Motor on/off switching','AC appliance control'],pinout:[{pin:'VCC',arduino:'5V',notes:'Coil power',type:'orange'},{pin:'GND',arduino:'GND',notes:'Ground',type:''},{pin:'IN',arduino:'Digital Pin (e.g. 7)',notes:'LOW = relay ON (active low)',type:'teal'},{pin:'COM',arduino:'—',notes:'Common terminal (load)',type:''},{pin:'NO',arduino:'—',notes:'Normally Open — closes on trigger',type:''}],code:`<span class="kw">const</span> <span class="st">int</span> relayPin=<span class="nm">7</span>;\n<span class="kw">void</span> <span class="fn">setup</span>() { <span class="fn">pinMode</span>(relayPin,OUTPUT); <span class="fn">digitalWrite</span>(relayPin,HIGH); <span class="cm">// OFF</span> }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="fn">digitalWrite</span>(relayPin,LOW);  <span class="fn">delay</span>(<span class="nm">3000</span>); <span class="cm">// ON</span>\n  <span class="fn">digitalWrite</span>(relayPin,HIGH); <span class="fn">delay</span>(<span class="nm">3000</span>); <span class="cm">// OFF</span>\n}`,tip:'⚠️ NEVER touch the AC side while connected to mains power. Always test with low-voltage DC first.',circuits:[{src:'images/relay-wiring.png',caption:'Relay Module Wiring',cols:2,objectFit:'contain', height:'500px'}]},
+  {emoji:'📶',image:'images/HC05.png',name:'Bluetooth HC-05',category:'Module · Wireless',desc:'Add wireless Bluetooth 2.0. Control Arduino from your smartphone via serial.',tags:['Serial comm','AT commands','Android/iOS'],tagTeal:'Wireless',level:3,badge:'',badgeClass:'',color:'#00001a',descFull:'The HC-05 is a Bluetooth 2.0 SPP module that creates a wireless serial link between your Arduino and any Bluetooth-capable device. Use AT commands to configure baud rate, name, and PIN code.',uses:['Smartphone-controlled robots','Wireless sensor data logging','Bluetooth keyboard/joystick input','Remote monitoring via phone app'],pinout:[{pin:'VCC',arduino:'5V',notes:'Module power',type:'orange'},{pin:'GND',arduino:'GND',notes:'Ground',type:''},{pin:'TXD',arduino:'RX pin (or SoftwareSerial)',notes:'Module → Arduino',type:'teal'},{pin:'RXD',arduino:'TX pin (via voltage divider!)',notes:'Arduino → Module (3.3V logic!)',type:'teal'}],code:`<span class="kw">#include</span> <span class="st">&lt;SoftwareSerial.h&gt;</span>\nSoftwareSerial <span class="fn">BT</span>(<span class="nm">10</span>,<span class="nm">11</span>);\n<span class="kw">void</span> <span class="fn">setup</span>() { Serial.<span class="fn">begin</span>(<span class="nm">9600</span>); BT.<span class="fn">begin</span>(<span class="nm">9600</span>); }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  <span class="kw">if</span>(BT.<span class="fn">available</span>()) {\n    <span class="st">char</span> c=BT.<span class="fn">read</span>(); Serial.<span class="fn">println</span>(c);\n  }\n}`,tip:'The HC-05 RXD pin is NOT 5V tolerant — use a voltage divider (1kΩ + 2kΩ) on the Arduino TX line.',circuits:[{src:'images/hc-05.jpg',caption:'HC-05 Bluetooth Module',objectFit:'fill', height:'400px',cols:2},{src:'images/hc05-wiring.webp',caption:'HC-05 Wiring with Voltage Divider',cols:2,objectFit:'contain', height:'500px'}]},
+  {emoji:'🎮',image:null,name:'Joystick',category:'Input · Control',desc:'Dual-axis analog joystick with button. Great for robot controllers and games.',tags:['analogRead()','X/Y axis','Button press'],tagTeal:'Input',level:2,badge:'',badgeClass:'',color:'#12001a',descFull:'The joystick module contains two 10kΩ potentiometers (one for X, one for Y) and a push button (SW) triggered by pressing the stick down. At rest, both axes read ~512 (center).',uses:['Remote control for wheeled robots','Camera pan/tilt control','Game controller input','Menu navigation on OLED displays'],pinout:[{pin:'GND',arduino:'GND',notes:'Ground',type:''},{pin:'+5V',arduino:'5V',notes:'Power',type:'orange'},{pin:'VRx',arduino:'A0',notes:'X axis (0–1023)',type:'teal'},{pin:'VRy',arduino:'A1',notes:'Y axis (0–1023)',type:'teal'},{pin:'SW',arduino:'Digital (INPUT_PULLUP)',notes:'LOW when pressed',type:'teal'}],code:`<span class="kw">const</span> <span class="st">int</span> xPin=A0,yPin=A1,swPin=<span class="nm">2</span>;\n<span class="kw">void</span> <span class="fn">setup</span>() { Serial.<span class="fn">begin</span>(<span class="nm">9600</span>); <span class="fn">pinMode</span>(swPin,INPUT_PULLUP); }\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  Serial.<span class="fn">print</span>(<span class="st">"X:"</span>); Serial.<span class="fn">print</span>(<span class="fn">analogRead</span>(xPin));\n  Serial.<span class="fn">print</span>(<span class="st">" Y:"</span>); Serial.<span class="fn">println</span>(<span class="fn">analogRead</span>(yPin));\n  <span class="fn">delay</span>(<span class="nm">200</span>);\n}`,tip:'Use map(analogRead(A0), 0, 1023, -100, 100) to get a centered −100 to +100 range for robot speed control.',circuits:[{src:'images/joystick.png',caption:'Joystick', objectFit:'contain'},{src:'images/joystick-wiring.png',caption:'Joystick Wiring',cols:2, objectFit:'contain', height:'500px'}]},
+  {emoji:'🔢',image:'images/7seg.png',name:'7-Segment Display',category:'Output · Display',desc:'Show digits 0–9 on seven LED segments. Perfect for counters and clocks.',tags:['BCD decoder','Segment pins','Multiplexing'],tagTeal:'Display',level:2,badge:'',badgeClass:'',color:'#0a1200',descFull:'A 7-segment display has 7 LED segments (a–g) and a decimal point. Each segment is addressed by a separate pin. Common cathode types connect the common pin to GND. For multiple digits, multiplexing rapidly switches between them.',uses:['Digital score displays','Countdown timers','Temperature readouts','Clock displays'],pinout:[{pin:'a–g, dp',arduino:'Digital Pins 2–9',notes:'Each segment via 220Ω',type:'teal'},{pin:'COM (common cathode)',arduino:'GND',notes:'Or 5V for common anode',type:''}],code:`<span class="st">int</span> segs[]={<span class="nm">2</span>,<span class="nm">3</span>,<span class="nm">4</span>,<span class="nm">5</span>,<span class="nm">6</span>,<span class="nm">7</span>,<span class="nm">8</span>};\n<span class="st">int</span> nums[<span class="nm">3</span>][<span class="nm">7</span>]={{<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>},{<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>},{<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">1</span>}};\n<span class="kw">void</span> <span class="fn">setup</span>() { <span class="kw">for</span>(<span class="st">int</span> i=<span class="nm">0</span>;i&lt;<span class="nm">7</span>;i++) <span class="fn">pinMode</span>(segs[i],OUTPUT); }\n<span class="kw">void</span> <span class="fn">loop</span>() { <span class="kw">for</span>(<span class="st">int</span> n=<span class="nm">0</span>;n&lt;<span class="nm">3</span>;n++){<span class="kw">for</span>(<span class="st">int</span> i=<span class="nm">0</span>;i&lt;<span class="nm">7</span>;i++) <span class="fn">digitalWrite</span>(segs[i],nums[n][i]);<span class="fn">delay</span>(<span class="nm">800</span>);} }`,tip:'For multiple 7-segment digits, use a MAX7219 driver IC — it controls up to 8 digits with just 3 Arduino pins via SPI.',circuits:[{src:'images/7seg-wiring.png',caption:'7-Segment Wiring',cols:2, objectFit:'contain', height:'500px'}]},
+  {emoji:'🔲',image:'images/matrix8x8.png',name:'8×8 LED Matrix',category:'Output · LED Matrix',desc:'Display scrolling text, animations and icons on an 8×8 LED grid.',tags:['MAX7219','SPI','LED'],tagTeal:'Display',level:2,badge:'',badgeClass:'',color:'#0a0a0a',descFull:'8×8 LED matrix modules driven by the MAX7219 display 64 individually controllable LEDs. Controlled via SPI with just 3 Arduino pins. Use the LedControl or MD_MAX72XX library.',uses:['Scrolling news ticker','Game display (Snake, Tetris)','Digital clock icons','Robot facial expressions'],pinout:[{pin:'VCC',arduino:'5V',notes:'Power',type:'orange'},{pin:'GND',arduino:'GND',notes:'Ground',type:''},{pin:'DIN',arduino:'Pin 11 (MOSI)',notes:'SPI data',type:'teal'},{pin:'CLK',arduino:'Pin 13 (SCK)',notes:'SPI clock',type:'teal'},{pin:'CS',arduino:'Pin 10',notes:'SPI chip select',type:'teal'}],code:`<span class="kw">#include</span> <span class="st">&lt;LedControl.h&gt;</span>\nLedControl lc=<span class="fn">LedControl</span>(<span class="nm">11</span>,<span class="nm">13</span>,<span class="nm">10</span>,<span class="nm">1</span>);\n<span class="kw">void</span> <span class="fn">setup</span>() {\n  lc.<span class="fn">shutdown</span>(<span class="nm">0</span>,<span class="kw">false</span>); lc.<span class="fn">setIntensity</span>(<span class="nm">0</span>,<span class="nm">8</span>); lc.<span class="fn">clearDisplay</span>(<span class="nm">0</span>);\n}\n<span class="kw">void</span> <span class="fn">loop</span>() {\n  lc.<span class="fn">setLed</span>(<span class="nm">0</span>,<span class="nm">3</span>,<span class="nm">3</span>,<span class="kw">true</span>); <span class="fn">delay</span>(<span class="nm">500</span>);\n  lc.<span class="fn">setLed</span>(<span class="nm">0</span>,<span class="nm">3</span>,<span class="nm">3</span>,<span class="kw">false</span>); <span class="fn">delay</span>(<span class="nm">500</span>);\n}`,tip:'Use MD_MAX72XX library with MD_Parola for easy scrolling text. LedControl gives lower-level individual pixel control.',circuits:[{src:'images/matrix-wiring.jpg',caption:'MAX7219 Matrix Wiring', objectFit:'contain', height:'500px', cols:2}]},
+  {emoji:'🖥️',image:'images/lcd.png',name:'LCD Display',category:'Output · Display',desc:'16×2 character LCD. Display sensor data, messages and menus in real time.',tags:['LiquidCrystal','16×2 chars','I2C backpack'],tagTeal:'Display',level:2,badge:'New',badgeClass:'',color:'#001208',descFull:'The 16×2 LCD can show 16 characters across 2 rows. Using it with an I2C backpack module reduces wiring from 6+ pins to just 2 (SDA + SCL). Install the "LiquidCrystal I2C" library for the I2C version.',uses:['Real-time sensor readings','Menu systems for user interaction','Countdown timers and clocks','Debug output without Serial Monitor'],pinout:[{pin:'VCC (I2C module)',arduino:'5V',notes:'Power',type:'orange'},{pin:'GND (I2C module)',arduino:'GND',notes:'Ground',type:''},{pin:'SDA (I2C module)',arduino:'A4 (SDA)',notes:'I2C data',type:'teal'},{pin:'SCL (I2C module)',arduino:'A5 (SCL)',notes:'I2C clock',type:'teal'}],code:`<span class="kw">#include</span> <span class="st">&lt;Wire.h&gt;</span>\n<span class="kw">#include</span> <span class="st">&lt;LiquidCrystal_I2C.h&gt;</span>\nLiquidCrystal_I2C <span class="fn">lcd</span>(<span class="nm">0x27</span>,<span class="nm">16</span>,<span class="nm">2</span>);\n<span class="kw">void</span> <span class="fn">setup</span>() {\n  lcd.<span class="fn">init</span>(); lcd.<span class="fn">backlight</span>();\n  lcd.<span class="fn">setCursor</span>(<span class="nm">0</span>,<span class="nm">0</span>); lcd.<span class="fn">print</span>(<span class="st">"Hello Arduino!"</span>);\n}\n<span class="kw">void</span> <span class="fn">loop</span>() {}`,tip:'If nothing shows, the I2C address might be 0x3F instead of 0x27. Run an I2C scanner sketch to find your module\'s address.',circuits:[{src:'images/lcd-wiring.png',caption:'LCD I2C Wiring',cols:2, objectFit:'contain', height:'500px'}]},
+  {emoji:'📺',image:'images/oled.png',name:'OLED Display',category:'Output · Display',desc:'Tiny 128×64 OLED display for crisp text and graphics via I2C.',tags:['I2C','SSD1306','Graphics'],tagTeal:'Display',level:2,badge:'',badgeClass:'',color:'#000814',descFull:'The 0.96" OLED display uses the SSD1306 driver and communicates via I2C. It shows 128×64 pixels of crisp white on black with no backlight needed. Install the "Adafruit SSD1306" and "Adafruit GFX" libraries.',uses:['Compact sensor value display','Menu interfaces','Mini game displays','Battery-level indicators'],pinout:[{pin:'VCC',arduino:'3.3V or 5V',notes:'Power (check your module)',type:'orange'},{pin:'GND',arduino:'GND',notes:'Ground',type:''},{pin:'SDA',arduino:'A4 (SDA)',notes:'I2C data',type:'teal'},{pin:'SCL',arduino:'A5 (SCL)',notes:'I2C clock',type:'teal'}],code:`<span class="kw">#include</span> <span class="st">&lt;Wire.h&gt;</span>\n<span class="kw">#include</span> <span class="st">&lt;Adafruit_SSD1306.h&gt;</span>\nAdafruit_SSD1306 <span class="fn">display</span>(<span class="nm">128</span>,<span class="nm">64</span>,&Wire,-<span class="nm">1</span>);\n<span class="kw">void</span> <span class="fn">setup</span>() {\n  display.<span class="fn">begin</span>(SSD1306_SWITCHCAPVCC,<span class="nm">0x3C</span>);\n  display.<span class="fn">clearDisplay</span>();\n  display.<span class="fn">setTextSize</span>(<span class="nm">1</span>); display.<span class="fn">setTextColor</span>(WHITE);\n  display.<span class="fn">setCursor</span>(<span class="nm">0</span>,<span class="nm">0</span>); display.<span class="fn">println</span>(<span class="st">"Hello OLED!"</span>);\n  display.<span class="fn">display</span>();\n}\n<span class="kw">void</span> <span class="fn">loop</span>() {}`,tip:'Always call display.display() after drawing — nothing appears until you do. The SSD1306 library buffers all drawing operations first.',circuits:[{src:'images/oled-wiring.png',caption:'OLED I2C Wiring', objectFit:'contain', height:'500px', cols:2}]},
+];
+
+/* ════════ STATE ════════ */
+let current=0, filtered=[...components], detailOpen=false;
+
+/* ════════ THREE.JS BACKGROUND ════════ */
+(function(){
+  const canvas=document.getElementById('heroCanvas');
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,100);
+  camera.position.set(0,0,14);
+
+  scene.add(new THREE.AmbientLight(0xffffff,0.3));
+  const l1=new THREE.PointLight(0x00979d,2.5,30); l1.position.set(10,6,5); scene.add(l1);
+  const l2=new THREE.PointLight(0xe8500a,1.5,25); l2.position.set(-10,-5,4); scene.add(l2);
+
+  // Floating particle components
+  const comps=[];
+  const positions=[];
+  for(let i=0;i<24;i++){
+    const geo=new THREE.OctahedronGeometry(0.15+Math.random()*0.2,0);
+    const col=[0x00979d,0xe8500a,0xffdd00,0x66bb6a,0x42a5f5,0xab47bc][Math.floor(Math.random()*6)];
+    const mat=new THREE.MeshPhongMaterial({color:col,emissive:col,emissiveIntensity:.5,shininess:80});
+    const mesh=new THREE.Mesh(geo,mat);
+    const px=(Math.random()-.5)*20, py=(Math.random()-.5)*12, pz=(Math.random()-.5)*4-3;
+    mesh.position.set(px,py,pz);
+    scene.add(mesh);
+    positions.push([px,py,pz]);
+    comps.push({mesh,speed:.2+Math.random()*.5,off:Math.random()*Math.PI*2});
+  }
+
+  // Circuit board lines
+  const lineMat=new THREE.LineBasicMaterial({color:0x00979d,opacity:.08,transparent:true});
+  for(let i=0;i<8;i++){
+    const y=-5+i*1.5;
+    const pts=[new THREE.Vector3(-12,y,-4),new THREE.Vector3(12,y,-4)];
+    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),lineMat));
+  }
+  for(let i=0;i<6;i++){
+    const x=-8+i*3;
+    const pts=[new THREE.Vector3(x,-6,-4),new THREE.Vector3(x,6,-4)];
+    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),lineMat));
+  }
+
+  let mx=0,my=0;
+  document.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*2;my=-(e.clientY/innerHeight-.5)*2;});
+
+  function resize(){
+    const w=canvas.parentElement.clientWidth, h=canvas.parentElement.clientHeight;
+    renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix();
+  }
+
+  let t=0;
+  function animate(){
+    requestAnimationFrame(animate); t+=.01;
+    comps.forEach((c,i)=>{
+      c.mesh.position.y=positions[i][1]+Math.sin(t*c.speed+c.off)*.4;
+      c.mesh.rotation.x+=.006; c.mesh.rotation.y+=.009;
+    });
+    l1.position.x=6+Math.sin(t*.3)*4;
+    camera.position.x+=(mx*.8-camera.position.x)*.03;
+    camera.position.y+=(my*.5-camera.position.y)*.03;
+    camera.lookAt(0,0,0);
+    renderer.render(scene,camera);
+  }
+  resize(); addEventListener('resize',resize); animate();
+})();
+
+/* ════════ RENDER CARDS ════════ */
+function renderCards(){
+  const track=document.getElementById('cardsTrack');
+  track.innerHTML=filtered.map((c,i)=>{
+    const visual=c.image
+      ?`<div class="card-visual"><img src="${c.image}" alt="${c.name}" loading="lazy"></div>`
+      :`<div class="card-visual"><span class="card-emoji">${c.emoji}</span></div>`;
+    return `<div class="comp-card ${i===current?'active':''}" onclick="jumpTo(${i})">
+      ${c.badge?`<div class="card-badge ${c.badgeClass}">${c.badge}</div>`:''}
+      ${visual}
+      <div class="card-overlay"></div>
+      <div class="card-info">
+        <div class="card-category">${c.category}</div>
+        <div class="card-name">${c.name}</div>
+        <div class="card-dots">${[1,2,3].map(d=>`<div class="card-dot ${c.level>=d?'on':''}"></div>`).join('')}</div>
+      </div>
+    </div>`;
+  }).join('');
+  updateTrackPosition(false);
+  document.getElementById('totalCount').textContent='/ '+filtered.length;
+}
+
+function updateTrackPosition(animate=true){
+  const track=document.getElementById('cardsTrack');
+  const CARD_W=204, OFFSET_X=16;
+  const offset=current*CARD_W-OFFSET_X;
+  if(!animate) track.style.transition='none';
+  track.style.transform=`translateX(-${Math.max(0,offset)}px)`;
+  if(!animate){void track.offsetWidth; track.style.transition='';}
+  document.querySelectorAll('.comp-card').forEach((el,i)=>el.classList.toggle('active',i===current));
+}
+
+function updatePanel(idx){
+  const c=filtered[idx]; if(!c)return;
+  document.getElementById('bgLayer').style.backgroundColor=c.color;
+  document.getElementById('bgEmoji').textContent=c.image?'':c.emoji;
+  ['compCategory','compName','compDesc'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.classList.remove('panel-swap'); void el.offsetWidth; el.classList.add('panel-swap');
+  });
+  setTimeout(()=>{
+    document.getElementById('compCategory').textContent=c.category;
+    document.getElementById('compName').textContent=c.name;
+    document.getElementById('compDesc').textContent=c.desc;
+    document.getElementById('compTags').innerHTML=`<span class="comp-tag teal">${c.tagTeal}</span>`+c.tags.map(t=>`<span class="comp-tag">${t}</span>`).join('');
+    document.querySelectorAll('#diffDots .diff-dot').forEach((d,i)=>d.classList.toggle('on',i<c.level));
+    const num=String(idx+1).padStart(2,'0');
+    document.getElementById('compCounter').textContent=num;
+    document.getElementById('counterInline').textContent=num;
+    document.getElementById('progressFill').style.width=((idx+1)/filtered.length*100)+'%';
+  },80);
+}
+
+function navigate(dir){
+  current=(current+dir+filtered.length)%filtered.length;
+  updateTrackPosition(true); updatePanel(current);
+}
+function jumpTo(idx){
+  if(idx===current)return;
+  current=idx; updateTrackPosition(true); updatePanel(current);
+}
+
+/* ════════ DETAIL PANEL ════════ */
+function openDetail(){
+  const c=filtered[current]; if(!c)return;
+  document.getElementById('detailCrumb').textContent=`Components / ${c.name}`;
+  renderDetail(c);
+  document.getElementById('heroPanel').style.display='none';
+  document.getElementById('detailPanel').style.display='flex';
+  document.getElementById('detailPanel').style.flexDirection='column';
+  document.getElementById('detailPanel').scrollTop=0;
+  detailOpen=true;
+}
+
+function closeDetail(){
+  document.getElementById('detailPanel').style.display='none';
+  document.getElementById('heroPanel').style.display='';
+  detailOpen=false;
+}
+
+function renderDetail(c){
+  const idx=filtered.indexOf(c);
+  const isLast=idx===filtered.length-1, isFirst=idx===0;
+  const visual=c.image
+    ?`<img src="${c.image}" alt="${c.name}" style="max-height:160px;object-fit:contain;">`
+    :`<span style="font-size:120px;filter:drop-shadow(0 12px 30px rgba(0,0,0,0.5))">${c.emoji}</span>`;
+
+  const pinRows=c.pinout.map(p=>`<tr><td>${p.pin}</td><td><span class="pin-badge ${p.type}">${p.arduino}</span></td><td>${p.notes}</td></tr>`).join('');
+  const useRows=c.uses.map(u=>`<div class="use-row"><div class="use-dot"></div><span>${u}</span></div>`).join('');
+
+  let circuitHtml='';
+  if(c.circuits&&c.circuits.length>0){
+    const imgs=c.circuits.map(ci=>{
+      const h=ci.height||'220px',fit=ci.objectFit||'cover',span=ci.cols===2?'grid-column:1/-1;':'';
+      return `<div class="circuit-img-wrap" style="${span}">
+        <img src="${ci.src}" alt="${ci.caption}" loading="lazy" style="height:${h};object-fit:${fit};">
+        <div class="circuit-caption">${ci.caption}</div>
+      </div>`;
+    }).join('');
+    circuitHtml=`<div class="circuit-section"><div class="detail-section-title">Circuit Diagrams & Wiring Photos</div><div class="circuit-grid">${imgs}</div></div>`;
+  }
+
+  const bottomNav=`<div class="detail-bottom-nav">
+    ${!isFirst?`<button class="btn-detail-prev" onclick="detailNav(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Previous</button>`:'<div></div>'}
+    ${isLast
+      ?`<button class="btn-detail-next is-last" onclick="closeDetail()">← Back to Components</button>`
+      :`<button class="btn-detail-next" onclick="detailNav(1)">Next Component<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>`}
+  </div>`;
+
+  document.getElementById('detailContent').innerHTML=`
+    <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:28px;padding:24px 0 16px;border-bottom:1px solid var(--border);">
+      ${visual}
+      <span class="detail-visual-badge">${c.tagTeal} · Level ${c.level}</span>
+    </div>
+    <div>
+      <div class="detail-section-title">About This Component</div>
+      <div class="detail-component-name">${c.name}</div>
+      <span class="detail-category-tag">${c.category}</span>
+      <div class="detail-desc-full">${c.descFull}</div>
+      <div class="detail-uses-title">🔧 Where We Use It</div>
+      <div style="margin-bottom:20px;">${useRows}</div>
+      <div class="detail-section-title" style="margin-top:20px;">Pinout / Wiring</div>
+      <table class="pinout-table"><thead><tr><th>Pin</th><th>Arduino</th><th>Notes</th></tr></thead><tbody>${pinRows}</tbody></table>
+    </div>
+    <div>
+      <div class="detail-section-title">Sample Code</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre class="code-pre">${c.code}</pre>
+      </div>
+      <div class="tip-box"><div class="tip-icon">💡</div><div class="tip-text"><strong>Pro Tip:</strong> ${c.tip}</div></div>
+    </div>
+    ${circuitHtml}
+    ${bottomNav}
+  `;
+}
+
+function detailNav(dir){
+  current=(current+dir+filtered.length)%filtered.length;
+  updateTrackPosition(true); updatePanel(current);
+  document.getElementById('detailCrumb').textContent=`Components / ${filtered[current].name}`;
+  renderDetail(filtered[current]);
+  document.getElementById('detailPanel').scrollTop=0;
+}
+
+function copyCode(btn){
+  const pre=btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(()=>{btn.textContent='✓ Copied!';setTimeout(()=>{btn.textContent='Copy';},1800);});
+}
+
+/* ════════ FILTER ════════ */
+function filterComps(cat,pill){
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
+  pill.classList.add('active');
+  filtered=cat==='all'?[...components]:components.filter(c=>c.category.toLowerCase().includes(cat)||c.tags.some(t=>t.toLowerCase().includes(cat)));
+  current=0; renderCards(); updatePanel(0);
+}
+
+/* ════════ SEARCH ════════ */
+function handleSearch(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  filtered=q?components.filter(c=>c.name.toLowerCase().includes(q)||c.category.toLowerCase().includes(q)||c.tags.some(t=>t.toLowerCase().includes(q))):[...components];
+  current=0; renderCards(); updatePanel(0);
+}
+
+/* ════════ KEYBOARD + SCROLL ════════ */
+document.addEventListener('keydown',e=>{
+  if(detailOpen){if(e.key==='Escape')closeDetail();return;}
+  if(e.key==='ArrowRight')navigate(1);
+  if(e.key==='ArrowLeft')navigate(-1);
+  if(e.key==='Enter')openDetail();
+});
+
+let scrollLock=false;
+document.getElementById('heroPanel').addEventListener('wheel',e=>{
+  if(detailOpen)return; e.preventDefault();
+  if(scrollLock)return;
+  navigate(e.deltaY>0||e.deltaX>0?1:-1);
+  scrollLock=true; setTimeout(()=>scrollLock=false,420);
+},{passive:false});
+
+let touchStartX=0;
+document.getElementById('heroPanel').addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;},{passive:true});
+document.getElementById('heroPanel').addEventListener('touchend',e=>{
+  if(detailOpen)return;
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  if(Math.abs(dx)<40)return;
+  navigate(dx<0?1:-1);
+},{passive:true});
+
+function navSearch(q) {
+  q = q.toLowerCase().trim();
+  if (!q) return;
+  // Map keywords to pages
+  const routes = [
+    { keywords: ['led','resistor','buzzer','sensor','servo','motor','lcd','oled','rfid','bluetooth','relay','ultrasonic','component'], page: 'components.html' },
+    { keywords: ['mblock','block','scratch','drag','beginner'], page: 'mblock.html' },
+    { keywords: ['c++','cpp','code','variable','loop','function','serial'], page: 'cpp.html' },
+    { keywords: ['project','light','piano','switch','reaction','blink'], page: 'projects.html' },
+  ];
+  for (const route of routes) {
+    if (route.keywords.some(k => q.includes(k))) {
+      window.location.href = route.page + '?search=' + encodeURIComponent(q);
+      return;
+    }
+  }
+}
+
+function toggleAccount(e){e.stopPropagation();document.getElementById('accountDropdown').classList.toggle('open');}
+document.addEventListener('click',()=>document.getElementById('accountDropdown')?.classList.remove('open'));
+function logout(){if(confirm('Log out?'))alert('Logged out!');}
+
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+/* ════════ INIT ════════ */
+renderCards(); updatePanel(0);
+</script>
+</body>
+</html>

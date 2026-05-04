@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arduino Projects — Logo 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/responsive.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --teal:#307fff;--teal-dark:#0123ac;--teal-light:rgba(0, 47, 157, 0.12);
+  --orange:#e8500a;--orange-light:rgba(232,80,10,0.12);
+  --purple:#7c3aed;--purple-light:rgba(124,58,237,0.12);
+  --dark:#050708;--dark2:#0c0f10;--dark3:#141819;
+  --border:rgba(255,255,255,0.08);--muted:rgba(255,255,255,0.45);--faint:rgba(255,255,255,0.05);
+}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--dark);color:#fff;overflow-x:hidden;}
+
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+.cursor-glow{position:fixed;pointer-events:none;z-index:999;width:380px;height:380px;background:radial-gradient(circle,rgba(0,151,157,0.05) 0%,transparent 70%);border-radius:50%;transform:translate(-50%,-50%);}
+
+/* READ PROGRESS */
+#readProgress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--orange));z-index:999;transition:width .1s;width:0%;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 40px;gap:24px;background:rgba(5,7,8,0.84);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'Fraunces',serif;font-size:24px;font-weight:900;font-style:italic;color:var(--teal);letter-spacing:-1px;text-decoration:none;text-shadow:0 0 28px rgba(0,151,157,0.35);}
+.nav-links{display:flex;gap:4px;list-style:none;}
+.nav-links a{font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;padding:6px 13px;border-radius:8px;transition:all .2s;}
+.nav-links a:hover,.nav-links a.active{background:var(--teal-light);color:var(--teal);}
+.nav-right{display:flex;align-items:center;justify-content:flex-end;gap:10px;}
+.nav-search{display:flex;align-items:center;background:var(--faint);border:1.5px solid var(--border);border-radius:100px;padding:0 14px;height:34px;gap:8px;width:180px;}
+.nav-search svg{width:13px;color:var(--muted);}
+.nav-search input{background:none;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:12.5px;color:#fff;width:100%;}
+.nav-search input::placeholder{color:rgba(255,255,255,0.2);}
+.nav-account{display:flex;align-items:center;gap:8px;background:var(--teal);color:#fff;border:none;padding:7px 16px 7px 9px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+.nav-account:hover{background:var(--teal-dark);}
+.acc-av{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;}
+.nav-logo .orange{ color: var(--orange);}
+.back-btn{position:fixed;top:78px;left:36px;z-index:210;display:flex;align-items:center;gap:7px;background:rgba(5,7,8,0.88);border:1px solid var(--border);color:rgba(255,255,255,0.7);padding:7px 15px 7px 11px;border-radius:100px;font-size:12.5px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;text-decoration:none;backdrop-filter:blur(10px);transition:all .22s;}
+.back-btn:hover{background:var(--teal-light);border-color:var(--teal);color:#fff;transform:translateX(-2px);}
+.back-btn svg{width:13px;}
+
+.account-wrap{position:relative;}
+.nav-account{display:flex;align-items:center;gap:8px;background:var(--teal);color:#fff;border:none;padding:7px 16px 7px 9px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+.nav-account:hover{background:var(--teal-dark);}
+.acc-av{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;}
+.account-dropdown{position:absolute;top:calc(100% + 10px);right:0;width:280px;background:#181c1e;border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .22s,transform .22s;z-index:300;}
+.account-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0);}
+.acc-header{background:linear-gradient(135deg,#00979d,#007a7f);padding:20px 18px;display:flex;align-items:center;gap:14px;}
+.acc-big-avatar{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid rgba(255,255,255,0.3);flex-shrink:0;}
+.acc-name{font-size:14px;font-weight:700;color:#fff;}
+.acc-email{font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;}
+.acc-progress-wrap{padding:14px 16px;border-bottom:1px solid var(--border);}
+.acc-progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:7px;}
+.acc-progress-bar{height:5px;background:rgba(255,255,255,0.08);border-radius:100px;overflow:hidden;}
+.acc-progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-dark));border-radius:100px;}
+.acc-menu{padding:6px;}
+.acc-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;text-decoration:none;color:rgba(255,255,255,0.8);font-size:13px;font-weight:500;transition:background .15s;}
+.acc-item:hover{background:rgba(0,151,157,0.1);color:var(--teal);}
+.acc-item-icon{width:30px;height:30px;border-radius:8px;background:var(--faint);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.acc-divider{height:1px;background:var(--border);margin:4px 12px;}
+.acc-logout{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:#f28b82;transition:background .15s;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:4px;}
+.acc-logout:hover{background:rgba(242,139,130,0.08);}
+.back-btn{position:fixed;top:78px;left:36px;z-index:210;display:flex;align-items:center;gap:7px;background:rgba(5,7,8,0.88);border:1px solid var(--border);color:rgba(255,255,255,0.7);padding:7px 15px 7px 11px;border-radius:100px;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:none;backdrop-filter:blur(10px);transition:all .22s;}
+.back-btn:hover{background:var(--teal-light);border-color:var(--teal);color:#fff;transform:translateX(-2px);}
+.back-btn svg{width:13px;}
+
+/* HERO */
+.page-hero{min-height:100vh;display:flex;align-items:center;padding:120px 80px 80px;position:relative;overflow:hidden;}
+#hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;}
+.hero-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(0,151,157,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,151,157,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;}
+.hero-content{position:relative;z-index:5;max-width:600px;}
+.hero-eyebrow{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:3px;margin-bottom:18px;display:flex;align-items:center;gap:10px;opacity:0;animation:riseUp .7s .2s ease forwards;}
+.hero-eyebrow::before{content:'';width:24px;height:2px;background:var(--teal);border-radius:2px;}
+.hero-title{font-family:'Fraunces',serif;font-size:clamp(52px,7vw,90px);font-weight:900;line-height:.9;letter-spacing:-3px;margin-bottom:22px;opacity:0;animation:riseUp .7s .4s ease forwards;}
+.hero-title .accent{color:var(--teal);font-style:italic;text-shadow:0 0 40px rgba(0,151,157,0.4);}
+.hero-sub{font-size:15px;color:var(--muted);line-height:1.8;margin-bottom:36px;max-width:480px;opacity:0;animation:riseUp .7s .6s ease forwards;}
+.tier-pills{display:flex;gap:12px;flex-wrap:wrap;opacity:0;animation:riseUp .7s .8s ease forwards;}
+.tier-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:100px;font-size:13px;font-weight:600;text-decoration:none;transition:all .22s;border:1.5px solid transparent;}
+.tier-pill.basic{background:var(--teal-light);border-color:rgba(0,151,157,0.3);color:var(--teal);}
+.tier-pill.inter{background:var(--orange-light);border-color:rgba(232,80,10,0.3);color:#ff8a65;}
+.tier-pill.adv{background:var(--purple-light);border-color:rgba(124,58,237,0.3);color:#a78bfa;}
+.tier-pill:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
+@keyframes riseUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* STICKY SIDEBAR TOC */
+.layout{display:grid;grid-template-columns:220px 1fr;gap:0;position:relative;z-index:10;}
+.sidebar{position:sticky;top:94px;height:calc(100vh - 94px);background:var(--dark3);border-right:1px solid var(--border);padding:24px 0;overflow-y:auto;scrollbar-width:thin;}
+.sidebar-title{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:2.5px;padding:0 20px 12px;border-bottom:1px solid var(--border);margin-bottom:12px;}
+.toc-proj-btn{display:block;font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;padding:8px 20px;transition:all .18s;border-left:2px solid transparent;}
+.toc-proj-btn:hover{color:#fff;background:rgba(0,151,157,0.06);}
+.toc-proj-btn.active{color:var(--teal);border-left-color:var(--teal);background:var(--teal-light);}
+.toc-section-hd{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;padding:14px 20px 6px;color:rgba(255,255,255,0.25);}
+
+/* MAIN CONTENT */
+.main-content{background:var(--dark2);}
+
+/* TIER BANDS */
+.tier-band{padding:56px 56px 28px;position:relative;}
+.tier-band::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.tier-band.basic::before{background:linear-gradient(90deg,transparent,var(--teal),transparent);}
+.tier-band.inter::before{background:linear-gradient(90deg,transparent,var(--orange),transparent);}
+.tier-band.adv::before{background:linear-gradient(90deg,transparent,var(--purple),transparent);}
+.tier-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:3px;margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.tier-label::before{content:'';width:24px;height:2px;border-radius:2px;}
+.tier-band.basic .tier-label{color:var(--teal);}
+.tier-band.basic .tier-label::before{background:var(--teal);}
+.tier-band.inter .tier-label{color:#ff8a65;}
+.tier-band.inter .tier-label::before{background:var(--orange);}
+.tier-band.adv .tier-label{color:#a78bfa;}
+.tier-band.adv .tier-label::before{background:var(--purple);}
+.tier-title{font-family:'Fraunces',serif;font-size:clamp(30px,4vw,46px);font-weight:900;letter-spacing:-1.5px;}
+.tier-desc{font-size:14px;color:var(--muted);margin-top:10px;max-width:580px;line-height:1.7;}
+
+/* PROJECT CARD */
+.project-card{margin:0 56px 48px;background:var(--dark3);border:1px solid var(--border);border-radius:22px;overflow:hidden;transition:border-color .3s;scroll-margin-top:80px;}
+.project-card:hover{border-color:rgba(0,151,157,0.2);}
+.proj-header{display:grid;grid-template-columns:1fr auto;align-items:center;gap:20px;padding:26px 32px 22px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015);cursor:pointer;user-select:none;transition:background .2s;}
+.proj-header:hover{background:rgba(255,255,255,0.03);}
+.proj-num{font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.proj-title{font-family:'Fraunces',serif;font-size:clamp(20px,2.5vw,30px);font-weight:900;letter-spacing:-.8px;}
+.proj-meta{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap;}
+.proj-tag{font-family:'DM Mono',monospace;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;}
+.proj-tag.teal{background:var(--teal-light);color:var(--teal);border:1px solid rgba(0,151,157,0.25);}
+.proj-tag.orange{background:var(--orange-light);color:#ff8a65;border:1px solid rgba(232,80,10,0.25);}
+.proj-tag.gray{background:var(--faint);color:var(--muted);border:1px solid var(--border);}
+.time-badge{font-size:11px;color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:3px 10px;border-radius:100px;}
+.difficulty-row{display:flex;align-items:center;gap:10px;margin-top:8px;}
+.diff-label{font-size:11px;color:var(--muted);}
+.diff-stars{display:flex;gap:4px;}
+.diff-star{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.1);}
+.diff-star.on{background:var(--teal);box-shadow:0 0 6px rgba(0,151,157,0.6);}
+.proj-chevron{font-size:20px;color:var(--muted);transition:transform .25s;flex-shrink:0;}
+.proj-header.open .proj-chevron{transform:rotate(180deg);}
+.proj-body{display:none;}
+.proj-body.open{display:block;}
+.proj-section{padding:28px 32px;border-bottom:1px solid var(--border);}
+.proj-section:last-child{border-bottom:none;}
+.sect-label{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.sect-label::before{content:'';width:18px;height:2px;background:var(--teal);border-radius:2px;}
+.proj-overview{font-size:14px;color:var(--muted);line-height:1.8;max-width:720px;margin-bottom:18px;}
+.proj-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+.proj-list li{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted);line-height:1.6;}
+.proj-list li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:7px;}
+
+/* Intro grid */
+.intro-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
+.intro-card{background:var(--dark);border:1px solid var(--border);border-radius:14px;padding:18px;transition:all .25s;}
+.intro-card:hover{border-color:rgba(0,151,157,0.25);transform:translateY(-2px);}
+.intro-card-icon{font-size:26px;margin-bottom:10px;}
+.intro-card-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:5px;}
+.intro-card-text{font-size:12px;color:var(--muted);line-height:1.65;}
+
+/* Circuit slots */
+.circuit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+.circuit-slot{background:var(--dark);border:1.5px dashed rgba(0,151,157,0.25);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:12px;transition:all .2s;}
+.circuit-slot:hover{border-color:rgba(0,151,157,0.5);background:rgba(0,151,157,0.04);}
+.circuit-slot.full{grid-column:span 2;}
+.circuit-slot-icon{font-size:22px;flex-shrink:0;align-items:center;max-height:650px;}
+.circuit-slot-icon img{width:990px;max-height:650px;border-radius:12px;}
+.circuit-slot-label{font-size:15px;color:var(--muted);line-height:1.5;}
+.circuit-slot-label code{display:block;font-family:'DM Mono',monospace;font-size:12px;color:rgba(0,151,157,0.7);margin-top:3px;}
+/* Sub-tabs */
+.sub-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.sub-tab{padding:7px 17px;border-radius:100px;border:1px solid var(--border);background:var(--faint);font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;}
+.sub-tab:hover{border-color:var(--teal);color:var(--teal);}
+.sub-tab.active{background:var(--teal-light);border-color:rgba(0,151,157,0.35);color:var(--teal);}
+.sub-panel{display:none;}
+.sub-panel.active{display:block;}
+
+/* Code compare */
+.code-compare{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
+.code-col-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;padding:5px 12px;border-radius:6px;display:inline-block;}
+.code-col-label.mblock{background:rgba(33,150,243,0.15);color:#90caf9;}
+.code-col-label.cpp{background:var(--teal-light);color:var(--teal);}
+.mblock-screenshot{background:rgba(33,150,243,0.07);border:1.5px dashed rgba(33,150,243,0.25);border-radius:12px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;}
+.mblock-screenshot-icon{font-size:32px;}
+.mblock-screenshot-icon img{width:500px;min-height:500px;border-radius:12px;}
+
+
+
+/* Code blocks */
+.code-block{background:#0d1117;border:1px solid var(--border);border-radius:13px;overflow:hidden;margin-top:0;transition:box-shadow .25s;}
+.code-block:hover{box-shadow:0 0 0 1px rgba(0,151,157,0.3);}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border);}
+.code-lang{font-family:'DM Mono',monospace;font-size:9.5px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:1px;}
+.code-lang.cpp{color:var(--teal);}
+.copy-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:2px 9px;border-radius:5px;font-size:10px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .18s;}
+.copy-btn:hover{background:var(--teal-light);border-color:var(--teal);color:var(--teal);}
+pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-size:13px;line-height:1.8;color:#c9d1d9;margin:0;scrollbar-width:thin;}
+.kw{color:#ff7b72;}.fn{color:#d2a8ff;}.cm{color:#8b949e;}.st{color:#a5d6ff;}.nm{color:#79c0ff;}
+
+/* Quiz */
+.quiz-wrap{background:var(--dark);border:1px solid var(--border);border-radius:16px;padding:22px 26px;}
+.quiz-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.quiz-question{font-size:13px;font-weight:600;color:#fff;margin-bottom:12px;line-height:1.55;}
+.quiz-options{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:12.5px;color:var(--muted);transition:all .2s;}
+.quiz-opt:hover{border-color:rgba(0,151,157,0.35);background:rgba(0,151,157,0.06);color:#fff;}
+.quiz-opt-letter{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.quiz-opt.correct{border-color:#66bb6a;background:rgba(102,187,106,0.1);color:#a5d6a7;}
+.quiz-opt.wrong{border-color:#ef5350;background:rgba(239,83,80,0.08);color:#ef9a9a;}
+.quiz-feedback{font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px;display:none;padding:10px 14px;border-radius:9px;}
+.quiz-feedback.show{display:block;}
+.quiz-feedback.ok{background:rgba(102,187,106,0.08);border:1px solid rgba(102,187,106,0.2);color:#a5d6a7;}
+.quiz-feedback.no{background:rgba(239,83,80,0.07);border:1px solid rgba(239,83,80,0.2);color:#ef9a9a;}
+.quiz-q{margin-bottom:16px;}
+
+/* Message box */
+.message-box{background:var(--dark);border:1px solid var(--border);border-radius:14px;padding:20px 24px;}
+.message-box-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;display:flex;align-items:center;gap:10px;}
+.message-box-sub{font-size:12px;color:var(--muted);margin-bottom:14px;}
+.msg-row{display:flex;flex-direction:column;gap:10px;}
+.msg-input{background:rgba(255,255,255,0.03);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-size:13px;font-family:'DM Sans',sans-serif;color:#fff;outline:none;resize:vertical;min-height:80px;transition:border-color .2s;}
+.msg-input:focus{border-color:var(--teal);}
+.msg-input::placeholder{color:rgba(255,255,255,0.2);}
+.msg-send{align-self:flex-end;background:var(--teal);color:#fff;border:none;padding:10px 26px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+.msg-send:hover{background:var(--teal-dark);transform:translateY(-1px);}
+.msg-sent{display:none;font-size:12px;color:#66bb6a;font-weight:600;margin-top:8px;}
+
+/* Bonus */
+.bonus-box{background:linear-gradient(135deg,rgba(232,80,10,0.06),rgba(232,80,10,0.02));border:1px solid rgba(232,80,10,0.2);border-radius:14px;padding:20px 24px;display:flex;gap:16px;}
+.bonus-icon{font-size:28px;flex-shrink:0;}
+.bonus-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;}
+.bonus-list{list-style:none;display:flex;flex-direction:column;gap:7px;}
+.bonus-list li{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--muted);line-height:1.6;}
+.bonus-list li::before{content:'›';color:var(--orange);font-weight:700;flex-shrink:0;}
+
+/* No-code box */
+.no-code-box{background:var(--faint);border:1px solid var(--border);border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:14px;}
+.no-code-box-text .title{font-size:14px;font-weight:600;color:#fff;margin-bottom:4px;}
+.no-code-box-text .desc{font-size:13px;color:var(--muted);}
+
+/* Next strip */
+.next-strip{margin:0 56px 48px;background:rgba(0,151,157,0.05);border:1px solid rgba(0,151,157,0.15);border-radius:16px;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.next-strip-label{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;}
+.next-strip-title{font-size:13px;color:var(--muted);line-height:1.5;}
+.btn-next-proj{background:var(--teal);color:#fff;border:none;padding:10px 22px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none;transition:all .2s;}
+.btn-next-proj:hover{background:var(--teal-dark);transform:translateY(-1px);}
+
+/* Coming soon */
+.coming-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:0 56px 56px;}
+.coming-card{background:var(--dark3);border:1px solid var(--border);border-radius:20px;padding:26px;position:relative;transition:all .3s;}
+.coming-card:hover{border-color:rgba(0,151,157,0.25);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,0.3);}
+.coming-icon{font-size:40px;margin-bottom:14px;}
+.coming-title{font-family:'Fraunces',serif;font-size:21px;font-weight:900;margin-bottom:10px;}
+.coming-label{display:inline-block;margin-top:16px;font-size:11px;font-weight:700;color:var(--teal);background:var(--teal-light);padding:4px 12px;border-radius:100px;text-transform:uppercase;letter-spacing:1px;}
+.coming-badge{position:absolute;top:18px;right:18px;font-family:'DM Mono',monospace;font-size:9px;font-weight:700;color:var(--muted);background:var(--faint);border:1px solid var(--border);padding:3px 10px;border-radius:100px;}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<div id="readProgress"></div>
+<div class="cursor-glow" id="cg"></div>
+<canvas id="bg-canvas"></canvas>
+
+<nav>
+  <div><a class="nav-logo" href="#">L<span class="orange">A</span></a></div>
+  <div><ul class="nav-links">
+    <li><a href="arduino.html">Home</a></li>
+    <li><a href="components.html">Components</a></li>
+    <li><a href="mblock.html">Learn</a></li>
+    <li><a href="projects.html" class="active">Projects</a></li>
+    <li><a href="arduino.html#contact">Contact</a></li>
+  </ul></div>
+  <div class="nav-right">
+    <div class="nav-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input placeholder="Search…" oninput="navSearch(this.value)">
+    </div>
+    <!-- Account button + dropdown -->
+<div class="account-wrap">
+      <button class="nav-account" onclick="toggleAccount(event)">
+        <div class="acc-av">👤</div>Account
+      </button>
+      <div class="account-dropdown" id="accountDropdown">
+        <div class="acc-header">
+          <div class="acc-big-avatar">👤</div>
+          <div><div class="acc-name">Student Name</div><div class="acc-email">student@school.edu</div></div>
+        </div>
+        <div class="acc-progress-wrap">
+          <div class="acc-progress-label"><span>Lessons Completed</span><span>42%</span></div>
+          <div class="acc-progress-bar"><div class="acc-progress-fill" style="width:42%"></div></div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;">21 / 50 lessons</div>
+        </div>
+        <div class="acc-menu">
+          <a class="acc-item" href="profile.html"><div class="acc-item-icon">👤</div>View Profile</a>
+          <a class="acc-item" href="projects.html"><div class="acc-item-icon">🔧</div>Your Projects</a>
+          <div class="acc-divider"></div>
+          <a class="acc-item" href="settings.html"><div class="acc-item-icon">⚙️</div>Settings</a>
+          <div class="acc-divider"></div>
+          <button class="acc-logout" onclick="logout()">🚪 Log Out</button>
+        </div>
+      </div>
+    </div>
+</nav>
+
+<a class="back-btn" href="arduino.html">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  Back to Home
+</a>
+
+<!-- HERO -->
+<section class="page-hero">
+  <div class="hero-grid-bg"></div>
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Hands-On Learning</div>
+    <h1 class="hero-title">Arduino<br><span class="accent">Projects</span></h1>
+    <p class="hero-sub">Build real circuits and write real code. Each project takes you one step further — from your first LED all the way to multiplayer games and electric pianos.</p>
+    <div class="tier-pills">
+      <a class="tier-pill basic" href="#basic">⚡ Basics</a>
+      <a class="tier-pill inter" href="#intermediate">🔥 Intermediate</a>
+      <a class="tier-pill adv" href="#advanced">🚀 Advanced</a>
+    </div>
+  </div>
+</section>
+
+<!-- LAYOUT WITH SIDEBAR -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-title">Projects</div>
+    <div class="toc-section-hd">⚡ Basics</div>
+    <a class="toc-proj-btn" href="#proj1">01 · 💡 Light It Up</a>
+    <a class="toc-proj-btn" href="#proj2">02 · ✨ Light Coding</a>
+    <a class="toc-proj-btn" href="#proj3">03 · 🔘 Switch It Up</a>
+    <a class="toc-proj-btn" href="#proj4">04 · 🎹 Electric Piano</a>
+    <a class="toc-proj-btn" href="#proj5">05 · 🏁 Reaction Race</a>
+    <div class="toc-section-hd">🔥 Intermediate</div>
+    <a class="toc-proj-btn" href="#intermediate">06 · 🌡️ Weather Station</a>
+    <a class="toc-proj-btn" href="#intermediate">07 · 🤖 Robot Car</a>
+    <a class="toc-proj-btn" href="#intermediate">08 · 🔒 Smart Lock</a>
+    <div class="toc-section-hd">🚀 Advanced</div>
+    <a class="toc-proj-btn" href="#advanced">09 · 📡 Bluetooth Control</a>
+    <a class="toc-proj-btn" href="#advanced">10 · 🌈 LED Matrix</a>
+    <a class="toc-proj-btn" href="#advanced">11 · 🏠 Smart Home</a>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-content">
+
+    <!-- ═══ BASICS ═══ -->
+    <div id="basic">
+    <div class="tier-band basic reveal">
+      <div class="tier-label">Level 1</div>
+      <h2 class="tier-title">Basics</h2>
+      <p class="tier-desc">No experience needed. Learn circuits, components, and your first code by building light projects step by step.</p>
+    </div>
+
+    <!-- PROJECT 1 -->
+    <div class="project-card reveal" id="proj1">
+      <div class="proj-header open" onclick="toggleProject(this)">
+        <div>
+          <div class="proj-num">Basic · Project 01</div>
+          <div class="proj-title">💡 Light It Up</div>
+          <div class="proj-meta">
+            <span class="proj-tag teal">No Code Needed</span>
+            <span class="proj-tag gray">LED · Resistor · Breadboard</span>
+            <span class="proj-tag gray">5 Sub-Projects</span>
+            <span class="time-badge">⏱ 45–60 min</span>
+          </div>
+          <div class="difficulty-row"><span class="diff-label">Difficulty</span><div class="diff-stars"><div class="diff-star on"></div><div class="diff-star"></div><div class="diff-star"></div><div class="diff-star"></div><div class="diff-star"></div></div></div>
+        </div>
+        <div class="proj-chevron open">▾</div>
+      </div>
+      <div class="proj-body open">
+        <div class="proj-section">
+          <div class="sect-label">Introduction</div>
+          <p class="proj-overview">In this project we build a series of light circuits — no coding yet. You'll learn how circuits work, what components are, and how to wire an LED on a breadboard. By the end you'll have built 5 different circuits using LEDs, resistors, switches, a potentiometer, and an RGB LED.</p>
+          <div class="intro-grid">
+            <div class="intro-card"><div class="intro-card-icon">🧰</div><div class="intro-card-title">What You Need</div><div class="intro-card-text">Arduino Uno, breadboard, LEDs (multiple colours), 220Ω–330Ω resistors, push buttons, potentiometer, RGB LED, jumper wires.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">⚡</div><div class="intro-card-title">What You'll Learn</div><div class="intro-card-text">How circuits work, power rails, LED polarity, resistors, series vs parallel wiring, switches, potentiometers, RGB mixing.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">🌍</div><div class="intro-card-title">Real World Use</div><div class="intro-card-text">Power indicator lights, traffic signals, dimmer switches, RGB mood lighting, status LEDs in every electronic device.</div></div>
+          </div>
+          <ul class="proj-list">
+            <li>A circuit needs: a power source, wires, components, and must form a complete loop.</li>
+            <li>The red rail on the breadboard carries 5V power; the blue rail is ground (GND).</li>
+            <li>LEDs only work in one direction (polarity) — longer leg is positive (anode).</li>
+            <li>Always use a 220Ω–330Ω resistor in series with an LED to protect it.</li>
+            <li>Switches break the circuit by default (OFF) and complete it when pressed (ON).</li>
+            <li>A potentiometer is a variable resistor — twisting it changes resistance and LED brightness.</li>
+            <li>An RGB LED has 4 pins: one ground (longest), and one for each colour (R, G, B).</li>
+          </ul>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Sub-Projects — Circuit Diagrams</div>
+          <div class="sub-tabs">
+            <button class="sub-tab active" onclick="switchSub(this,'p1s1')">1 · Single LED</button>
+            <button class="sub-tab" onclick="switchSub(this,'p1s2')">2 · Three LEDs</button>
+            <button class="sub-tab" onclick="switchSub(this,'p1s3')">3 · LED + Switch</button>
+            <button class="sub-tab" onclick="switchSub(this,'p1s4')">4 · Potentiometer</button>
+            <button class="sub-tab" onclick="switchSub(this,'p1s5')">5 · RGB LED</button>
+          </div>
+          <div class="sub-panel active" id="p1s1">
+            <div class="circuit-grid"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p1s1.png"></div></div>
+            <div class="circuit-slot-label">Single LED wired to 5V via 220Ω resistor</div>
+            </div>
+          </div>
+          <div class="sub-panel" id="p1s2">
+            <div class="circuit-grid"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p1s2.png"></div></div>
+            <div class="circuit-slot-label">Three LEDs in parallel, each with its own resistor</div></div>
+          </div>
+          <div class="sub-panel" id="p1s3">
+            <div class="circuit-grid"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p1s3.png"></div></div>
+            <div class="circuit-slot-label">LED + push switch in series — press to light</div></div>
+          </div>
+          <div class="sub-panel" id="p1s4">
+            <div class="circuit-grid"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p1s4.png"></div></div>
+            <div class="circuit-slot-label">Potentiometer controlling LED brightness via variable resistance</div></div>
+          </div>
+          <div class="sub-panel" id="p1s5">
+            <div class="circuit-grid"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/rgb-wiring.png"></div></div>
+            <div class="circuit-slot-label">RGB LED with 3 switches — one per colour channel</div></div>
+          </div>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Code</div>
+          <div class="no-code-box"><span style="font-size:28px;">🔌</span><div class="no-code-box-text"><div class="title">No Code in This Project</div><div class="desc">Light It Up is purely hardware — circuits powered directly from the Arduino's 5V pin. You'll write your first code in Project 2: Light Coding.</div></div></div>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Quick Quiz</div>
+          <div class="quiz-wrap">
+            <div class="quiz-title"><span>🧠</span> Test Your Understanding</div>
+            <div class="quiz-q">
+              <div class="quiz-question">1. Why must you always use a resistor with an LED?</div>
+              <div class="quiz-options">
+                <div class="quiz-opt" onclick="answer(this,'wrong','LEDs are dim without them — the resistor makes them brighter.')"><span class="quiz-opt-letter">A</span>To make the LED brighter</div>
+                <div class="quiz-opt" onclick="answer(this,'correct','Without a resistor, too much current flows through the LED and it burns out — and can damage the Arduino pin too.')"><span class="quiz-opt-letter">B</span>To limit current so the LED doesn't burn out</div>
+                <div class="quiz-opt" onclick="answer(this,'wrong','The resistor has nothing to do with the LED\'s colour.')"><span class="quiz-opt-letter">C</span>To change the LED colour</div>
+              </div>
+              <div class="quiz-feedback"></div>
+            </div>
+            <div class="quiz-q" style="margin-top:18px;">
+              <div class="quiz-question">2. If you have 3 LEDs in parallel and you remove one, what happens to the others?</div>
+              <div class="quiz-options">
+                <div class="quiz-opt" onclick="answer(this,'wrong','In parallel, each LED has its own independent path to power.')"><span class="quiz-opt-letter">A</span>All LEDs go out</div>
+                <div class="quiz-opt" onclick="answer(this,'correct','In a parallel circuit each LED has its own complete path — the other two stay on independently.')"><span class="quiz-opt-letter">B</span>The other two stay lit</div>
+                <div class="quiz-opt" onclick="answer(this,'wrong','Brightness is affected by resistance, not by removing a parallel branch.')"><span class="quiz-opt-letter">C</span>They get brighter</div>
+              </div>
+              <div class="quiz-feedback"></div>
+            </div>
+          </div>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Ask a Question</div>
+          <div class="message-box">
+            <div class="message-box-title"><span>💬</span> Got a question about Project 1?</div>
+            <div class="message-box-sub">Stuck on the circuit? Something not working? Ask your coach here.</div>
+            <div class="msg-row"><textarea class="msg-input" placeholder="Type your question here… e.g. 'My LED isn't lighting up, what should I check?'"></textarea><button class="msg-send" onclick="sendMsg(this)">Send →</button></div>
+            <div class="msg-sent">✓ Message sent! Your coach will reply soon.</div>
+          </div>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Bonus Challenges</div>
+          <div class="bonus-box"><div class="bonus-icon">🌟</div><div><div class="bonus-title">Want to go further?</div><ul class="bonus-list"><li>Wire LEDs in series and compare the brightness to parallel — can you explain the difference?</li><li>Use the potentiometer to control two LEDs at once.</li><li>Try wiring the RGB LED with three separate switches — one for each colour. Mix your own colours!</li><li>Add a 4th LED in a different colour and wire it with a switch in series with the others.</li></ul></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="next-strip reveal">
+      <div class="next-strip-text"><div class="next-strip-label">Up Next</div><div class="next-strip-title">Project 02: Light Coding — write your first Arduino code and make LEDs blink with programming</div></div>
+      <a class="btn-next-proj" href="#proj2" onclick="openProject('proj2')">Start Project 02 →</a>
+    </div>
+
+    <!-- PROJECT 2 -->
+    <div class="project-card reveal" id="proj2">
+      <div class="proj-header" onclick="toggleProject(this)">
+        <div>
+          <div class="proj-num">Basic · Project 02</div>
+          <div class="proj-title">✨ Light Coding</div>
+          <div class="proj-meta"><span class="proj-tag teal">mBlock</span><span class="proj-tag gray">LED · digitalWrite · Loops</span><span class="proj-tag gray">4 Sub-Projects</span><span class="time-badge">⏱ 60–90 min</span></div>
+          <div class="difficulty-row"><span class="diff-label">Difficulty</span><div class="diff-stars"><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star"></div><div class="diff-star"></div><div class="diff-star"></div></div></div>
+        </div>
+        <div class="proj-chevron">▾</div>
+      </div>
+      <div class="proj-body">
+        <div class="proj-section">
+          <div class="sect-label">Introduction</div>
+          <p class="proj-overview">Now we add code to our circuits! Using mBlock, we control LEDs with digital pin outputs — turning them on, off, blinking, sequencing, and even sending SOS in morse code. This is where software meets hardware for the first time.</p>
+          <div class="intro-grid">
+            <div class="intro-card"><div class="intro-card-icon">🧰</div><div class="intro-card-title">What You Need</div><div class="intro-card-text">Arduino Uno, breadboard, 3 LEDs (red, yellow, green), 220Ω resistors, USB cable, mBlock installed.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">⚡</div><div class="intro-card-title">What You'll Learn</div><div class="intro-card-text">digitalWrite HIGH/LOW, forever loops, wait blocks, controlling multiple pins, traffic light sequence, morse code SOS.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">🌍</div><div class="intro-card-title">Real World Use</div><div class="intro-card-text">Traffic lights, notification LEDs, emergency signals, animated signage, status indicators on electronics.</div></div>
+          </div>
+          <ul class="proj-list">
+            <li>Connect pin 13 to the breadboard red rail — when code turns pin 13 HIGH, the rail gets 5V.</li>
+            <li>Use "set digital pin 13 output as HIGH/LOW" blocks to control the LED.</li>
+            <li>A "forever" loop makes code repeat — just like Arduino's loop() function.</li>
+            <li>Connect 3 LEDs to pins 13, 12, 11 to control them independently.</li>
+            <li>Traffic lights: Green 5s → Yellow 1s → Red 5s, repeating in a loop.</li>
+            <li>SOS morse code: 3 short blinks (dots) + 3 long blinks (dashes) + 3 short blinks.</li>
+            <li>Use "repeat 3" blocks to avoid duplicating code for the SOS pattern.</li>
+          </ul>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Sub-Projects — Circuit &amp; Code</div>
+          <div class="sub-tabs">
+            <button class="sub-tab active" onclick="switchSub(this,'p2s1')">Blink LED</button>
+            <button class="sub-tab" onclick="switchSub(this,'p2s2')">3 LEDs Sequence</button>
+            <button class="sub-tab" onclick="switchSub(this,'p2s3')">Traffic Lights</button>
+            <button class="sub-tab" onclick="switchSub(this,'p2s4')">SOS Signal</button>
+          </div>
+          <div class="sub-panel active" id="p2s1">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p2s1.png"></div></div><div class="circuit-slot-label">Single LED wired to Pin 13</div></div>
+            <div class="code-compare">
+              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p2s1-mblock.png"></div></div><p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;">Use: <strong style="color:#fff;">when clicked → forever → set pin 13 HIGH → wait 1 sec → set pin 13 LOW → wait 1 sec</strong></p></div>
+              <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(<span class="nm">13</span>, OUTPUT);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, HIGH);
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, LOW);
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+}</pre></div></div>
+            </div>
+          </div>
+          <div class="sub-panel" id="p2s2">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p2s2.png"></div></div><div class="circuit-slot-label">3 LEDs wired to Pins 13, 12, 11</div></div>
+            <div class="code-compare">
+              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p2s2-mblock.png"></div></div><p style="font-size:12px;color:var(--muted);margin-top:10px;">Use pins 13, 12, 11 — each LED blinks on/off in order with a 1 second wait between each.</p></div>
+              <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(<span class="nm">13</span>, OUTPUT);
+  <span class="fn">pinMode</span>(<span class="nm">12</span>, OUTPUT);
+  <span class="fn">pinMode</span>(<span class="nm">11</span>, OUTPUT);
+}
+<span class="kw">void</span> <span class="fn">blink</span>(<span class="st">int</span> pin, <span class="st">int</span> ms) {
+  <span class="fn">digitalWrite</span>(pin, HIGH); <span class="fn">delay</span>(ms);
+  <span class="fn">digitalWrite</span>(pin, LOW);  <span class="fn">delay</span>(ms);
+}
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">blink</span>(<span class="nm">13</span>, <span class="nm">1000</span>);
+  <span class="fn">blink</span>(<span class="nm">12</span>, <span class="nm">1000</span>);
+  <span class="fn">blink</span>(<span class="nm">11</span>, <span class="nm">1000</span>);
+}</pre></div></div>
+            </div>
+          </div>
+          <div class="sub-panel" id="p2s3">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p2s3.png"></div></div><div class="circuit-slot-label">Traffic Light circuit (Red=Pin11, Yellow=Pin12, Green=Pin13)</div></div>
+            <div class="code-compare">
+              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p2s3-mblock.png"></div></div></div>
+              <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="cm">// Pin 13=Green, 12=Yellow, 11=Red</span>
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(<span class="nm">13</span>, OUTPUT);
+  <span class="fn">pinMode</span>(<span class="nm">12</span>, OUTPUT);
+  <span class="fn">pinMode</span>(<span class="nm">11</span>, OUTPUT);
+}
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, HIGH); <span class="fn">delay</span>(<span class="nm">5000</span>); <span class="cm">// Green 5s</span>
+  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, LOW);
+  <span class="fn">digitalWrite</span>(<span class="nm">12</span>, HIGH); <span class="fn">delay</span>(<span class="nm">1000</span>); <span class="cm">// Yellow 1s</span>
+  <span class="fn">digitalWrite</span>(<span class="nm">12</span>, LOW);
+  <span class="fn">digitalWrite</span>(<span class="nm">11</span>, HIGH); <span class="fn">delay</span>(<span class="nm">5000</span>); <span class="cm">// Red 5s</span>
+  <span class="fn">digitalWrite</span>(<span class="nm">11</span>, LOW);
+}</pre></div></div>
+            </div>
+          </div>
+          <div class="sub-panel" id="p2s4">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p2s4.png"></div></div><div class="circuit-slot-label">Single LED on Pin 13 (same as Blink LED circuit)</div></div>
+            <div class="code-compare">
+              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p2s4-mblock.png"></div></div><p style="font-size:12px;color:var(--muted);margin-top:10px;">Tip: Use "repeat 3" blocks. Dots = 0.3s blinks, Dashes = 1s blinks.</p></div>
+              <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">void</span> <span class="fn">blink</span>(<span class="st">int</span> dur) {
+  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, HIGH); <span class="fn">delay</span>(dur);
+  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, LOW);  <span class="fn">delay</span>(<span class="nm">200</span>);
+}
+<span class="kw">void</span> <span class="fn">setup</span>() { <span class="fn">pinMode</span>(<span class="nm">13</span>, OUTPUT); }
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="cm">// S — 3 dots (short)</span>
+  <span class="kw">for</span>(<span class="st">int</span> i=<span class="nm">0</span>;i&lt;<span class="nm">3</span>;i++) <span class="fn">blink</span>(<span class="nm">300</span>);
+  <span class="fn">delay</span>(<span class="nm">500</span>);
+  <span class="cm">// O — 3 dashes (long)</span>
+  <span class="kw">for</span>(<span class="st">int</span> i=<span class="nm">0</span>;i&lt;<span class="nm">3</span>;i++) <span class="fn">blink</span>(<span class="nm">1000</span>);
+  <span class="fn">delay</span>(<span class="nm">500</span>);
+  <span class="cm">// S — 3 dots</span>
+  <span class="kw">for</span>(<span class="st">int</span> i=<span class="nm">0</span>;i&lt;<span class="nm">3</span>;i++) <span class="fn">blink</span>(<span class="nm">300</span>);
+  <span class="fn">delay</span>(<span class="nm">2000</span>);
+}</pre></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Quick Quiz</div>
+          <div class="quiz-wrap">
+            <div class="quiz-title"><span>🧠</span> Test Your Understanding</div>
+            <div class="quiz-q">
+              <div class="quiz-question">1. Why do we connect each of 3 LEDs to a different pin (13, 12, 11)?</div>
+              <div class="quiz-options">
+                <div class="quiz-opt" onclick="answer(this,'wrong','Connecting to the same pin means all three turn on/off together.')"><span class="quiz-opt-letter">A</span>We could connect them all to pin 13</div>
+                <div class="quiz-opt" onclick="answer(this,'correct','Each pin controls one LED independently — this is how you can turn on pin 13 while 12 and 11 stay off.')"><span class="quiz-opt-letter">B</span>So each LED can be controlled separately by code</div>
+                <div class="quiz-opt" onclick="answer(this,'wrong','The colour of the LED doesn\'t depend on which pin it\'s connected to.')"><span class="quiz-opt-letter">C</span>Different pins output different colours</div>
+              </div>
+              <div class="quiz-feedback"></div>
+            </div>
+          </div>
+        </div>
+        <div class="proj-section"><div class="sect-label">Ask a Question</div><div class="message-box"><div class="message-box-title"><span>💬</span> Got a question about Project 2?</div><div class="message-box-sub">Something not blinking? Ask your coach below.</div><div class="msg-row"><textarea class="msg-input" placeholder="Type your question here…"></textarea><button class="msg-send" onclick="sendMsg(this)">Send →</button></div><div class="msg-sent">✓ Message sent! Your coach will reply soon.</div></div></div>
+        <div class="proj-section"><div class="sect-label">Bonus Challenges</div><div class="bonus-box"><div class="bonus-icon">🌟</div><div><div class="bonus-title">Want to go further?</div><ul class="bonus-list"><li>Change the traffic light timing — make yellow last longer. What's realistic for a real road?</li><li>Add a pedestrian walk signal: after green, flash the green LED 3 times before yellow.</li><li>Make a binary counter: use 3 LEDs to count from 0–7 in binary.</li><li>Encode your own name in morse code using the LED.</li></ul></div></div></div>
+      </div>
+    </div>
+
+    <div class="next-strip reveal">
+      <div class="next-strip-text"><div class="next-strip-label">Up Next</div><div class="next-strip-title">Project 03: Switch It Up — add input switches and make the Arduino respond to button presses</div></div>
+      <a class="btn-next-proj" href="#proj3" onclick="openProject('proj3')">Start Project 03 →</a>
+    </div>
+
+    <!-- PROJECT 3 -->
+    <div class="project-card reveal" id="proj3">
+      <div class="proj-header" onclick="toggleProject(this)">
+        <div>
+          <div class="proj-num">Basic · Project 03</div>
+          <div class="proj-title">🔘 Switch It Up</div>
+          <div class="proj-meta"><span class="proj-tag teal">mBlock</span><span class="proj-tag gray">Push Button · digitalRead · Input</span><span class="proj-tag gray">5 Sub-Projects</span><span class="time-badge">⏱ 60–90 min</span></div>
+          <div class="difficulty-row"><span class="diff-label">Difficulty</span><div class="diff-stars"><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star"></div><div class="diff-star"></div></div></div>
+        </div>
+        <div class="proj-chevron">▾</div>
+      </div>
+      <div class="proj-body">
+        <div class="proj-section">
+          <div class="sect-label">Introduction</div>
+          <p class="proj-overview">Switches are input devices — they let the user talk back to the Arduino. In this project you'll build circuits with one and two switches (series and parallel), then code software switches and physical input switches that Arduino can detect and respond to.</p>
+          <div class="intro-grid">
+            <div class="intro-card"><div class="intro-card-icon">🧰</div><div class="intro-card-title">What You Need</div><div class="intro-card-text">Arduino Uno, breadboard, push button switches (2–3), LEDs, 220Ω resistors, 10kΩ resistor (pull-down), jumper wires, mBlock.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">⚡</div><div class="intro-card-title">What You'll Learn</div><div class="intro-card-text">How switches work, series vs parallel switch wiring, software toggle switches, pull-down resistors, digitalRead(), conditional code.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">🌍</div><div class="intro-card-title">Real World Use</div><div class="intro-card-text">Doorbells, keyboard keys, game controllers, security alarm triggers, elevator buttons, vending machines.</div></div>
+          </div>
+          <ul class="proj-list">
+            <li>Switches are placed over the ravine (gap) of the breadboard — it can only go on correctly one way.</li>
+            <li>Series switches: both must be pressed for the circuit to complete (AND logic).</li>
+            <li>Parallel switches: either one being pressed completes the circuit (OR logic).</li>
+            <li>A software switch uses keyboard input in mBlock to trigger the Arduino — no physical button needed.</li>
+            <li>A toggle switch changes state each time you press — if ON, press turns it OFF, and vice versa.</li>
+            <li>A pull-down resistor (10kΩ to GND) keeps pin 2 at a stable LOW (0) when the button is not pressed.</li>
+            <li>When the button is pressed, 5V travels through the switch to pin 2, making it HIGH (1).</li>
+          </ul>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Sub-Projects — Circuit &amp; Code</div>
+          <div class="sub-tabs">
+            <button class="sub-tab active" onclick="switchSub(this,'p3s0')">Series &amp; Parallel</button>
+            <button class="sub-tab" onclick="switchSub(this,'p3s1')">Software Switch</button>
+            <button class="sub-tab" onclick="switchSub(this,'p3s2')">Toggle Switch</button>
+            <button class="sub-tab" onclick="switchSub(this,'p3s3')">Physical Input Switch 1</button>
+            <button class="sub-tab" onclick="switchSub(this,'p3s4')">Physical Input Switch 2</button>
+          </div>
+          <div class="sub-panel active" id="p3s0">
+            <div class="circuit-grid">
+              <div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p1s3.png"></div></div><div class="circuit-slot-label">Single Switch + LED (baseline circuit)</div>
+              <div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p3s01.png"></div></div><div class="circuit-slot-label">Series Switch — both buttons must be pressed (AND Gate)</div>
+              <div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p3s02.png"></div></div><div class="circuit-slot-label">Parallel Switch — either button completes the circuit (OR Gate)</div>
+            </div>
+            <p style="font-size:13px;color:var(--muted);margin-top:14px;line-height:1.7;"><strong style="color:#fff;">Series:</strong> both switches must be closed for current to flow — AND logic. <strong style="color:#fff;">Parallel:</strong> either switch can complete the circuit — OR logic. These are hardware-only circuits — no code needed.</p>
+          </div>
+          <div class="sub-panel" id="p3s1">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p2s1.png"></div></div><div class="circuit-slot-label">Single Switch + LED (software triggers the Arduino via serial/mBlock broadcast)</div></div>
+            <div class="code-compare">
+            <div><div class="code-col-label mblock">🧩 mBlock Sprite</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s1-mblock1.png"></div></div><p style="font-size:15px;color:var(--muted);margin-top:10px;">A sprite detects a keypress (e.g. Space) and broadcasts to the Arduino sprite, which sets pin 13 HIGH or LOW.</p></div>
+            <div><div class="code-col-label mblock">🧩 mBlock Device</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s1-mblock2.png"></div></div>
+          </div></div></div>
+
+          <div class="sub-panel" id="p3s2"><div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p2s1.png"></div></div><div class="circuit-slot-label">Same input switch circuit — press once to toggle LED on, press again to toggle off</div></div>
+          <div class="code-compare">
+            <div><div class="code-col-label mblock">🧩 mBlock Sprite</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s2-mblock.png"></div></div></div>
+            <div><div class="code-col-label mblock">🧩 mBlock Device</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s1-mblock2.png"></div></div></div>
+          </div></div>
+          
+          <div class="sub-panel" id="p3s3"><div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p3s3.png"></div></div><div class="circuit-slot-label">Input Switch with Pull-Down resistor on Pin 2</div></div>
+          <div class="code-compare">
+
+            <div><div class="code-col-label mblock">🧩 mBlock Device</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s3-mblock1.png"></div></div><p style="font-size:12px;color:var(--muted);margin-top:10px;">Use: "read digital pin 2" — when it equals 1, broadcast "message" in device.</p></div>
+  <div><div class="code-col-label mblock">🧩 mBlock Sprite</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s3-mblock2.png"></div></div><p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;">Use: When I recieve "message" - say hello in sprite.</p></div>
+            </div></div>
+
+<div class="sub-panel" id="p3s4"><div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p3s4.png"></div></div>
+<div class="circuit-slot-label">Input Switch with Pull-Down resistor on Pin 2</div></div>
+<div class="code-compare">
+  <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s4-mblock.png"></div></div><p style="font-size:12px;color:var(--muted);margin-top:10px;">Use "read digital pin 2" — when it equals 1, turn on an LED.</p></div>
+            <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">const</span> <span class="st">int</span> btnPin = <span class="nm">2</span>;
+<span class="kw">const</span> <span class="st">int</span> ledPin = <span class="nm">13</span>;
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(btnPin, INPUT);
+  <span class="fn">pinMode</span>(ledPin, OUTPUT);
+}
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="st">int</span> state = <span class="fn">digitalRead</span>(btnPin);
+  <span class="fn">digitalWrite</span>(ledPin, state);
+}</pre></div></div>
+  
+
+</div></div>
+        </div>
+        <div class="proj-section"><div class="sect-label">Quick Quiz</div><div class="quiz-wrap"><div class="quiz-title"><span>🧠</span> Test Your Understanding</div><div class="quiz-q"><div class="quiz-question">1. What is the purpose of the pull-down resistor (10kΩ to GND) on pin 2?</div><div class="quiz-options"><div class="quiz-opt" onclick="answer(this,'wrong','The pull-down resistor is for INPUT pins, not LED output brightness.')"><span class="quiz-opt-letter">A</span>To make the LED brighter</div><div class="quiz-opt" onclick="answer(this,'correct','Without the pull-down, pin 2 floats between HIGH and LOW randomly. The resistor pulls it firmly to LOW so we get a clean OFF signal.')"><span class="quiz-opt-letter">B</span>To give pin 2 a stable LOW signal when the button is not pressed</div><div class="quiz-opt" onclick="answer(this,'wrong','Switches are physical hardware — they don\'t need protection from heat.')"><span class="quiz-opt-letter">C</span>To stop the switch from overheating</div></div><div class="quiz-feedback"></div></div></div></div>
+        <div class="proj-section"><div class="sect-label">Ask a Question</div><div class="message-box"><div class="message-box-title"><span>💬</span> Got a question about Project 3?</div><div class="message-box-sub">Button not responding? Ask your coach below.</div><div class="msg-row"><textarea class="msg-input" placeholder="Type your question here…"></textarea><button class="msg-send" onclick="sendMsg(this)">Send →</button></div><div class="msg-sent">✓ Message sent!</div></div></div>
+        <div class="proj-section"><div class="sect-label">Bonus Challenges</div><div class="bonus-box"><div class="bonus-icon">🌟</div><div><div class="bonus-title">Want to go further?</div><ul class="bonus-list"><li>Wire 3 switches in series — all 3 must be pressed simultaneously for the LED to light.</li><li>Create a toggle LED that counts presses — after 5 presses, it stays off until reset.</li><li>Use a switch to choose between two different LED blink patterns.</li><li>Build a simple alarm: the LED blinks fast for 5 seconds after the button is pressed, then stops.</li></ul></div></div></div>
+      </div>
+    </div>
+
+    <div class="next-strip reveal">
+      <div class="next-strip-text"><div class="next-strip-label">Up Next</div><div class="next-strip-title">Project 04: Electric Piano — play musical notes with fruit or buttons using analog input</div></div>
+      <a class="btn-next-proj" href="#proj4" onclick="openProject('proj4')">Start Project 04 →</a>
+    </div>
+
+    <!-- PROJECT 4 -->
+    <div class="project-card reveal" id="proj4">
+      <div class="proj-header" onclick="toggleProject(this)">
+        <div>
+          <div class="proj-num">Basic · Project 04</div>
+          <div class="proj-title">🎹 Electric Piano</div>
+          <div class="proj-meta"><span class="proj-tag teal">mBlock</span><span class="proj-tag orange">2 Versions</span><span class="proj-tag gray">Analog Input · Sound · Buttons</span><span class="time-badge">⏱ 90–120 min</span></div>
+          <div class="difficulty-row"><span class="diff-label">Difficulty</span><div class="diff-stars"><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star"></div></div></div>
+        </div>
+        <div class="proj-chevron">▾</div>
+      </div>
+      <div class="proj-body">
+        <div class="proj-section">
+          <div class="sect-label">Introduction</div>
+          <p class="proj-overview">Build a working electric piano! This project has two versions: Version A uses fruit or Play-Doh as touch-sensitive keys (capacitive touch via analog pins), and Version B uses physical push buttons as piano keys. Both play musical notes through mBlock.</p>
+          <div class="intro-grid">
+            <div class="intro-card"><div class="intro-card-icon">🍌</div><div class="intro-card-title">What You Need (A)</div><div class="intro-card-text">Arduino Uno, 6× resistors (1MΩ–10MΩ), conductive material (bananas, grapes, or Play-Doh) × 6, mBlock with Sound Extension.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">🎹</div><div class="intro-card-title">What You Need (B)</div><div class="intro-card-text">Arduino Uno, 8× push buttons, 8× 1kΩ resistors, buzzer (for upload mode), jumper wires, mBlock.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">🌍</div><div class="intro-card-title">Real World Use</div><div class="intro-card-text">Musical instruments, touch-sensitive interfaces, interactive art installations, accessibility devices, STEM education.</div></div>
+          </div>
+          <ul class="proj-list">
+            <li><strong style="color:#fff;">Version A:</strong> High-resistance pull-up resistors (1MΩ+) connect 5V to analog pins A0–A5. Values stay HIGH (1000+) when floating.</li>
+            <li>Touch the conductive key while holding the ground wire — your body conducts electricity, pulling the value LOW.</li>
+            <li>Code checks: if analog value &lt; 700, play a note via broadcast.</li>
+            <li><strong style="color:#fff;">Version B:</strong> 8 push buttons wired to digital pins 6–13 with pull-down resistors.</li>
+            <li>Each button plays a different musical note: Do (C4), Re (D4), Mi (E4), Fa (F4), So (G4), La (A4), Ti (B4), High Do (C5).</li>
+            <li>In upload mode, connect a buzzer to use tone() — no computer sound needed.</li>
+          </ul>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Sub-Projects — Circuit &amp; Code</div>
+          <div class="sub-tabs">
+            <button class="sub-tab active" onclick="switchSub(this,'p4s1')">Version A — Fruit Piano</button>
+            <button class="sub-tab" onclick="switchSub(this,'p4s2')">Version B — Button Piano</button>
+          </div>
+          <div class="sub-panel active" id="p4s1"><div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p4s1.png"></div></div><div class="circuit-slot-label">Fruit / Play-Doh keys — 1MΩ+ resistors on analog pins A0–A5, ground wire held by player</div></div>
+          <div class="code-compare">
+            <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p4s1-mblock.png"></div></div><p style="font-size:12px;color:var(--muted);margin-top:10px;">Forever loop: if analog pin A5 &lt; Trigger (800) → broadcast "Piano A" → wait until A5 &gt; Trigger.</p></div>
+            <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ (Upload Mode)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="cm">// Fruit piano — analog touch</span>
+<span class="kw">const</span> <span class="st">int</span> buzzer = <span class="nm">5</span>;
+<span class="st">int</span> notes[] = {<span class="nm">262</span>,<span class="nm">294</span>,<span class="nm">330</span>,<span class="nm">349</span>,<span class="nm">392</span>,<span class="nm">440</span>};
+<span class="kw">const</span> <span class="st">int</span> threshold = <span class="nm">700</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">for</span> (<span class="st">int</span> i=<span class="nm">0</span>;i&lt;<span class="nm">6</span>;i++) {
+    <span class="kw">if</span> (<span class="fn">analogRead</span>(i) &lt; threshold) {
+      <span class="fn">tone</span>(buzzer, notes[i], <span class="nm">300</span>);
+      <span class="kw">while</span>(<span class="fn">analogRead</span>(i) &lt; threshold);
+    }
+  }
+}</pre></div></div></div></div>
+          <div class="sub-panel" id="p4s2"><div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p4s2.png"></div></div><div class="circuit-slot-label">8 push buttons on pins 6–13 with 1kΩ pull-down resistors, buzzer on pin 5</div></div>
+          <div class="code-compare"><div>
+          <div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p4s2-mblock.png"></div></div></div>
+          <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ (Upload Mode + Buzzer)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="cm">// Button piano: pins 6-13, buzzer pin 5</span>
+<span class="kw">const</span> <span class="st">int</span> buzzer = <span class="nm">5</span>;
+<span class="st">int</span> btns[]  = {<span class="nm">6</span>,<span class="nm">7</span>,<span class="nm">8</span>,<span class="nm">9</span>,<span class="nm">10</span>,<span class="nm">11</span>,<span class="nm">12</span>,<span class="nm">13</span>};
+<span class="st">int</span> notes[] = {<span class="nm">262</span>,<span class="nm">294</span>,<span class="nm">330</span>,<span class="nm">349</span>,<span class="nm">392</span>,<span class="nm">440</span>,<span class="nm">494</span>,<span class="nm">523</span>};
+<span class="cm">// Do  Re   Mi   Fa   So  La  Ti  Do(hi)</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="kw">for</span>(<span class="st">int</span> i=<span class="nm">0</span>;i&lt;<span class="nm">8</span>;i++) <span class="fn">pinMode</span>(btns[i], INPUT);
+}
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">for</span>(<span class="st">int</span> i=<span class="nm">0</span>;i&lt;<span class="nm">8</span>;i++) {
+    <span class="kw">if</span> (<span class="fn">digitalRead</span>(btns[i]) == HIGH) {
+      <span class="fn">tone</span>(buzzer, notes[i]);
+      <span class="kw">while</span>(<span class="fn">digitalRead</span>(btns[i]) == HIGH);
+      <span class="fn">noTone</span>(buzzer);
+    }
+  }
+}</pre></div></div></div></div>
+        </div>
+        <div class="proj-section"><div class="sect-label">Quick Quiz</div><div class="quiz-wrap"><div class="quiz-title"><span>🧠</span> Test Your Understanding</div><div class="quiz-q"><div class="quiz-question">1. Why do we need 1MΩ+ (mega ohm) resistors for the fruit piano, not regular 220Ω ones?</div><div class="quiz-options"><div class="quiz-opt" onclick="answer(this,'wrong','High resistance keeps the analog value stable at HIGH, not LOW.')"><span class="quiz-opt-letter">A</span>To make the analog value stay LOW</div><div class="quiz-opt" onclick="answer(this,'correct','Fruit has very high resistance. We need a resistor higher than the fruit\'s resistance so that touching the fruit pulls the pin LOW noticeably.')"><span class="quiz-opt-letter">B</span>The fruit/Play-Doh has high resistance — we need even higher to pull up correctly</div><div class="quiz-opt" onclick="answer(this,'wrong','The resistance value has nothing to do with which musical note plays.')"><span class="quiz-opt-letter">C</span>Different resistance = different musical notes</div></div><div class="quiz-feedback"></div></div></div></div>
+        <div class="proj-section"><div class="sect-label">Ask a Question</div><div class="message-box"><div class="message-box-title"><span>💬</span> Got a question about Project 4?</div><div class="message-box-sub">Piano not making sound? Ask your coach below.</div><div class="msg-row"><textarea class="msg-input" placeholder="Type your question here…"></textarea><button class="msg-send" onclick="sendMsg(this)">Send →</button></div><div class="msg-sent">✓ Message sent!</div></div></div>
+      </div>
+    </div>
+
+    <div class="next-strip reveal">
+      <div class="next-strip-text"><div class="next-strip-label">Up Next</div><div class="next-strip-title">Project 05: Reaction Race — a 2-player game combining buttons, LEDs, and game logic</div></div>
+      <a class="btn-next-proj" href="#proj5" onclick="openProject('proj5')">Start Project 05 →</a>
+    </div>
+
+    <!-- PROJECT 5 -->
+    <div class="project-card reveal" id="proj5">
+      <div class="proj-header" onclick="toggleProject(this)">
+        <div>
+          <div class="proj-num">Basic · Project 05</div>
+          <div class="proj-title">🏁 Reaction Race</div>
+          <div class="proj-meta"><span class="proj-tag teal">mBlock</span><span class="proj-tag orange">Multiplayer Game</span><span class="proj-tag gray">Buttons · Traffic Lights · Variables</span></div>
+          <div class="difficulty-row"><span class="diff-label">Difficulty</span><div class="diff-stars"><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div></div></div>
+        </div>
+        <div class="proj-chevron">▾</div>
+      </div>
+      <div class="proj-body">
+        <div class="proj-section">
+          <div class="sect-label">Introduction</div>
+          <p class="proj-overview">Build a 2-player reaction speed game! Both players have a button. A traffic light (Red → Yellow → Green) counts down on real LEDs. The first player to press their button after the green light scores a point. First to 5 wins. You'll combine everything you've learned — circuits, inputs, outputs, and game logic.</p>
+          <div class="intro-grid">
+            <div class="intro-card"><div class="intro-card-icon">🧰</div><div class="intro-card-title">What You Need</div><div class="intro-card-text">Arduino Uno, breadboard, 2× push buttons, 3× LEDs (Red, Yellow, Green), 2× 10kΩ resistors, 3× 220Ω resistors, jumper wires, mBlock.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">⚡</div><div class="intro-card-title">What You'll Learn</div><div class="intro-card-text">Combining inputs & outputs in one project, game logic with variables, player scores, anti-cheat detection, sprites and game design.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">🌍</div><div class="intro-card-title">Real World Use</div><div class="intro-card-text">Arcade games, quiz buzzers, drag racing start lights, reaction time training devices, game show buzzers.</div></div>
+          </div>
+          <ul class="proj-list">
+            <li>Buttons connect to pins 2 and 3 via pull-down resistors — LOW by default, HIGH when pressed.</li>
+            <li>Traffic LEDs: Red=pin 13, Yellow=pin 12, Green=pin 11 — same wiring as Project 2.</li>
+            <li>Game logic: spacebar starts the game → Red 1s → Yellow 1s → Green → detect who presses first.</li>
+            <li>Use mBlock sprites for each player (Panda, Bee) with score variables displayed on screen.</li>
+            <li>Anti-cheat: if button is already held when Green lights up, it doesn't count — must release and re-press.</li>
+            <li>Challenge: detect a tie (both buttons within same loop cycle) and display "TIE!" message.</li>
+          </ul>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Sub-Projects — Circuit &amp; Code</div>
+          <div class="sub-tabs">
+            <button class="sub-tab active" onclick="switchSub(this,'p5s1')">Buttons Setup</button>
+            <button class="sub-tab" onclick="switchSub(this,'p5s2')">Traffic Light LEDs</button>
+            <button class="sub-tab" onclick="switchSub(this,'p5s3')">Full Game</button>
+          </div>
+          <div class="sub-panel active" id="p5s1">
+            <div class="circuit-grid"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p5s1.png"></div></div><div class="circuit-slot-label">2 input buttons (pins 2 &amp; 3) with 10kΩ pull-down resistors</div></div>
+            <p style="font-size:13px;color:var(--muted);margin-top:14px;line-height:1.7;">Wire Player 1's button to pin 2 and Player 2's button to pin 3. Each needs a 10kΩ pull-down resistor to GND so pins read stable LOW when the button is not pressed.</p>
+          </div>
+          <div class="sub-panel" id="p5s2">
+            <div class="circuit-grid"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p2s3.png"></div></div><div class="circuit-slot-label">Traffic light LEDs — Red=pin 13, Yellow=pin 12, Green=pin 11 (same as Project 2)</div></div>
+            <p style="font-size:13px;color:var(--muted);margin-top:14px;line-height:1.7;">Wire Red LED to pin 11, Yellow to pin 12, Green to pin 13 — each with a 220Ω resistor. This is the same traffic light circuit from Project 2.</p>
+          </div>
+          <div class="sub-panel" id="p5s3">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p5.png"></div></div><div class="circuit-slot-label">Full game circuit — both buttons + traffic light LEDs combined</div></div>
+            <div class="code-compare">
+            <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p5-mblock.png"></div></div><p style="font-size:12px;color:var(--muted);margin-top:10px;">Game flow: Space pressed → Red LED (1s) → Yellow (1s) → Green → forever loop checking pins 2 &amp; 3 → winner gets +1 score → repeat.</p>
+            
+          </div>
+            <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="st">int</span> p1=<span class="nm">2</span>, p2=<span class="nm">3</span>;     <span class="cm">// button pins</span>
+<span class="st">int</span> r=<span class="nm">11</span>, y=<span class="nm">12</span>, g=<span class="nm">13</span>; <span class="cm">// LED pins</span>
+<span class="st">int</span> score1=<span class="nm">0</span>, score2=<span class="nm">0</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(p1,INPUT); <span class="fn">pinMode</span>(p2,INPUT);
+  <span class="fn">pinMode</span>(r,OUTPUT); <span class="fn">pinMode</span>(y,OUTPUT);
+  <span class="fn">pinMode</span>(g,OUTPUT);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+<span class="kw">void</span> <span class="fn">runRace</span>() {
+  <span class="fn">digitalWrite</span>(r,HIGH); <span class="fn">delay</span>(<span class="nm">1000</span>);
+  <span class="fn">digitalWrite</span>(r,LOW);
+  <span class="fn">digitalWrite</span>(y,HIGH); <span class="fn">delay</span>(<span class="nm">1000</span>);
+  <span class="fn">digitalWrite</span>(y,LOW);
+  <span class="fn">digitalWrite</span>(g,HIGH);
+  <span class="kw">while</span>(<span class="kw">true</span>) {
+    <span class="kw">if</span>(<span class="fn">digitalRead</span>(p1)==HIGH) { score1++; <span class="kw">break</span>; }
+    <span class="kw">if</span>(<span class="fn">digitalRead</span>(p2)==HIGH) { score2++; <span class="kw">break</span>; }
+  }
+  <span class="fn">digitalWrite</span>(g,LOW);
+  Serial.<span class="fn">print</span>(<span class="st">"P1:"</span>); Serial.<span class="fn">print</span>(score1);
+  Serial.<span class="fn">print</span>(<span class="st">" P2:"</span>); Serial.<span class="fn">println</span>(score2);
+}
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">delay</span>(<span class="nm">3000</span>);
+  <span class="fn">runRace</span>();
+}</pre></div></div>
+          </div>
+          </div>
+        </div>
+        <div class="proj-section"><div class="sect-label">Quick Quiz</div><div class="quiz-wrap"><div class="quiz-title"><span>🧠</span> Test Your Understanding</div><div class="quiz-q"><div class="quiz-question">1. A player holds their button down before the green light. How do you prevent them from cheating?</div><div class="quiz-options"><div class="quiz-opt" onclick="answer(this,'wrong','Disqualifying them forever is too harsh — they might have pressed by accident.')"><span class="quiz-opt-letter">A</span>Disqualify them from the entire game</div><div class="quiz-opt" onclick="answer(this,'correct','Before starting the countdown, check if any button is already pressed. If so, wait until it\'s released before showing green. This forces players to release first.')"><span class="quiz-opt-letter">B</span>Check if button is held before green — make them release first</div><div class="quiz-opt" onclick="answer(this,'wrong','Adding more LEDs doesn\'t fix the cheat detection logic.')"><span class="quiz-opt-letter">C</span>Add more LEDs to confuse the player</div></div><div class="quiz-feedback"></div></div></div></div>
+        <div class="proj-section"><div class="sect-label">Ask a Question</div><div class="message-box"><div class="message-box-title"><span>💬</span> Got a question about Project 5?</div><div class="message-box-sub">Game logic confusing? Ask your coach below.</div><div class="msg-row"><textarea class="msg-input" placeholder="Type your question here…"></textarea><button class="msg-send" onclick="sendMsg(this)">Send →</button></div><div class="msg-sent">✓ Message sent!</div></div></div>
+        <div class="proj-section"><div class="sect-label">Bonus Challenges</div><div class="bonus-box"><div class="bonus-icon">🌟</div><div><div class="bonus-title">Ready for more?</div><ul class="bonus-list"><li>Prevent cheating: if a button is held when the green light turns on, disqualify that player.</li><li>Check both buttons in parallel so neither player has a code advantage.</li><li>Detect a tie: if both buttons are pressed within 50ms of each other, declare a draw.</li><li>Make it a 3-player game: add a third button on pin 4 and a third sprite.</li><li>Add a scoreboard: first player to reach 5 points wins and the game resets.</li></ul></div></div></div>
+      </div>
+    </div>
+
+    <div class="next-strip reveal" style="background:linear-gradient(135deg,rgba(232,80,10,0.08),rgba(232,80,10,0.03));border-color:rgba(232,80,10,0.2);">
+      <div class="next-strip-text"><div class="next-strip-label" style="color:#ff8a65;">🎉 Basics Complete!</div><div class="next-strip-title">You've finished all 5 basic projects. Ready for the next level?</div></div>
+      <a class="btn-next-proj" href="#intermediate" style="background:var(--orange);">Go to Intermediate 🔥</a>
+    </div>
+    </div><!-- /basic -->
+
+    <!-- ═══ INTERMEDIATE ═══ -->
+    <div id="intermediate">
+    <div class="tier-band inter reveal">
+      <div class="tier-label">Level 2</div>
+      <h2 class="tier-title">Intermediate</h2>
+      <p class="tier-desc">Ready to go further? These projects combine sensors, displays, motors, and more advanced coding.</p>
+    </div>
+    <div class="coming-grid">
+      <div class="coming-card reveal"><div class="coming-icon">🌡️</div><div class="coming-title">Weather Station</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">DHT22 temp & humidity sensor + LCD display showing live readings. Includes threshold alerts with buzzer.</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 06</div></div>
+      <div class="coming-card reveal"><div class="coming-icon">🤖</div><div class="coming-title">Robot Car</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">L298N motor driver + DC motors + ultrasonic sensor for obstacle avoidance. Drive your first robot!</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 07</div></div>
+      <div class="coming-card reveal"><div class="coming-icon">🔒</div><div class="coming-title">Smart Lock</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">4×4 keypad + servo motor + LCD. Enter the correct code to unlock. Lockout after 3 wrong attempts.</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 08</div></div>
+    </div>
+    </div>
+
+    <!-- ═══ ADVANCED ═══ -->
+    <div id="advanced">
+    <div class="tier-band adv reveal">
+      <div class="tier-label">Level 3</div>
+      <h2 class="tier-title">Advanced</h2>
+      <p class="tier-desc">For students who've mastered the basics and intermediate level. These projects push your skills to the limit.</p>
+    </div>
+    <div class="coming-grid">
+      <div class="coming-card reveal"><div class="coming-icon">📡</div><div class="coming-title">Bluetooth Control</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">HC-05 Bluetooth module + custom Android app. Control LEDs, motors, and sensors wirelessly from your phone.</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 09</div></div>
+      <div class="coming-card reveal"><div class="coming-icon">🌈</div><div class="coming-title">LED Matrix Display</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">8×8 LED matrix + MAX7219 driver. Scroll text, show animations, and create pixel art with addressable LEDs.</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 10</div></div>
+      <div class="coming-card reveal"><div class="coming-icon">🏠</div><div class="coming-title">Smart Home</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">PIR motion sensor + relay + DHT22 + LCD. Automatic lights, temperature control, and intruder detection — all in one system.</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 11</div></div>
+    </div>
+    <div style="height:80px;"></div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /layout -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* CURSOR + PROGRESS */
+document.addEventListener('mousemove', e => {
+  document.getElementById('cg').style.cssText = `left:${e.clientX}px;top:${e.clientY}px;`;
+});
+window.addEventListener('scroll', () => {
+  const el = document.documentElement;
+  const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+  document.getElementById('readProgress').style.width = pct + '%';
+  // Active sidebar link
+  ['proj1','proj2','proj3','proj4','proj5','intermediate','advanced'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    if (r.top < 140 && r.bottom > 0) {
+      document.querySelectorAll('.toc-proj-btn').forEach(b => b.classList.remove('active'));
+      const link = document.querySelector(`.toc-proj-btn[href="#${id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+});
+
+/* PARTICLE BG */
+(function(){
+  const c = document.getElementById('bg-canvas'), ctx = c.getContext('2d');
+  let W, H, pts = [];
+  function resize(){ W = c.width = innerWidth; H = c.height = innerHeight; }
+  function P(){ this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.2;this.vy=(Math.random()-.5)*.2;this.r=Math.random()*.8+.2;this.a=Math.random()*.25+.04;this.col=Math.random()>.6?'#00979d':'#ffffff'; }
+  P.prototype.upd=function(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H){this.x=Math.random()*W;this.y=Math.random()*H;}};
+  for(let i=0;i<90;i++) pts.push(new P());
+  function loop(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.upd();ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.col;ctx.globalAlpha=p.a;ctx.fill();ctx.globalAlpha=1;});for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){ctx.beginPath();ctx.strokeStyle=`rgba(0,151,157,${(1-d/100)*.1})`;ctx.lineWidth=.4;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();}}requestAnimationFrame(loop);}
+  addEventListener('resize',resize);resize();loop();
+})();
+
+/* HERO 3D — workshop/circuit lab scene */
+(function(){
+  const canvas = document.getElementById('hero-canvas');
+  const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(48, innerWidth/innerHeight, 0.1, 100);
+  camera.position.set(0, 0, 18);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+  const l1 = new THREE.PointLight(0x00979d, 3, 30); l1.position.set(8, 6, 5); scene.add(l1);
+  const l2 = new THREE.PointLight(0xe8500a, 2, 25); l2.position.set(-8, -4, 4); scene.add(l2);
+  const l3 = new THREE.PointLight(0xffdd00, 1.5, 20); l3.position.set(0, 8, 3); scene.add(l3);
+
+  // 5 floating project icons (boxes with emissive glow)
+  const projData = [
+    {color:0xffdd00, emit:0xffaa00, emoji:'💡', x:-7, y:2.5, z:0},
+    {color:0x00bfff, emit:0x0088cc, emoji:'✨', x:-4, y:-2, z:1},
+    {color:0x66bb6a, emit:0x338844, emoji:'🔘', x:0, y:3.5, z:-1},
+    {color:0xff8a65, emit:0xcc5500, emoji:'🎹', x:4, y:-1.5, z:0.5},
+    {color:0xf44336, emit:0xaa2222, emoji:'🏁', x:7, y:2, z:-0.5},
+  ];
+
+  const projMeshes = projData.map((p, i) => {
+    const group = new THREE.Group();
+    // Rounded-ish box
+    const geo = new THREE.BoxGeometry(1.6, 1.6, 0.4);
+    const mat = new THREE.MeshPhongMaterial({color:p.color, emissive:p.emit, emissiveIntensity:.45, shininess:70});
+    group.add(new THREE.Mesh(geo, mat));
+    // Glow sphere
+    const sg = new THREE.SphereGeometry(1.0, 14, 14);
+    const sm = new THREE.MeshPhongMaterial({color:p.color, opacity:.1, transparent:true});
+    group.add(new THREE.Mesh(sg, sm));
+    // Number plate on front
+    const ng = new THREE.BoxGeometry(0.5, 0.3, 0.08);
+    const nm = new THREE.MeshPhongMaterial({color:0x111111});
+    const np = new THREE.Mesh(ng, nm);
+    np.position.set(0, -0.5, 0.25);
+    group.add(np);
+
+    group.position.set(p.x, p.y, p.z);
+    group.rotation.set((Math.random()-.5)*.2, (Math.random()-.5)*.3, (Math.random()-.5)*.15);
+    scene.add(group);
+    return {group, base:[p.x, p.y, p.z], speed:.25+Math.random()*.35, off:(i/5)*Math.PI*2};
+  });
+
+  // Connecting circuit traces between projects
+  const traceMat = new THREE.LineBasicMaterial({color:0x00979d, opacity:.2, transparent:true});
+  for(let i=0;i<projData.length-1;i++){
+    const pts = [
+      new THREE.Vector3(projData[i].x +4, projData[i].y, projData[i].z),
+      new THREE.Vector3(projData[i+1].x +4, projData[i+1].y, projData[i+1].z)
+    ];
+    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), traceMat));
+  }
+
+  // Floating resistor cylinders
+  for(let i=0;i<8;i++){
+    const geo = new THREE.CylinderGeometry(.06, .06, .5, 8);
+    const mat = new THREE.MeshPhongMaterial({color:Math.random()>.5?0xc8a86c:0x88cc66, shininess:40});
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set((Math.random()-.5)*18 + 4, (Math.random()-.5)*10, (Math.random()-.5)*3-2);
+    mesh.rotation.z = Math.PI/2;
+    scene.add(mesh);
+  }
+
+  // Floating LED spheres
+  const ledColors = [0xff2222, 0x22ff22, 0xffff22, 0x2222ff, 0xff8822];
+  ledColors.forEach((col,i) => {
+    const geo = new THREE.SphereGeometry(.14, 10, 10);
+    const mat = new THREE.MeshPhongMaterial({color:col, emissive:col, emissiveIntensity:.9});
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(-5+i*4.5, -4+Math.sin(i)*2, -1);
+    scene.add(mesh);
+  });
+
+  // Central circuit board
+  const boardGeo = new THREE.BoxGeometry(5, 3.5, .08);
+  const boardMat = new THREE.MeshPhongMaterial({color:0x0a4f3a, shininess:40});
+  const board = new THREE.Mesh(boardGeo, boardMat);
+  board.position.set(4, 0, -2.5);
+  scene.add(board);
+  // Board traces
+  const traceColors = [0x00979d, 0xffaa00, 0xff4400];
+  traceColors.forEach((col,i) => {
+    const tg = new THREE.BoxGeometry(4, .04, .05);
+    const tm = new THREE.MeshPhongMaterial({color:col, emissive:col, emissiveIntensity:.5});
+    const t = new THREE.Mesh(tg, tm);
+    t.position.set(4, -0.8+i*.8, -2.44);
+    scene.add(t);
+  });
+
+  let mx=0, my=0;
+  document.addEventListener('mousemove', e => {
+    mx=(e.clientX/innerWidth-.5)*2;
+    my=-(e.clientY/innerHeight-.5)*2;
+  });
+
+  function resize(){
+    renderer.setSize(innerWidth, innerHeight);
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  let t=0;
+  function animate(){
+    requestAnimationFrame(animate);
+    t+=.011;
+    projMeshes.forEach(p=>{
+      p.group.position.y = p.base[1] + Math.sin(t*p.speed+p.off)*.45;
+      p.group.position.x = p.base[0] + 4 + Math.cos(t*p.speed*.6+p.off)*.12;
+      p.group.rotation.y += .008;
+      p.group.rotation.z = Math.sin(t*p.speed*.4+p.off)*.07;
+    });
+    board.rotation.y += (mx*.06 - board.rotation.y)*.04;
+    board.rotation.x += (-my*.04 - board.rotation.x)*.04;
+    camera.position.x += (mx*1.2-camera.position.x)*.03;
+    camera.position.y += (my*.8-camera.position.y)*.03;
+    camera.lookAt(0,0,0);
+    renderer.render(scene,camera);
+  }
+  resize(); addEventListener('resize',resize); animate();
+})();
+
+/* TOGGLE PROJECT */
+function toggleProject(header){
+  const body=header.nextElementSibling;
+  const chevron=header.querySelector('.proj-chevron');
+  const open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  header.classList.toggle('open',!open);
+  chevron.classList.toggle('open',!open);
+}
+function openProject(id){
+  const card=document.getElementById(id);
+  if(!card)return;
+  const h=card.querySelector('.proj-header'),b=card.querySelector('.proj-body'),c=h.querySelector('.proj-chevron');
+  if(!b.classList.contains('open')){b.classList.add('open');h.classList.add('open');c.classList.add('open');}
+  setTimeout(()=>card.scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+
+/* SWITCH SUB TABS */
+function switchSub(btn,panelId){
+  const section=btn.closest('.proj-section')||btn.closest('.proj-body');
+  section.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
+  section.querySelectorAll('.sub-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  const panel=document.getElementById(panelId);
+  if(panel) panel.classList.add('active');
+}
+
+/* QUIZ */
+function answer(opt,result,explanation){
+  const q=opt.closest('.quiz-q');
+  if(q.dataset.answered)return;
+  q.dataset.answered='1';
+  q.querySelectorAll('.quiz-opt').forEach(o=>o.style.pointerEvents='none');
+  opt.classList.add(result);
+  const fb=q.querySelector('.quiz-feedback');
+  fb.textContent=(result==='correct'?'✓ Correct! ':'✗ Not quite. ')+explanation;
+  fb.className='quiz-feedback show '+(result==='correct'?'ok':'no');
+}
+
+/* SEND MESSAGE */
+function sendMsg(btn){
+  const box=btn.closest('.message-box');
+  const inp=box.querySelector('.msg-input');
+  if(!inp.value.trim())return;
+  btn.textContent='Sent ✓';btn.disabled=true;inp.disabled=true;
+  box.querySelector('.msg-sent').style.display='block';
+}
+
+/* COPY CODE */
+function copyCode(btn){
+  const pre=btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(()=>{btn.textContent='✓ Copied!';setTimeout(()=>{btn.textContent='Copy';},1800);});
+}
+
+/* SCROLL REVEAL */
+function navSearch(q) {
+  q = q.toLowerCase().trim();
+  if (!q) return;
+  // Map keywords to pages
+  const routes = [
+    { keywords: ['led','resistor','buzzer','sensor','servo','motor','lcd','oled','rfid','bluetooth','relay','ultrasonic','component'], page: 'components.html' },
+    { keywords: ['mblock','block','scratch','drag','beginner'], page: 'mblock.html' },
+    { keywords: ['c++','cpp','code','variable','loop','function','serial'], page: 'cpp.html' },
+    { keywords: ['project','light','piano','switch','reaction','blink'], page: 'projects.html' },
+  ];
+  for (const route of routes) {
+    if (route.keywords.some(k => q.includes(k))) {
+      window.location.href = route.page + '?search=' + encodeURIComponent(q);
+      return;
+    }
+  }
+}
+
+function toggleAccount(e){e.stopPropagation();document.getElementById('accountDropdown').classList.toggle('open');}
+document.addEventListener('click',()=>document.getElementById('accountDropdown')?.classList.remove('open'));
+function logout(){if(confirm('Log out?'))alert('Logged out!');}
+
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+</script>
+</body>
+</html>

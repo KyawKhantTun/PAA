@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn Arduino — 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/responsive.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+--teal:#307fff;--teal-dark:#0123ac;--teal-light:rgba(0, 47, 157, 0.12);
+  --orange: #e8500a;
+  --dark: #050708;
+  --darker: #030405;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--dark);
+  color: #fff;
+  overflow-x: hidden;
+}
+
+/* ─── CANVAS BACKGROUND ─── */
+#bg-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: 66px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 44px;
+  background: rgba(5,7,8,0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(0,151,157,0.15);
+}
+
+.nav-logo {
+  font-family: 'Fraunces', serif;
+  font-size: 26px; font-weight: 900; font-style: italic;
+  color: var(--teal);
+  letter-spacing: -1px;
+  text-decoration: none;
+  text-shadow: 0 0 30px var(--teal-glow);
+}
+
+.nav-logo .orange{ color: var(--orange);}
+
+.nav-links {
+  display: flex; gap: 4px; list-style: none;
+}
+.nav-links a {
+  font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,0.45);
+  text-decoration: none; padding: 7px 16px;
+  border-radius: 8px; transition: all 0.2s; white-space: nowrap;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: #fff; background: rgba(0,151,157,0.1); color: var(--teal);
+}
+
+.nav-right {
+  display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+}
+
+.nav-search {
+  display: flex; align-items: center;
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 100px; padding: 0 14px; height: 34px; gap: 8px;
+  transition: border-color 0.2s; width: 180px;
+}
+.nav-search:focus-within { border-color: var(--teal); }
+.nav-search svg { width: 13px; color: rgba(255,255,255,0.3); flex-shrink: 0; }
+.nav-search input {
+  background: none; border: none; outline: none;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; color: #fff; width: 100%;
+}
+.nav-search input::placeholder { color: rgba(255,255,255,0.2); }
+
+.account-wrap{position:relative;}
+.nav-account{display:flex;align-items:center;gap:8px;background:var(--teal);color:#fff;border:none;padding:7px 16px 7px 9px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+.nav-account:hover{background:var(--teal-dark);}
+.acc-av{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;}
+.account-dropdown{position:absolute;top:calc(100% + 10px);right:0;width:280px;background:#181c1e;border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .22s,transform .22s;z-index:300;}
+.account-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0);}
+.acc-header{background:linear-gradient(135deg,#00979d,#007a7f);padding:20px 18px;display:flex;align-items:center;gap:14px;}
+.acc-big-avatar{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid rgba(255,255,255,0.3);flex-shrink:0;}
+.acc-name{font-size:14px;font-weight:700;color:#fff;}
+.acc-email{font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;}
+.acc-progress-wrap{padding:14px 16px;border-bottom:1px solid var(--border);}
+.acc-progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:7px;}
+.acc-progress-bar{height:5px;background:rgba(255,255,255,0.08);border-radius:100px;overflow:hidden;}
+.acc-progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-dark));border-radius:100px;}
+.acc-menu{padding:6px;}
+.acc-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;text-decoration:none;color:rgba(255,255,255,0.8);font-size:13px;font-weight:500;transition:background .15s;}
+.acc-item:hover{background:rgba(0,151,157,0.1);color:var(--teal);}
+.acc-item-icon{width:30px;height:30px;border-radius:8px;background:var(--faint);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.acc-divider{height:1px;background:var(--border);margin:4px 12px;}
+.acc-logout{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:#f28b82;transition:background .15s;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:4px;}
+.acc-logout:hover{background:rgba(242,139,130,0.08);}
+.back-btn{position:fixed;top:78px;left:36px;z-index:210;display:flex;align-items:center;gap:7px;background:rgba(5,7,8,0.88);border:1px solid var(--border);color:rgba(255,255,255,0.7);padding:7px 15px 7px 11px;border-radius:100px;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:none;backdrop-filter:blur(10px);transition:all .22s;}
+.back-btn:hover{background:var(--teal-light);border-color:var(--teal);color:#fff;transform:translateX(-2px);}
+.back-btn svg{width:13px;}
+/* ─── HERO ─── */
+#hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 66px 0 0;
+  overflow: hidden;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 10;
+  padding: 0 80px;
+  max-width: 660px;
+  pointer-events: auto;
+}
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 11px; font-weight: 700; color: var(--teal);
+  text-transform: uppercase; letter-spacing: 3px;
+  margin-bottom: 20px;
+  opacity: 0; animation: riseUp 0.7s 0.3s ease forwards;
+}
+.hero-eyebrow-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--teal);
+  box-shadow: 0 0 12px var(--teal);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
+
+.hero-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(48px, 6vw, 86px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -3px;
+  margin-bottom: 18px;
+  opacity: 0; animation: riseUp 0.7s 0.5s ease forwards;
+}
+.hero-title .teal { color: var(--teal); text-shadow: 0 0 40px rgba(0,151,157,0.5); }
+.hero-title .orange { color: var(--orange); font-style: italic; }
+
+.hero-sub {
+  font-size: 15px; color: rgba(255,255,255,0.45);
+  line-height: 1.8; margin-bottom: 36px; max-width: 480px;
+  opacity: 0; animation: riseUp 0.7s 0.7s ease forwards;
+}
+
+.hero-actions {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 22px;
+  opacity: 0; animation: riseUp 0.7s 0.9s ease forwards;
+}
+
+.btn-primary {
+  background: var(--teal); color: #fff; border: none;
+  padding: 15px 38px; border-radius: 100px;
+  font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; letter-spacing: 0.3px;
+  transition: all 0.25s;
+  box-shadow: 0 8px 32px rgba(0,151,157,0.35), 0 0 0 0 rgba(0,151,157,0.5);
+  animation: glowPulse 3s ease-in-out 2s infinite;
+}
+.btn-primary:hover {
+  background: var(--teal-dark); transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(0,151,157,0.5);
+}
+@keyframes glowPulse {
+  0%,100%{box-shadow:0 8px 32px rgba(0,151,157,0.35),0 0 0 0 rgba(0,151,157,0.4)}
+  50%{box-shadow:0 8px 32px rgba(0,151,157,0.35),0 0 0 14px rgba(0,151,157,0)}
+}
+
+.btn-secondary {
+  background: transparent; color: rgba(255,255,255,0.6);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  padding: 14px 28px; border-radius: 100px;
+  font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: all 0.22s;
+}
+.btn-secondary:hover { border-color: var(--teal); color: var(--teal); }
+
+/* floating stat chips */
+.stat-chips {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  opacity: 0; animation: riseUp 0.7s 1.1s ease forwards;
+}
+.stat-chip {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 10px 16px;
+  backdrop-filter: blur(12px);
+  transition: all 0.25s;
+}
+.stat-chip:hover {
+  border-color: rgba(0,151,157,0.4);
+  background: rgba(0,151,157,0.07);
+  transform: translateY(-2px);
+}
+.stat-chip-icon { font-size: 20px; }
+.stat-chip-val { font-size: 16px; font-weight: 700; color: #fff; line-height: 1; }
+.stat-chip-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 1px; }
+
+/* 3D canvas for hero */
+#hero-canvas {
+  position: absolute;
+  top: 0; right: 0;
+  width: 60%;
+  height: 100%;
+  z-index: 5;
+}
+
+/* scroll cue */
+.scroll-cue {
+  position: absolute; bottom: 5px; left: 80px; z-index: 10;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 11px; color: rgba(255,255,255,0.8);
+  letter-spacing: 2px; text-transform: uppercase;
+  opacity: 0; animation: riseUp 0.7s 1.4s ease forwards;
+}
+.scroll-line {
+  width: 40px; height: 1px; background: rgba(255,255,255,0.15);
+  animation: expandLine 2s 1.5s ease-out forwards;
+  transform-origin: left; transform: scaleX(0);
+}
+@keyframes expandLine { to { transform: scaleX(1); } }
+
+@keyframes riseUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── SECTION: COMPONENTS ─── */
+#components {
+  position: relative; z-index: 10;
+  padding: 120px 80px;
+  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.8) 100%);
+}
+
+.section-header { text-align: center; margin-bottom: 60px; }
+.section-eyebrow {
+  display: inline-block;
+  font-size: 11px; font-weight: 700; color: var(--teal);
+  text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px;
+}
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(36px, 5vw, 58px); font-weight: 900;
+  letter-spacing: -2px; line-height: 1; margin-bottom: 14px;
+}
+.section-title em { color: var(--orange); font-style: italic; }
+.section-desc { font-size: 14px; color: rgba(255,255,255,0.4); max-width: 440px; margin: 0 auto; line-height: 1.8; }
+
+.filter-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 52px; flex-wrap: wrap; }
+.filter-btn {
+  padding: 8px 20px; border-radius: 100px;
+  border: 1.5px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04); font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,0.4); cursor: pointer;
+  transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+}
+.filter-btn:hover { border-color: var(--teal); color: var(--teal); }
+.filter-btn.active {
+  background: var(--teal); border-color: var(--teal); color: #fff;
+  box-shadow: 0 4px 20px rgba(0,151,157,0.3);
+}
+
+/* 3D card grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px; margin-bottom: 48px;
+}
+
+.comp-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px; padding: 24px 20px 20px;
+  transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+  cursor: pointer; position: relative; overflow: hidden;
+  transform-style: preserve-3d;
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+}
+.comp-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: 20px;
+  background: radial-gradient(600px circle at var(--mx,50%) var(--my,50%), rgba(0,151,157,0.08), transparent 40%);
+  opacity: 0; transition: opacity 0.4s;
+}
+.comp-card:hover { border-color: rgba(0,151,157,0.4); transform: perspective(1000px) translateZ(10px) translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,151,157,0.2); }
+.comp-card:hover::before { opacity: 1; }
+
+.comp-badge {
+  position: absolute; top: 14px; right: 14px;
+  background: var(--teal); color: #fff; font-size: 9px; font-weight: 700;
+  padding: 3px 9px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.comp-badge.hot { background: var(--orange); }
+
+.comp-emoji { font-size: 64px; text-align: center; margin-bottom: 16px; display: block; transition: transform 0.3s; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); }
+.comp-card:hover .comp-emoji { transform: scale(1.12) rotate(-5deg) translateY(-4px); }
+
+.comp-name { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.comp-desc { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; margin-bottom: 16px; }
+
+.comp-footer { display: flex; align-items: center; justify-content: space-between; }
+.level-dots { display: flex; gap: 4px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.1); }
+.dot.on { background: var(--teal); box-shadow: 0 0 8px rgba(0,151,157,0.6); }
+
+.btn-comp {
+  background: rgba(0,151,157,0.15); color: var(--teal);
+  border: 1px solid rgba(0,151,157,0.3); padding: 7px 14px;
+  border-radius: 100px; font-size: 11px; font-weight: 700;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s;
+}
+.btn-comp:hover { background: var(--teal); color: #fff; }
+
+.btn-explore-all {
+  display: block; margin: 0 auto;
+  background: transparent; color: rgba(255,255,255,0.6);
+  border: 1.5px solid rgba(255,255,255,0.12); padding: 15px 48px;
+  border-radius: 100px; font-size: 14px; font-weight: 600;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.25s;
+}
+.btn-explore-all:hover { border-color: var(--teal); color: var(--teal); transform: translateY(-2px); }
+
+/* ─── SECTION: LEARN ─── */
+#learn {
+  position: relative; z-index: 10;
+  padding: 80px 80px 120px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: center;
+}
+
+/* 3D cube scene */
+#learn-canvas-wrap {
+  position: relative;
+  height: 440px;
+  display: flex; align-items: center; justify-content: center;
+}
+#learn-canvas { width: 100%; height: 100%; }
+
+.learn-stats {
+  position: absolute;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.learn-stat-card {
+  background: rgba(255,255,255,0.04); backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 14px;
+  padding: 14px 18px; transition: all 0.25s;
+}
+.learn-stat-card:hover { border-color: rgba(0,151,157,0.3); transform: translateX(4px); }
+.learn-stat-top { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 900; color: var(--teal); }
+.learn-stat-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+.learn-stat-card.s-top { position: absolute; top: 30px; right: -24px; width: 140px; }
+.learn-stat-card.s-bot { position: absolute; bottom: 30px; left: -24px; width: 140px; }
+
+.learn-text .section-eyebrow,
+.learn-text .section-title { text-align: left; margin-bottom: 16px; }
+.learn-text p { font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.8; margin-bottom: 12px; }
+
+.feature-list { display: flex; flex-direction: column; gap: 10px; margin: 20px 0 32px; }
+.feature-item { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
+.feature-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: rgba(0,151,157,0.12); border: 1px solid rgba(0,151,157,0.2);
+  display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+}
+
+.path-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 28px; }
+.path-card {
+  border-radius: 16px; padding: 22px 18px; cursor: pointer;
+  transition: all 0.25s; border: 1.5px solid transparent;
+  text-decoration: none; display: block;
+}
+.path-card.mblock { background: linear-gradient(135deg, rgba(0,151,157,0.1), rgba(0,122,127,0.05)); border-color: rgba(0,151,157,0.2); }
+.path-card.cpp    { background: linear-gradient(135deg, rgba(57,73,171,0.12), rgba(40,53,147,0.06)); border-color: rgba(57,73,171,0.2); }
+.path-card:hover  { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); border-color: var(--teal); }
+.path-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+.path-name { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+.path-tag { font-size: 10px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 7px; }
+.path-desc { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.5; }
+
+/* ─── SECTION: CONTACT ─── */
+#contact {
+  position: relative; z-index: 10;
+  padding: 100px 80px;
+  background: rgba(0,0,0,0.5);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; max-width: 1100px; margin: 52px auto 0; }
+
+.contact-cards { display: flex; flex-direction: column; gap: 16px; }
+.contact-card {
+  display: flex; align-items: center; gap: 16px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px; padding: 18px 20px; transition: all 0.25s;
+}
+.contact-card:hover { border-color: rgba(0,151,157,0.3); transform: translateX(4px); }
+.cc-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: rgba(0,151,157,0.1); border: 1px solid rgba(0,151,157,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.cc-label { font-size: 10px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 2px; }
+.cc-val { font-size: 14px; font-weight: 600; color: #fff; }
+.cc-sub { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+
+.contact-form { display: flex; flex-direction: column; gap: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.6); }
+.form-group input,
+.form-group textarea,
+.form-group select {
+  background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 10px; padding: 11px 14px; font-size: 13px;
+  font-family: 'DM Sans', sans-serif; color: #fff; outline: none;
+  transition: border-color 0.2s; resize: none;
+}
+.form-group select option { background: #1a1a1a; }
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,151,157,0.1); }
+.form-group input::placeholder,
+.form-group textarea::placeholder { color: rgba(255,255,255,0.2); }
+
+.btn-send {
+  background: var(--teal); color: #fff; border: none;
+  padding: 14px 36px; border-radius: 100px; font-size: 14px; font-weight: 600;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.25s;
+  align-self: flex-start; box-shadow: 0 6px 24px rgba(0,151,157,0.28);
+}
+.btn-send:hover { background: var(--teal-dark); transform: translateY(-2px); }
+
+/* ─── FOOTER ─── */
+footer {
+  position: relative; z-index: 10;
+  background: var(--darker);
+  padding: 52px 80px 36px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.footer-top {
+  display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 48px; padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 28px;
+}
+.footer-logo { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 900; font-style: italic; color: var(--teal); text-shadow: 0 0 30px var(--teal-glow); }
+.footer-tag { font-size: 13px; color: rgba(255,255,255,0.3); margin-top: 6px; margin-bottom: 18px; }
+.footer-social { display: flex; gap: 10px; }
+.soc-btn {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; cursor: pointer; transition: all 0.2s;
+  color: rgba(255,255,255,0.4); text-decoration: none;
+}
+.soc-btn:hover { background: var(--teal); border-color: var(--teal); color: #fff; }
+.footer-col-title { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
+.footer-col-links { display: flex; flex-direction: column; gap: 10px; }
+.footer-col-links a { font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s; }
+.footer-col-links a:hover { color: var(--teal); }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: rgba(255,255,255,0.2); }
+
+/* ─── SCROLL REVEAL ─── */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ─── CURSOR GLOW ─── */
+.cursor-glow {
+  position: fixed; pointer-events: none; z-index: 999;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(0,151,157,0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s;
+}
+
+/* ─── SECTION DIVIDER ─── */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,151,157,0.8), transparent);
+  margin: 0;
+  position: relative; z-index: 10;
+}
+
+
+</style>
+</head>
+<body>
+
+<!-- Cursor glow -->
+<div class="cursor-glow" id="cursor-glow"></div>
+
+<!-- Background particle canvas -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="nav-left">
+    <a class="nav-logo" href="#">L<span class="orange">A</span></a>
+  </div>
+  <div class="nav-middle">
+    <ul class="nav-links">
+      <li><a href="#hero" class="active">Home</a></li>
+      <li><a href="#components">Components</a></li>
+      <li><a href="#learn">Learn</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+  <div class="nav-right">
+    <div class="nav-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input placeholder="Search…" oninput="navSearch(this.value)">
+    </div>
+    <!-- Account button + dropdown -->
+<div class="account-wrap">
+      <button class="nav-account" onclick="toggleAccount(event)">
+        <div class="acc-av">👤</div>Account
+      </button>
+      <div class="account-dropdown" id="accountDropdown">
+        <div class="acc-header">
+          <div class="acc-big-avatar">👤</div>
+          <div><div class="acc-name">Student Name</div><div class="acc-email">student@school.edu</div></div>
+        </div>
+        <div class="acc-progress-wrap">
+          <div class="acc-progress-label"><span>Lessons Completed</span><span>42%</span></div>
+          <div class="acc-progress-bar"><div class="acc-progress-fill" style="width:42%"></div></div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;">21 / 50 lessons</div>
+        </div>
+        <div class="acc-menu">
+          <a class="acc-item" href="profile.html"><div class="acc-item-icon">👤</div>View Profile</a>
+          <a class="acc-item" href="projects.html"><div class="acc-item-icon">🔧</div>Your Projects</a>
+          <div class="acc-divider"></div>
+          <a class="acc-item" href="settings.html"><div class="acc-item-icon">⚙️</div>Settings</a>
+          <div class="acc-divider"></div>
+          <button class="acc-logout" onclick="logout()">🚪 Log Out</button>
+        </div>
+      </div>
+    </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-dot"></span>
+      Hardware · Programming · Making
+    </div>
+    <h1 class="hero-title">
+      Learn<br>
+      <span class="teal">Arduino</span><br>
+      <span class="orange">Today</span>
+    </h1>
+    <p class="hero-sub">
+      Arduino components are the building blocks of every project. From LEDs and resistors to sensors and motors — learn what each part does and start building real things.
+    </p>
+    <div class="hero-actions">
+      <a href="#components"><button class="btn-primary" onclick="scrollTo('#components')">Start Learning →</button></a>
+      <a href="#learn"><button class="btn-secondary" onclick="scrollTo('#learn')">Explore Courses</button></a>
+    </div>
+    <div class="stat-chips">
+      <div class="stat-chip">
+        <span class="stat-chip-icon">⚡</span>
+        <div>
+          <div class="stat-chip-val">25+</div>
+          <div class="stat-chip-label">Components</div>
+        </div>
+      </div>
+      <div class="stat-chip">
+        <span class="stat-chip-icon">📚</span>
+        <div>
+          <div class="stat-chip-val">50+</div>
+          <div class="stat-chip-label">Lessons</div>
+        </div>
+      </div>
+      <div class="stat-chip">
+        <span class="stat-chip-icon">🔧</span>
+        <div>
+          <div class="stat-chip-val">2</div>
+          <div class="stat-chip-label">Learning Paths</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-cue">
+    <div class="scroll-line"></div>
+    Scroll to explore
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ COMPONENTS ═══ -->
+<section id="components">
+  <div class="section-header reveal">
+    <p class="section-eyebrow">Essential Parts</p>
+    <h2 class="section-title">Popular <em>Components</em></h2>
+    <p class="section-desc">Discover the most-used Arduino components. Learn what each part does and how to wire them up in your projects.</p>
+  </div>
+
+  <div class="filter-row reveal">
+    <button class="filter-btn active" onclick="filterComps('all',this)">All</button>
+    <button class="filter-btn" onclick="filterComps('input',this)">Input</button>
+    <button class="filter-btn" onclick="filterComps('output',this)">Output</button>
+    <button class="filter-btn" onclick="filterComps('sensor',this)">Sensors</button>
+    <button class="filter-btn" onclick="filterComps('power',this)">Power</button>
+    <button class="filter-btn" onclick="filterComps('module',this)">Modules</button>
+  </div>
+
+  <div class="cards-grid" id="cardsGrid"></div>
+  <button class="btn-explore-all" onclick="window.location.href='components.html'">Explore All Components →</button>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ LEARN ═══ -->
+<section id="learn">
+  <div id="learn-canvas-wrap" class="reveal">
+    <canvas id="learn-canvas"></canvas>
+    <div class="learn-stat-card s-top">
+      <div class="learn-stat-top">50+</div>
+      <div class="learn-stat-label">Lessons</div>
+    </div>
+    <div class="learn-stat-card s-bot">
+      <div class="learn-stat-top">2</div>
+      <div class="learn-stat-label">Learning Paths</div>
+    </div>
+  </div>
+
+  <div class="learn-text reveal">
+    <p class="section-eyebrow">How to Learn</p>
+    <h2 class="section-title">Code with <em style="color:var(--teal);font-style:italic;">mBlock</em> or C++</h2>
+    <p>Learning Arduino has never been easier. Start with mBlock's visual drag-and-drop blocks if you're a beginner, then graduate to writing real C++ code in the Arduino IDE.</p>
+    <p>Both tools let you control the same hardware — choose the path that fits your level and start making things blink, move, and react. 🚀</p>
+
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="feature-icon">🧩</div>
+        <span>mBlock — Visual Block-Based Coding (Beginner)</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">💻</div>
+        <span>C++ Arduino IDE — Real Code for Real Projects</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">⚡</div>
+        <span>Hands-On Projects from Day One</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🏆</div>
+        <span>Beginner to Advanced Learning Path</span>
+      </div>
+    </div>
+
+    <div class="path-cards">
+      <a class="path-card mblock" href="mblock.html">
+        <span class="path-icon">🧩</span>
+        <div class="path-name">mBlock</div>
+        <div class="path-tag">Beginner Friendly</div>
+        <div class="path-desc">Drag-and-drop visual coding. No typing required to get started.</div>
+      </a>
+      <a class="path-card cpp" href="cpp.html">
+        <span class="path-icon">💻</span>
+        <div class="path-name">C++</div>
+        <div class="path-tag">Advanced</div>
+        <div class="path-desc">Write real Arduino code in the IDE. Full control over your hardware.</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ CONTACT ═══ -->
+<section id="contact">
+  <div class="section-header reveal">
+    <p class="section-eyebrow">Get in Touch</p>
+    <h2 class="section-title">Contact <em>Us</em></h2>
+    <p class="section-desc">Have questions about Arduino? We'd love to hear from you.</p>
+  </div>
+
+  <div class="contact-grid">
+    <div class="contact-cards reveal">
+      <div class="contact-card">
+        <div class="cc-icon">📧</div>
+        <div>
+          <div class="cc-label">Email Us</div>
+          <div class="cc-val">learnwithace0426@gmail.com</div>
+          <div class="cc-sub">We reply within 24 hours</div>
+        </div>
+      </div>
+      <div class="contact-card">
+        <div class="cc-icon">📍</div>
+        <div>
+          <div class="cc-label">Location</div>
+          <div class="cc-val">Myanmar</div>
+          <div class="cc-sub">Available worldwide online</div>
+        </div>
+      </div>
+      <div class="contact-card">
+        <div class="cc-icon">💬</div>
+        <div>
+          <div class="cc-label">Community</div>
+          <div class="cc-val">Join our Discord</div>
+          <div class="cc-sub">1,200+ Arduino learners</div>
+        </div>
+      </div>
+      <div class="contact-card">
+        <div class="cc-icon">🕐</div>
+        <div>
+          <div class="cc-label">Support Hours</div>
+          <div class="cc-val">Mon – Fri, 9am – 5pm</div>
+          <div class="cc-sub">SGT (UTC+8)</div>
+        </div>
+      </div>
+    </div>
+
+    <form class="contact-form reveal" onsubmit="submitForm(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" placeholder="John">
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" placeholder="Doe">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" placeholder="john@example.com">
+      </div>
+      <div class="form-group">
+        <label>Topic</label>
+        <select>
+          <option value="">Select a topic…</option>
+          <option>Course Question</option>
+          <option>Technical Help</option>
+          <option>Component Guide</option>
+          <option>Suggest a Lesson</option>
+          <option>Report a Bug</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea rows="5" placeholder="Tell us what's on your mind…"></textarea>
+      </div>
+      <button type="submit" class="btn-send" id="sendBtn">Send Message →</button>
+    </form>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo"><a class="nav-logo" href="#">L<span class="orange">A</span></a></div>
+      <div class="footer-tag">Learn. Build. Create.</div>
+      <div class="footer-social">
+        <a class="soc-btn" href="#">▶</a>
+        <a class="soc-btn" href="#">💬</a>
+        <a class="soc-btn" href="#">⌨</a>
+        <a class="soc-btn" href="#">📷</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Learn</div>
+      <div class="footer-col-links">
+        <a href="#components">Components</a>
+        <a href="mblock.html">mBlock Course</a>
+        <a href="cpp.html">C++ Course</a>
+        <a href="projects.html">Projects</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Resources</div>
+      <div class="footer-col-links">
+        <a href="https://www.arduino.cc/en/software" target="_blank">Download IDE</a>
+        <a href="#">Code Examples</a>
+        <a href="#">Component Datasheets</a>
+        <a href="#">Video Tutorials</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Support</div>
+      <div class="footer-col-links">
+        <a href="#contact">Contact Us</a>
+        <a href="#">FAQ</a>
+        <a href="#">Discord Community</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 LearnWithAce. All rights reserved.</span>
+    <span>Built for Arduino learners everywhere 🤖</span>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ════════════════════════════════════════
+   CURSOR GLOW
+════════════════════════════════════════ */
+const cursorGlow = document.getElementById('cursor-glow');
+document.addEventListener('mousemove', e => {
+  cursorGlow.style.left = e.clientX + 'px';
+  cursorGlow.style.top = e.clientY + 'px';
+});
+
+/* ════════════════════════════════════════
+   BACKGROUND PARTICLE CANVAS
+════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function Particle() {
+    this.reset();
+  }
+  Particle.prototype.reset = function() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.r = Math.random() * 1.2 + 0.2;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.alpha = Math.random() * 0.4 + 0.05;
+    this.color = Math.random() > 0.7 ? '#00979d' : '#ffffff';
+  };
+  Particle.prototype.update = function() {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+  };
+
+  for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+  function drawLine(a, b, dist) {
+    const opacity = (1 - dist / 120) * 0.15;
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(0,151,157,${opacity})`;
+    ctx.lineWidth = 0.5;
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      p.update();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.alpha;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) drawLine(particles[i], particles[j], dist);
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  loop();
+})();
+
+/* ════════════════════════════════════════
+   HERO 3D SCENE — floating Arduino + orbs
+════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  function resize() {
+    const w = canvas.parentElement.clientWidth * 0.6;
+    const h = canvas.parentElement.clientHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  camera.position.set(0, 0, 8);
+
+  // Lighting
+  scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+  const dirLight = new THREE.DirectionalLight(0x00979d, 2);
+  dirLight.position.set(5, 5, 5);
+  scene.add(dirLight);
+  const backLight = new THREE.PointLight(0xe8500a, 1.5, 20);
+  backLight.position.set(-4, -2, 3);
+  scene.add(backLight);
+  const frontLight = new THREE.PointLight(0x00979d, 1, 15);
+  frontLight.position.set(3, 3, 4);
+  scene.add(frontLight);
+
+  // Main Arduino board — stylized box
+  const boardGroup = new THREE.Group();
+  scene.add(boardGroup);
+
+  // Main board
+  const boardGeo = new THREE.BoxGeometry(3.6, 2.4, 0.12);
+  const boardMat = new THREE.MeshPhongMaterial({ color: 0x0a5f5a, shininess: 60, specular: 0x00979d });
+  const board = new THREE.Mesh(boardGeo, boardMat);
+  boardGroup.add(board);
+
+  // USB port
+  const usbGeo = new THREE.BoxGeometry(0.4, 0.6, 0.2);
+  const usbMat = new THREE.MeshPhongMaterial({ color: 0x888888, shininess: 100 });
+  const usb = new THREE.Mesh(usbGeo, usbMat);
+  usb.position.set(-1.7, 0.3, 0.06);
+  boardGroup.add(usb);
+
+  // Pin headers (top row)
+  for (let i = 0; i < 14; i++) {
+    const pinGeo = new THREE.BoxGeometry(0.07, 0.3, 0.07);
+    const pinMat = new THREE.MeshPhongMaterial({ color: 0xcccccc });
+    const pin = new THREE.Mesh(pinGeo, pinMat);
+    pin.position.set(-1.6 + i * 0.23, 1.2, 0.06);
+    boardGroup.add(pin);
+  }
+  // Pin headers (bottom row)
+  for (let i = 0; i < 6; i++) {
+    const pinGeo = new THREE.BoxGeometry(0.07, 0.3, 0.07);
+    const pinMat = new THREE.MeshPhongMaterial({ color: 0xcccccc });
+    const pin = new THREE.Mesh(pinGeo, pinMat);
+    pin.position.set(-0.6 + i * 0.23, -1.2, 0.06);
+    boardGroup.add(pin);
+  }
+
+  // Microcontroller chip
+  const chipGeo = new THREE.BoxGeometry(0.8, 1.2, 0.15);
+  const chipMat = new THREE.MeshPhongMaterial({ color: 0x111111, shininess: 150 });
+  const chip = new THREE.Mesh(chipGeo, chipMat);
+  chip.position.set(0.4, 0, 0.1);
+  boardGroup.add(chip);
+
+  // LED on board (glowing sphere)
+  const ledGeo = new THREE.SphereGeometry(0.08, 12, 12);
+  const ledMat = new THREE.MeshPhongMaterial({ color: 0x00ff88, emissive: 0x00ff88, emissiveIntensity: 0.8 });
+  const led = new THREE.Mesh(ledGeo, ledMat);
+  led.position.set(-0.5, 0.5, 0.15);
+  boardGroup.add(led);
+
+  // Power LED
+  const ledMat2 = new THREE.MeshPhongMaterial({ color: 0xff4400, emissive: 0xff4400, emissiveIntensity: 0.8 });
+  const led2 = new THREE.Mesh(ledGeo.clone(), ledMat2);
+  led2.position.set(-0.7, 0.5, 0.15);
+  boardGroup.add(led2);
+
+  // Glow ring around board
+  const ringGeo = new THREE.TorusGeometry(2.2, 0.02, 8, 60);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0x00979d, opacity: 0.5, transparent: true });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = Math.PI / 2;
+  scene.add(ring);
+
+  // Floating orbs (component representations)
+  const orbData = [
+    { color: 0xffdd00, emissive: 0xffaa00, pos: [3, 2, -1], size: 0.22 },   // LED
+    { color: 0x00ff88, emissive: 0x00cc66, pos: [-3, 1.5, -0.5], size: 0.18 }, // Sensor
+    { color: 0xff6600, emissive: 0xff4400, pos: [2.5, -2, -0.5], size: 0.2 },  // Motor
+    { color: 0x44aaff, emissive: 0x2288dd, pos: [-2.5, -1.5, -1], size: 0.25 },// Bluetooth
+    { color: 0xff44aa, emissive: 0xdd2288, pos: [3.5, 0.5, -0.8], size: 0.15 },
+    { color: 0xaa44ff, emissive: 0x8822dd, pos: [-3, -0.5, -0.5], size: 0.19 },
+    { color: 0x00979d, emissive: 0x007a7f, pos: [1.5, 2.5, -1], size: 0.17 },
+  ];
+
+  const orbs = orbData.map(d => {
+    const geo = new THREE.SphereGeometry(d.size, 20, 20);
+    const mat = new THREE.MeshPhongMaterial({
+      color: d.color, emissive: d.emissive, emissiveIntensity: 0.6, shininess: 100
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(...d.pos);
+    scene.add(mesh);
+    return { mesh, basePos: [...d.pos], speed: Math.random() * 0.5 + 0.3, offset: Math.random() * Math.PI * 2 };
+  });
+
+  // Connecting lines (wires) — simple line segments
+  const lineMat = new THREE.LineBasicMaterial({ color: 0x00979d, opacity: 0.25, transparent: true });
+  orbs.forEach(orb => {
+    const points = [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(...orb.basePos)
+    ];
+    const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+    scene.add(new THREE.Line(lineGeo, lineMat));
+  });
+
+  // Floating geometric helpers
+  const helperGeos = [
+    new THREE.OctahedronGeometry(0.4, 0),
+    new THREE.TetrahedronGeometry(0.3, 0),
+    new THREE.IcosahedronGeometry(0.25, 0),
+  ];
+  const helperMeshes = helperGeos.map((geo, i) => {
+    const mat = new THREE.MeshPhongMaterial({
+      color: 0x00979d, wireframe: true, opacity: 0.3, transparent: true
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    const angle = (i / 3) * Math.PI * 2;
+    mesh.position.set(Math.cos(angle) * 4, Math.sin(angle) * 2.5, -2);
+    scene.add(mesh);
+    return mesh;
+  });
+
+  // Mouse tracking
+  let mouseX = 0, mouseY = 0;
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    mouseY = -((e.clientY - rect.top) / rect.height - 0.5) * 2;
+  });
+
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.016;
+
+    // Board rotation following mouse
+    boardGroup.rotation.y += (mouseX * 0.4 - boardGroup.rotation.y) * 0.05;
+    boardGroup.rotation.x += (-mouseY * 0.25 - boardGroup.rotation.x) * 0.05;
+    boardGroup.position.y = Math.sin(t * 0.5) * 0.15;
+
+    // Ring
+    ring.rotation.z += 0.003;
+    ring.rotation.x += 0.001;
+
+    // LED blink
+    led.material.emissiveIntensity = 0.5 + Math.sin(t * 3) * 0.4;
+
+    // Orb animations
+    orbs.forEach(orb => {
+      orb.mesh.position.y = orb.basePos[1] + Math.sin(t * orb.speed + orb.offset) * 0.35;
+      orb.mesh.position.x = orb.basePos[0] + Math.cos(t * orb.speed * 0.7 + orb.offset) * 0.15;
+      orb.mesh.rotation.y += 0.01;
+    });
+
+    // Helper rotations
+    helperMeshes.forEach((mesh, i) => {
+      mesh.rotation.x += 0.008 + i * 0.003;
+      mesh.rotation.y += 0.012 + i * 0.002;
+      mesh.position.y = helperMeshes[i].position.y + Math.sin(t * 0.4 + i * 2) * 0.001;
+    });
+
+    renderer.render(scene, camera);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  animate();
+})();
+
+/* ════════════════════════════════════════
+   LEARN SECTION 3D — rotating cube showing paths
+════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('learn-canvas');
+  const wrap = document.getElementById('learn-canvas-wrap');
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.set(0, 0, 7);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  const l1 = new THREE.PointLight(0x00979d, 3, 20); l1.position.set(5, 5, 5); scene.add(l1);
+  const l2 = new THREE.PointLight(0x3949ab, 2, 20); l2.position.set(-5, -3, 3); scene.add(l2);
+
+  // Central glowing sphere (core)
+  const coreGeo = new THREE.SphereGeometry(1.1, 32, 32);
+  const coreMat = new THREE.MeshPhongMaterial({
+    color: 0x00979d, emissive: 0x003a3d, emissiveIntensity: 0.5, shininess: 80,
+    opacity: 0.85, transparent: true
+  });
+  const core = new THREE.Mesh(coreGeo, coreMat);
+  scene.add(core);
+
+  // Inner wireframe
+  const wireGeo = new THREE.IcosahedronGeometry(1.15, 1);
+  const wireMat = new THREE.MeshBasicMaterial({ color: 0x00979d, wireframe: true, opacity: 0.15, transparent: true });
+  const wireframe = new THREE.Mesh(wireGeo, wireMat);
+  scene.add(wireframe);
+
+  // Orbit rings
+  const rings = [1.8, 2.4, 3.0].map((r, i) => {
+    const geo = new THREE.TorusGeometry(r, 0.015, 8, 80);
+    const mat = new THREE.MeshBasicMaterial({ color: i === 0 ? 0x00979d : 0x3949ab, opacity: 0.4 - i * 0.1, transparent: true });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.rotation.x = Math.PI / 2 + i * 0.3;
+    mesh.rotation.z = i * 0.5;
+    scene.add(mesh);
+    return mesh;
+  });
+
+  // Satellites on orbits
+  const satColors = [0xffdd00, 0x00ff88, 0xff4400, 0x44aaff, 0xaa44ff, 0xff44aa];
+  const satellites = satColors.map((col, i) => {
+    const geo = new THREE.SphereGeometry(0.12, 12, 12);
+    const mat = new THREE.MeshPhongMaterial({ color: col, emissive: col, emissiveIntensity: 0.7 });
+    const mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+    const radius = 1.8 + (i % 3) * 0.6;
+    return { mesh, radius, speed: 0.5 + i * 0.15, offset: (i / satColors.length) * Math.PI * 2, ringIdx: i % 3 };
+  });
+
+  function resize() {
+    const size = Math.min(wrap.clientWidth, wrap.clientHeight);
+    renderer.setSize(wrap.clientWidth, size);
+    camera.aspect = wrap.clientWidth / size;
+    camera.updateProjectionMatrix();
+  }
+
+  let t = 0, mx = 0, my = 0;
+  wrap.addEventListener('mousemove', e => {
+    const r = wrap.getBoundingClientRect();
+    mx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+    my = -((e.clientY - r.top) / r.height - 0.5) * 2;
+  });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.012;
+
+    core.rotation.y += 0.005;
+    wireframe.rotation.y -= 0.008;
+    wireframe.rotation.x += 0.003;
+
+    rings.forEach((ring, i) => {
+      ring.rotation.y += 0.004 + i * 0.002;
+      ring.rotation.z += 0.002;
+    });
+
+    satellites.forEach(sat => {
+      const angle = t * sat.speed + sat.offset;
+      const tilt = sat.ringIdx * 0.4 + 0.3;
+      sat.mesh.position.x = Math.cos(angle) * sat.radius;
+      sat.mesh.position.y = Math.sin(angle) * sat.radius * Math.cos(tilt);
+      sat.mesh.position.z = Math.sin(angle) * sat.radius * Math.sin(tilt);
+    });
+
+    core.position.y = Math.sin(t * 0.5) * 0.08;
+    camera.position.x += (mx * 0.5 - camera.position.x) * 0.04;
+    camera.position.y += (my * 0.5 - camera.position.y) * 0.04;
+    camera.lookAt(0, 0, 0);
+
+    renderer.render(scene, camera);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  animate();
+})();
+
+/* ════════════════════════════════════════
+   COMPONENTS DATA + RENDER
+════════════════════════════════════════ */
+const components = [
+  { emoji:'💡', name:'LED',               desc:'Light Emitting Diode. Controls light output with digitalWrite().', level:1, badge:'Starter', badgeClass:'', category:'output' },
+  { emoji:'🔘', name:'Push Button',       desc:'Digital input. Read button presses with digitalRead() to trigger actions.', level:1, badge:'', badgeClass:'', category:'input' },
+  { emoji:'🌡️', name:'Temp Sensor',       desc:'DHT11/DHT22 reads temperature & humidity. Perfect for weather stations.', level:2, badge:'Popular', badgeClass:'', category:'sensor' },
+  { emoji:'📡', name:'Ultrasonic Sensor', desc:'HC-SR04 measures distance with sound. Used in obstacle-avoidance robots.', level:2, badge:'', badgeClass:'', category:'sensor' },
+  { emoji:'⚙️', name:'Servo Motor',       desc:'Precise 0–180° angle control with the Servo library. Great for robotics.', level:2, badge:'Hot', badgeClass:'hot', category:'output module' },
+  { emoji:'🔌', name:'Breadboard',        desc:'Solderless prototyping board. Connect components without soldering.', level:1, badge:'Essential', badgeClass:'', category:'power' },
+  { emoji:'📶', name:'Bluetooth Module',  desc:'HC-05/HC-06 adds wireless Bluetooth. Control your Arduino from a phone.', level:3, badge:'', badgeClass:'', category:'module' },
+  { emoji:'🖥️', name:'LCD Display',       desc:'16×2 character display. Show sensor data with the LiquidCrystal library.', level:2, badge:'New', badgeClass:'', category:'output module' },
+];
+
+function renderComponents(items) {
+  document.getElementById('cardsGrid').innerHTML = items.map(c => `
+    <div class="comp-card reveal visible" onmousemove="tiltCard(event,this)" onmouseleave="resetCard(this)">
+      ${c.badge ? `<div class="comp-badge ${c.badgeClass}">${c.badge}</div>` : ''}
+      <span class="comp-emoji">${c.emoji}</span>
+      <div class="comp-name">${c.name}</div>
+      <div class="comp-desc">${c.desc}</div>
+      <div class="comp-footer">
+        <div class="level-dots">
+          ${[1,2,3].map(d => `<div class="dot ${c.level >= d ? 'on' : ''}"></div>`).join('')}
+        </div>
+        <button class="btn-comp" onclick="window.location.href='components.html'">Learn →</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterComps(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderComponents(cat === 'all' ? components : components.filter(c => c.category.includes(cat)));
+}
+
+// 3D tilt on cards
+function tiltCard(e, card) {
+  const rect = card.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / rect.width;
+  const y = (e.clientY - rect.top) / rect.height;
+  const rotY = (x - 0.5) * 14;
+  const rotX = -(y - 0.5) * 10;
+  card.style.transform = `perspective(600px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-6px) translateZ(10px)`;
+  card.style.setProperty('--mx', (x * 100) + '%');
+  card.style.setProperty('--my', (y * 100) + '%');
+}
+function resetCard(card) {
+  card.style.transform = '';
+}
+
+/* ════════════════════════════════════════
+   CONTACT FORM
+════════════════════════════════════════ */
+function submitForm(e) {
+  e.preventDefault();
+  const btn = document.getElementById('sendBtn');
+  btn.textContent = '✓ Message Sent!';
+  btn.style.background = '#2e7d32';
+  setTimeout(() => { btn.textContent = 'Send Message →'; btn.style.background = ''; }, 2500);
+}
+
+/* ════════════════════════════════════════
+   SCROLL REVEAL
+════════════════════════════════════════ */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ════════════════════════════════════════
+   SMOOTH SCROLL
+════════════════════════════════════════ */
+function scrollTo(sel) {
+  document.querySelector(sel)?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function navSearch(q) {
+  q = q.toLowerCase().trim();
+  if (!q) return;
+  // Map keywords to pages
+  const routes = [
+    { keywords: ['led','resistor','buzzer','sensor','servo','motor','lcd','oled','rfid','bluetooth','relay','ultrasonic','component'], page: 'components.html' },
+    { keywords: ['mblock','block','scratch','drag','beginner'], page: 'mblock.html' },
+    { keywords: ['c++','cpp','code','variable','loop','function','serial'], page: 'cpp.html' },
+    { keywords: ['project','light','piano','switch','reaction','blink'], page: 'projects.html' },
+  ];
+  for (const route of routes) {
+    if (route.keywords.some(k => q.includes(k))) {
+      window.location.href = route.page + '?search=' + encodeURIComponent(q);
+      return;
+    }
+  }
+}
+
+function toggleAccount(e){e.stopPropagation();document.getElementById('accountDropdown').classList.toggle('open');}
+document.addEventListener('click',()=>document.getElementById('accountDropdown')?.classList.remove('open'));
+function logout(){if(confirm('Log out?'))alert('Logged out!');}
+
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+/* INIT */
+renderComponents(components);
+</script>
+</body>
+</html>
