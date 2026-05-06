@@ -77,6 +77,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--dark);color:#fff;display:
 @keyframes spin{to{transform:rotate(360deg)}}
 .bottom-note{text-align:center;margin-top:22px;font-size:12px;color:rgba(255,255,255,0.2);line-height:1.7;}
 
+/* DIVIDER */
+.or-divider{display:flex;align-items:center;gap:12px;margin:18px 0;}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.or-divider span{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+
+/* GOOGLE BUTTON */
+.btn-google{width:100%;background:rgba(255,255,255,0.05);color:#fff;border:1.5px solid var(--border);padding:13px 14px;border-radius:12px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:.1px;}
+.btn-google:hover{background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.18);transform:translateY(-1px);}
+.btn-google:disabled{pointer-events:none;opacity:.6;}
+.btn-google svg{width:18px;height:18px;flex-shrink:0;}
+
 /* ERROR BANNER */
 .error-banner{display:none;background:rgba(239,83,80,0.1);border:1px solid rgba(239,83,80,0.3);border-radius:11px;padding:12px 16px;font-size:13px;color:#ef9a9a;margin-bottom:18px;text-align:center;}
 .error-banner.show{display:block;}
@@ -172,7 +183,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--dark);color:#fff;display:
           <span id="btnLabel">Log In →</span>
         </button>
 
-        
+        <!-- DIVIDER -->
+        <div class="or-divider"><span>or</span></div>
+
+        <!-- GOOGLE SIGN-IN -->
+        <button class="btn-google" id="btnGoogle" onclick="doGoogleLogin()">
+          <!-- Google "G" logo SVG -->
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          <span id="googleLabel">Continue with Google</span>
+        </button>
+
         <div class="bottom-note">Having trouble? Ask your teacher or administrator for help.</div>
       </div>
     </div>
@@ -219,10 +244,10 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.firestore();
 
-let manualLogin = false; // ← ADD this line above
+let manualLogin = false;
 
 auth.onAuthStateChanged(async (user) => {
-  if (user && !manualLogin) { // ← add && !manualLogin
+  if (user && !manualLogin) {
     const userDoc = await db.collection('users').doc(user.uid).get();
     const profile = userDoc.data();
     window.location.replace(profile?.role === 'admin' ? 'admin.html' : 'arduino.html');
@@ -284,6 +309,15 @@ function setLoading(on){
   btn.disabled=on;
   btn.innerHTML=on?'<div class="spinner"></div><span>Logging in…</span>':'<span id="btnLabel">Log In →</span>';
 }
+function setGoogleLoading(on){
+  const btn=document.getElementById('btnGoogle');
+  btn.disabled=on;
+  if(on){
+    btn.innerHTML='<div class="spinner" style="border-color:rgba(255,255,255,0.2);border-top-color:#fff;"></div><span>Signing in…</span>';
+  } else {
+    btn.innerHTML=`<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;flex-shrink:0"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg><span id="googleLabel">Continue with Google</span>`;
+  }
+}
 
 async function doLogin(){
   const username=document.getElementById('username').value.trim();
@@ -306,9 +340,8 @@ async function doLogin(){
     const { email, role } = userDoc.data();
 
     // Step 3: Sign in with Firebase
-    manualLogin = true; // ← ADD this
-await auth.signInWithEmailAndPassword(email, password);
-   
+    manualLogin = true;
+    await auth.signInWithEmailAndPassword(email, password);
 
     // Step 4: Redirect based on role
     showToast('✓ Welcome back! Redirecting…');
@@ -316,8 +349,8 @@ await auth.signInWithEmailAndPassword(email, password);
       window.location.replace(role === 'admin' ? 'admin.html' : 'arduino.html');
     }, 900);
 
-} catch (err) {
-    manualLogin = false; // ← ADD this
+  } catch (err) {
+    manualLogin = false;
     setLoading(false);
     if (err.message === 'Username not found.' || err.message === 'User account not found.') {
       document.getElementById('username').classList.add('err');
@@ -329,6 +362,31 @@ await auth.signInWithEmailAndPassword(email, password);
       showBanner('Too many attempts. Please wait a moment and try again.');
     } else {
       showBanner('Something went wrong: ' + err.message);
+    }
+  }
+}
+
+/* GOOGLE LOGIN */
+async function doGoogleLogin(){
+  clearErr();
+  setGoogleLoading(true);
+  manualLogin = true;
+
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+
+  try {
+    await auth.signInWithPopup(provider);
+    showToast('✓ Signed in with Google! Redirecting…');
+    setTimeout(() => { window.location.replace('arduino.html'); }, 900);
+  } catch (err) {
+    manualLogin = false;
+    setGoogleLoading(false);
+    if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
+    if (err.code === 'auth/popup-blocked') {
+      showBanner('Pop-up blocked. Please allow pop-ups for this site and try again.');
+    } else {
+      showBanner('Google sign-in failed: ' + err.message);
     }
   }
 }
