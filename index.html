@@ -7,6 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/responsive.css">
 <style>
+
+
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --teal:#307fff;--teal-dark:#0123ac;--teal-light:rgba(0, 47, 157, 0.12);
@@ -169,6 +172,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--dark);color:#fff;display:
           <span id="btnLabel">Log In →</span>
         </button>
 
+        
         <div class="bottom-note">Having trouble? Ask your teacher or administrator for help.</div>
       </div>
     </div>
@@ -197,61 +201,37 @@ body{font-family:'DM Sans',sans-serif;background:var(--dark);color:#fff;display:
 <div class="toast" id="toast"></div>
 
 <!-- Three.js CDN (required for background particles) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<!-- Supabase CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-// ── CONFIG — paste your real values here ──────────────────────
-const SUPABASE_URL      = 'https://rfuvffajmaufoptgwtnd.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmdXZmZmFqbWF1Zm9wdGd3dG5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3Nzk5NjQsImV4cCI6MjA5MzM1NTk2NH0.E7HVW6uDxctpepxzspvpYmutJRvxBSYMl1nZ9mCKt9s';
-const API_BASE          = 'https://learnarduinowithace-production.up.railway.app';
-// ──────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey:            'AIzaSyD6kfvr-6qVSWMwWgp9PfKnGNT3u5K-4zk',
+  authDomain:        'learn-arduino-with-ace.firebaseapp.com',
+  projectId:         'learn-arduino-with-ace',
+  storageBucket:     'learn-arduino-with-ace.firebasestorage.app',
+  messagingSenderId: '100033192953',
+  appId:             '1:100033192953:web:c331698eea56c1a34c5328'
+};
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: { persistSession: true, autoRefreshToken: true }
-});
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
 
-async function getSession() {
-  const { data: { session } } = await supabase.auth.getSession();
-  return session;
-}
+let manualLogin = false; // ← ADD this line above
 
-async function getCurrentProfile() {
-  const session = await getSession();
-  if (!session) return null;
-  const { data } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-  return data;
-}
-
-async function apiFetch(path, options = {}) {
-  const session = await getSession();
-  const token   = session?.access_token;
-  const res = await fetch(`${API_BASE}${path}`, {
-    method:  options.method || 'GET',
-    headers: {
-      'Content-Type':  'application/json',
-      'Authorization': token ? `Bearer ${token}` : '',
-    },
-    body: options.body ? JSON.stringify(options.body) : undefined,
-  });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
-  return json;
-}
-
-async function signOut() {
-  await supabase.auth.signOut();
-  window.location.href = 'index.html';
-}
-
-/* If user is already logged in, redirect straight to the dashboard */
-(async function checkAlreadyLoggedIn(){
-  const session = await getSession();
-  if (session) {
-    const profile = await getCurrentProfile();
+auth.onAuthStateChanged(async (user) => {
+  if (user && !manualLogin) { // ← add && !manualLogin
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    const profile = userDoc.data();
     window.location.replace(profile?.role === 'admin' ? 'admin.html' : 'arduino.html');
   }
-})();
+});
+
+async function signOut() {
+  await auth.signOut();
+  window.location.href = 'index.html';
+}
 
 /* CURSOR */
 document.addEventListener('mousemove', e => {
@@ -287,7 +267,6 @@ document.addEventListener('mousemove', e => {
   resize();addEventListener('resize',resize);
 })();
 
-/* HELPERS */
 function clearErr(){
   document.getElementById('errorBanner').classList.remove('show');
   ['username','password'].forEach(id=>{
@@ -305,7 +284,6 @@ function setLoading(on){
   btn.innerHTML=on?'<div class="spinner"></div><span>Logging in…</span>':'<span id="btnLabel">Log In →</span>';
 }
 
-/* LOGIN — real Supabase auth */
 async function doLogin(){
   const username=document.getElementById('username').value.trim();
   const password=document.getElementById('password').value;
@@ -316,41 +294,44 @@ async function doLogin(){
 
   setLoading(true);
   try {
-    // Step 1: Look up email from username via our backend
-    const lookup = await apiFetch('/api/auth/lookup', {
-      method: 'POST',
-      body:   { username },
-    });
+    // Step 1: Look up username → uid in Firestore
+    const usernameDoc = await db.collection('usernames').doc(username.toLowerCase()).get();
+    if (!usernameDoc.exists) throw new Error('Username not found.');
+    const { uid } = usernameDoc.data();
 
-    // Step 2: Sign in via Supabase with email + password
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email:    lookup.email,
-      password,
-    });
+    // Step 2: Get email + role from users collection
+    const userDoc = await db.collection('users').doc(uid).get();
+    if (!userDoc.exists) throw new Error('User account not found.');
+    const { email, role } = userDoc.data();
 
-    if (error) throw new Error(error.message);
+    // Step 3: Sign in with Firebase
+    manualLogin = true; // ← ADD this
+await auth.signInWithEmailAndPassword(email, password);
+   
 
-    // Step 3: Redirect based on role
+    // Step 4: Redirect based on role
     showToast('✓ Welcome back! Redirecting…');
     setTimeout(() => {
-      window.location.replace(lookup.role === 'admin' ? 'admin.html' : 'arduino.html');
+      window.location.replace(role === 'admin' ? 'admin.html' : 'arduino.html');
     }, 900);
 
-  } catch (err) {
+} catch (err) {
+    manualLogin = false; // ← ADD this
     setLoading(false);
-    if (err.message === 'Username not found.') {
+    if (err.message === 'Username not found.' || err.message === 'User account not found.') {
       document.getElementById('username').classList.add('err');
       showBanner('Username not found. Check your username and try again.');
-    } else if (err.message.toLowerCase().includes('invalid')) {
+    } else if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
       document.getElementById('password').classList.add('err');
       showBanner('Incorrect password. Try again or contact your teacher.');
+    } else if (err.code === 'auth/too-many-requests') {
+      showBanner('Too many attempts. Please wait a moment and try again.');
     } else {
       showBanner('Something went wrong: ' + err.message);
     }
   }
 }
 
-/* FORGOT */
 function openForgot(){document.getElementById('forgotModal').classList.add('open');}
 function closeForgot(){document.getElementById('forgotModal').classList.remove('open');}
 function sendReset(){
@@ -361,8 +342,10 @@ function sendReset(){
 }
 document.getElementById('forgotModal').addEventListener('click',e=>{if(e.target===document.getElementById('forgotModal'))closeForgot();});
 
-/* TOAST */
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),3200);}
+
+
 </script>
+
 </body>
 </html>

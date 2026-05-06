@@ -258,19 +258,43 @@ tbody tr:hover td{background:rgba(255,255,255,0.02);color:#fff;}
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="js/supabase-client.js"></script>
-<script src="js/auth-guard.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-let allUsers=[], deleteTargetId=null;
+// ── PASTE YOUR SAME Firebase config from index.html ──
+const firebaseConfig = {
+  apiKey:            'AIzaSyD6kfvr-6qVSWMwWgp9PfKnGNT3u5K-4zk',
+  authDomain:        'learn-arduino-with-ace.firebaseapp.com',
+  projectId:         'learn-arduino-with-ace',
+  storageBucket:     'learn-arduino-with-ace.firebasestorage.app',
+  messagingSenderId: '100033192953',
+  appId:             '1:100033192953:web:c331698eea56c1a34c5328'
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
 
+let allUsers = [], deleteTargetId = null;
+
+// ── ADMIN GUARD + INIT ──
 (async function init(){
-  const {profile} = await adminGuard();
-  document.getElementById('sidebarAv').textContent   = (profile.full_name||profile.username).charAt(0).toUpperCase();
-  document.getElementById('sidebarName').textContent = profile.full_name||profile.username;
+  await new Promise(resolve => {
+    const unsub = auth.onAuthStateChanged(user => { unsub(); resolve(user); });
+  });
+  const user = auth.currentUser;
+  if (!user) { window.location.href = 'ardunio.html'; return; }
+  const userDoc = await db.collection('users').doc(user.uid).get();
+  const profile = userDoc.data();
+  if (!profile || profile.role !== 'admin') { window.location.href = 'arduino.html'; return; }
+  document.getElementById('sidebarAv').textContent   = (profile.displayName||profile.username||'A').charAt(0).toUpperCase();
+  document.getElementById('sidebarName').textContent = profile.displayName||profile.username;
   await loadDashboard();
 })();
 
+async function signOut(){ await auth.signOut(); window.location.href = 'index.html'; }
+
+// ── SECTIONS ──
 function showSection(id,link){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(l=>l.classList.remove('active'));
@@ -283,12 +307,12 @@ function showSection(id,link){
   if(id==='activity')loadActivity();
 }
 
+// ── DASHBOARD ──
 async function loadDashboard(){
   try{
-    const {users}=await apiFetch('/api/admin/users');
-    allUsers=users||[];
-    const total=allUsers.length;
-    const active=allUsers.filter(u=>!u.banned_until).length;
+    const snap = await db.collection('users').where('role','==','student').get();
+    allUsers = snap.docs.map(d=>({id:d.id,...d.data()}));
+    const total=allUsers.length, active=allUsers.filter(u=>!u.suspended).length;
     const avgProg=total?Math.round(allUsers.reduce((s,u)=>s+(u.avg_progress||0),0)/total):0;
     document.getElementById('statTotal').textContent=total;
     document.getElementById('statActive').textContent=active+' active';
@@ -300,14 +324,18 @@ async function loadDashboard(){
   }catch(err){showToast('⚠ '+err.message);}
 }
 
+// ── USERS ──
 async function loadUsers(filter='all'){
-  try{const {users}=await apiFetch('/api/admin/users');allUsers=users||[];renderUsers(filter);}
-  catch(err){showToast('⚠ '+err.message);}
+  try{
+    const snap = await db.collection('users').where('role','==','student').get();
+    allUsers = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderUsers(filter);
+  }catch(err){showToast('⚠ '+err.message);}
 }
 function renderUsers(filter='all'){
   let list=allUsers;
-  if(filter==='active')list=allUsers.filter(u=>!u.banned_until);
-  if(filter==='suspended')list=allUsers.filter(u=>!!u.banned_until);
+  if(filter==='active')list=allUsers.filter(u=>!u.suspended);
+  if(filter==='suspended')list=allUsers.filter(u=>!!u.suspended);
   document.getElementById('userCount').textContent=list.length+' student'+(list.length!==1?'s':'');
   document.getElementById('usersTable').innerHTML=list.map(u=>fullRow(u)).join('')||emptyRow(6,'No students found');
 }
@@ -315,48 +343,52 @@ let currentFilter='all';
 function filterUsers(f,btn){currentFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderUsers(f);}
 function searchUsers(q){
   if(!q.trim()){renderUsers(currentFilter);return;}
-  const f=allUsers.filter(u=>u.full_name?.toLowerCase().includes(q.toLowerCase())||u.username?.toLowerCase().includes(q.toLowerCase())||u.email?.toLowerCase().includes(q.toLowerCase()));
+  const f=allUsers.filter(u=>u.displayName?.toLowerCase().includes(q.toLowerCase())||u.username?.toLowerCase().includes(q.toLowerCase())||u.email?.toLowerCase().includes(q.toLowerCase()));
   document.getElementById('usersTable').innerHTML=f.map(u=>fullRow(u)).join('');
 }
 
+// ── PROGRESS ──
 async function loadProgress(){
   try{
-    const {users}=await apiFetch('/api/admin/users');
-    const {data:rows}=await supabase.from('lesson_progress').select('*');
+    const snap = await db.collection('users').where('role','==','student').get();
+    const users = snap.docs.map(d=>({id:d.id,...d.data()}));
+    const progSnap = await db.collection('lesson_progress').get();
+    const rows = progSnap.docs.map(d=>d.data());
     const pIds=['proj1','proj2','proj3','proj4','proj5'];
-    document.getElementById('progressTable').innerHTML=(users||[]).map(u=>{
-      const ur=(rows||[]).filter(r=>r.user_id===u.id);
+    document.getElementById('progressTable').innerHTML=users.map(u=>{
+      const ur=rows.filter(r=>r.user_id===u.id);
       const cells=pIds.map(pid=>{const r=ur.find(x=>x.lesson_id===pid);const p=r?.progress_pct||0;const c=p===100?'#66bb6a':p>0?'#ffa726':'rgba(255,255,255,0.15)';return `<td style="font-size:12px;font-family:'DM Mono',monospace;color:${c};">${p}%</td>`;}).join('');
       return `<tr><td>${userCell(u)}</td><td>${progCell(u.avg_progress)}</td>${cells}</tr>`;
     }).join('');
   }catch(err){showToast('⚠ '+err.message);}
 }
 
+// ── ACTIVITY ──
 async function loadDashActivity(){
-  const {activity}=await apiFetch('/api/admin/activity').catch(()=>({activity:[]}));
-  renderActivityList('dashActivity',(activity||[]).slice(0,6));
+  try{const snap=await db.collection('activity').orderBy('createdAt','desc').limit(6).get();renderActivityList('dashActivity',snap.docs.map(d=>d.data()));}
+  catch(e){document.getElementById('dashActivity').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);">No activity yet.</div>';}
 }
 async function loadActivity(){
-  const {activity}=await apiFetch('/api/admin/activity').catch(()=>({activity:[]}));
-  renderActivityList('fullActivity',activity||[]);
+  try{const snap=await db.collection('activity').orderBy('createdAt','desc').limit(50).get();renderActivityList('fullActivity',snap.docs.map(d=>d.data()));}
+  catch(e){document.getElementById('fullActivity').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);">No activity yet.</div>';}
 }
 function renderActivityList(elId,items){
   const dotMap={account_created:'purple',account_deleted:'red',password_reset:'orange',lesson_completed:'teal',quiz_submitted:'teal',login:'green',logout:'green',account_suspended:'red',account_reactivated:'teal',account_updated:'orange'};
   document.getElementById(elId).innerHTML=items.length
-    ?items.map(a=>`<div class="activity-item"><div class="act-dot ${dotMap[a.action]||'teal'}"></div><div class="act-text">${a.profiles?.full_name?`<span>${a.profiles.full_name}</span> `:''} ${a.details||a.action}${a.actor?.full_name?' (by '+a.actor.full_name+')':''}</div><div class="act-time">${timeAgo(a.created_at)}</div></div>`).join('')
+    ?items.map(a=>`<div class="activity-item"><div class="act-dot ${dotMap[a.action]||'teal'}"></div><div class="act-text">${a.displayName?`<span>${a.displayName}</span> `:''} ${a.details||a.action}</div><div class="act-time">${timeAgo(a.createdAt?.toDate?.())}</div></div>`).join('')
     :`<div style="text-align:center;padding:40px;color:var(--muted);">No activity yet.</div>`;
 }
 
-/* ROW BUILDERS */
-function userCell(u){return `<div class="user-cell"><div class="user-av">${(u.full_name||u.username||'?').charAt(0).toUpperCase()}</div><div><div class="user-name">${u.full_name||'—'}</div><div class="user-username">@${u.username}</div></div></div>`;}
+// ── ROW BUILDERS ──
+function userCell(u){return `<div class="user-cell"><div class="user-av">${(u.displayName||u.username||'?').charAt(0).toUpperCase()}</div><div><div class="user-name">${u.displayName||'—'}</div><div class="user-username">@${u.username}</div></div></div>`;}
 function progCell(p){const v=p||0;return `<div class="prog-cell"><div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${v}%"></div></div><span class="prog-pct">${v}%</span></div>`;}
 function actBtns(id){return `<div class="table-actions"><div class="act-btn" title="Reset password" onclick="openReset('${id}')">🔑</div><div class="act-btn" title="Toggle suspend" onclick="toggleSuspend('${id}')">🔒</div><div class="act-btn del" title="Delete" onclick="promptDelete('${id}')">🗑️</div></div>`;}
-function dashRow(u){return `<tr><td>${userCell(u)}</td><td>${progCell(u.avg_progress)}</td><td style="font-family:'DM Mono',monospace;font-size:12px;">${u.lessons_completed||0}</td><td style="font-size:12px;">${timeAgo(u.last_active)}</td><td>${actBtns(u.id)}</td></tr>`;}
-function fullRow(u){const s=u.banned_until?'suspended':'active';return `<tr><td>${userCell(u)}</td><td style="font-size:12px;">${u.email||'—'}</td><td style="font-size:12px;">${u.grade||'—'}</td><td>${progCell(u.avg_progress)}</td><td style="font-size:12px;">${timeAgo(u.last_active)}</td><td>${actBtns(u.id)}</td></tr>`;}
+function dashRow(u){return `<tr><td>${userCell(u)}</td><td>${progCell(u.avg_progress)}</td><td style="font-family:'DM Mono',monospace;font-size:12px;">${u.lessons_completed||0}</td><td style="font-size:12px;">${timeAgo(u.last_active?.toDate?.())}</td><td>${actBtns(u.id)}</td></tr>`;}
+function fullRow(u){const s=u.suspended?'suspended':'active';return `<tr><td>${userCell(u)}</td><td style="font-size:12px;">${u.email||'—'}</td><td style="font-size:12px;">${u.grade||'—'}</td><td>${progCell(u.avg_progress)}</td><td style="font-size:12px;">${timeAgo(u.last_active?.toDate?.())}</td><td>${actBtns(u.id)}</td></tr>`;}
 function emptyRow(cols,msg){return `<tr><td colspan="${cols}"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">${msg}</div></div></td></tr>`;}
-function timeAgo(ts){if(!ts)return '—';const d=Date.now()-new Date(ts).getTime(),m=Math.floor(d/60000);if(m<2)return 'Just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
+function timeAgo(d){if(!d)return '—';const diff=Date.now()-new Date(d).getTime(),m=Math.floor(diff/60000);if(m<2)return 'Just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
 
-/* CREATE */
+// ── CREATE ACCOUNT ──
 function openCreateModal(){['m_fname','m_lname','m_username','m_email','m_password'].forEach(id=>document.getElementById(id).value='');document.getElementById('m_credBox').classList.remove('show');document.getElementById('m_createBtn').style.display='';document.getElementById('m_cancelBtn').textContent='Cancel';document.getElementById('createModal').classList.add('open');}
 function closeCreateModal(){document.getElementById('createModal').classList.remove('open');}
 
@@ -372,7 +404,23 @@ async function createAccount(prefix){
   const btnId=prefix==='m'?'m_createBtn':'cf_submitBtn';
   document.getElementById(btnId).disabled=true;document.getElementById(btnId).textContent='Creating…';
   try{
-    await apiFetch('/api/admin/users',{method:'POST',body:{full_name:`${fn} ${ln}`,username:un,email:em,password:pw,grade:gr,role:ro}});
+    // Secondary app so admin stays logged in
+    const secondaryApp=firebase.initializeApp(firebaseConfig,'secondary_'+Date.now());
+    const secondaryAuth=secondaryApp.auth();
+    const result=await secondaryAuth.createUserWithEmailAndPassword(em,pw);
+    const uid=result.user.uid;
+    await secondaryAuth.signOut();
+    await secondaryApp.delete();
+
+    await db.collection('users').doc(uid).set({
+      uid, displayName:`${fn} ${ln}`, username:un.toLowerCase(),
+      email:em.toLowerCase(), grade:gr, role:ro,
+      suspended:false, avg_progress:0, lessons_completed:0,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await db.collection('usernames').doc(un.toLowerCase()).set({uid});
+    await db.collection('activity').add({action:'account_created',displayName:`${fn} ${ln}`,details:`Account created for ${fn} ${ln}`,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+
     document.getElementById(prefix+'_credUser').textContent=un;
     document.getElementById(prefix+'_credPass').textContent=pw;
     document.getElementById(prefix+'_credBox').classList.add('show');
@@ -380,36 +428,52 @@ async function createAccount(prefix){
     else{['cf_fname','cf_lname','cf_username','cf_email','cf_password'].forEach(id=>document.getElementById(id).value='');}
     showToast(`✓ Account created for ${fn} ${ln}`);
     await loadDashboard();
-  }catch(err){showToast('⚠ '+err.message);}
+  }catch(err){showToast('⚠ '+(err.code==='auth/email-already-in-use'?'Email already in use.':err.message));}
   finally{document.getElementById(btnId).disabled=false;document.getElementById(btnId).textContent=prefix==='m'?'Create Account →':'＋ Create Account';}
 }
 function createAccountModal(){createAccount('m');}
 function createAccountInline(){createAccount('cf');}
 
-/* RESET PASSWORD */
+// ── RESET PASSWORD — sends email to student ──
 let resetId=null;
-function openReset(id){resetId=id;const u=allUsers.find(x=>x.id===id);const pw=genPwStr();const box=`<div class="confirm-box" style="border-color:rgba(0,151,157,0.3);"><div class="confirm-icon">🔑</div><div class="confirm-title">Reset Password</div><div class="confirm-desc">New temp password for <strong style="color:#fff;">${u?.full_name||u?.username}</strong>:<br><br><span style="font-family:DM Mono,monospace;font-size:16px;font-weight:700;color:var(--teal);">${pw}</span></div><div class="confirm-actions"><button class="btn-cc" onclick="closeReset()">Cancel</button><button class="btn-cd" style="background:rgba(0,151,157,0.15);color:var(--teal);border-color:rgba(0,151,157,0.3);" onclick="doReset('${id}','${pw}')">Confirm Reset</button></div></div>`;document.getElementById('resetBoxInner').innerHTML=box;document.getElementById('resetModal2').classList.add('open');}
+function openReset(id){
+  resetId=id;const u=allUsers.find(x=>x.id===id);
+  const box=`<div class="confirm-box" style="border-color:rgba(0,151,157,0.3);"><div class="confirm-icon">🔑</div><div class="confirm-title">Reset Password</div><div class="confirm-desc">Send a password reset email to <strong style="color:#fff;">${u?.displayName||u?.username}</strong>?<br><br><span style="font-size:12px;color:var(--muted);">${u?.email}</span></div><div class="confirm-actions"><button class="btn-cc" onclick="closeReset()">Cancel</button><button class="btn-cd" style="background:rgba(0,151,157,0.15);color:var(--teal);border-color:rgba(0,151,157,0.3);" onclick="doReset('${id}')">Send Reset Email</button></div></div>`;
+  document.getElementById('resetBoxInner').innerHTML=box;document.getElementById('resetModal2').classList.add('open');
+}
 function closeReset(){document.getElementById('resetModal2').classList.remove('open');}
-async function doReset(id,pw){
-  try{await apiFetch(`/api/admin/users/${id}/reset-password`,{method:'POST',body:{new_password:pw}});closeReset();showToast('🔑 Password reset. Share it with the student.');}
+async function doReset(id){
+  const u=allUsers.find(x=>x.id===id);
+  try{await auth.sendPasswordResetEmail(u.email);closeReset();showToast('📧 Reset email sent to '+u.email);}
   catch(err){showToast('⚠ '+err.message);}
 }
 
-/* SUSPEND / DELETE */
+// ── SUSPEND ──
 async function toggleSuspend(id){
-  const u=allUsers.find(x=>x.id===id);const s=!!u?.banned_until;
-  try{await apiFetch(`/api/admin/users/${id}/suspend`,{method:'POST',body:{suspend:!s}});showToast(s?`✅ ${u.full_name} reactivated.`:`🔒 ${u.full_name} suspended.`);await loadDashboard();renderUsers(currentFilter);}
-  catch(err){showToast('⚠ '+err.message);}
+  const u=allUsers.find(x=>x.id===id);const nowSuspended=!u.suspended;
+  try{
+    await db.collection('users').doc(id).update({suspended:nowSuspended});
+    await db.collection('activity').add({action:nowSuspended?'account_suspended':'account_reactivated',displayName:u.displayName||u.username,details:`${u.displayName||u.username} ${nowSuspended?'suspended':'reactivated'}`,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    showToast(nowSuspended?`🔒 ${u.displayName} suspended.`:`✅ ${u.displayName} reactivated.`);
+    await loadDashboard();renderUsers(currentFilter);
+  }catch(err){showToast('⚠ '+err.message);}
 }
-function promptDelete(id){deleteTargetId=id;const u=allUsers.find(x=>x.id===id);document.getElementById('confirmDesc').textContent=`This will permanently delete ${u?.full_name||'this student'}'s account and all progress.`;document.getElementById('confirmModal').classList.add('open');}
+
+// ── DELETE ──
+function promptDelete(id){deleteTargetId=id;const u=allUsers.find(x=>x.id===id);document.getElementById('confirmDesc').textContent=`This will permanently delete ${u?.displayName||'this student'}'s account and all progress.`;document.getElementById('confirmModal').classList.add('open');}
 function closeConfirm(){document.getElementById('confirmModal').classList.remove('open');deleteTargetId=null;}
 async function confirmDelete(){
   document.getElementById('confirmDelBtn').disabled=true;document.getElementById('confirmDelBtn').textContent='Deleting…';
-  try{await apiFetch(`/api/admin/users/${deleteTargetId}`,{method:'DELETE'});closeConfirm();showToast('🗑️ Account deleted.');await loadDashboard();renderUsers(currentFilter);}
-  catch(err){showToast('⚠ '+err.message);document.getElementById('confirmDelBtn').disabled=false;document.getElementById('confirmDelBtn').textContent='Delete';}
+  try{
+    const u=allUsers.find(x=>x.id===deleteTargetId);
+    await db.collection('users').doc(deleteTargetId).delete();
+    await db.collection('usernames').doc(u?.username?.toLowerCase()).delete();
+    await db.collection('activity').add({action:'account_deleted',displayName:u?.displayName||'Unknown',details:`Account for ${u?.displayName||'student'} deleted`,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    closeConfirm();showToast('🗑️ Account deleted.');await loadDashboard();renderUsers(currentFilter);
+  }catch(err){showToast('⚠ '+err.message);document.getElementById('confirmDelBtn').disabled=false;document.getElementById('confirmDelBtn').textContent='Delete';}
 }
 
-/* HELPERS */
+// ── HELPERS ──
 function slugify(inp){inp.value=inp.value.toLowerCase().replace(/[^a-z0-9_]/g,'_').replace(/__+/g,'_');}
 function genPwStr(){const c='abcdefghjkmnpqrstuvwxyz23456789!@#';return Array.from({length:10},()=>c[Math.floor(Math.random()*c.length)]).join('');}
 function genPw(id){document.getElementById(id).value=genPwStr();}

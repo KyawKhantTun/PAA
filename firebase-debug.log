@@ -1,0 +1,118 @@
+[debug] [2026-05-06T08:16:15.204Z] ----------------------------------------------------------------------
+[debug] [2026-05-06T08:16:15.206Z] Command:       /Users/masterace/.nvm/versions/node/v24.15.0/bin/node /Users/masterace/.nvm/versions/node/v24.15.0/bin/firebase init
+[debug] [2026-05-06T08:16:15.206Z] CLI Version:   15.16.0
+[debug] [2026-05-06T08:16:15.206Z] Platform:      darwin
+[debug] [2026-05-06T08:16:15.206Z] Node Version:  v24.15.0
+[debug] [2026-05-06T08:16:15.206Z] Time:          Wed May 06 2026 14:46:15 GMT+0630 (Myanmar Time)
+[debug] [2026-05-06T08:16:15.206Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-05-06T08:16:15.207Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/masterace
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[debug] [2026-05-06T08:16:16.722Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-05-06T08:16:16.723Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] 
+[debug] [2026-05-06T08:16:45.113Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-05-06T08:16:45.113Z] > authorizing via signed-in user (khanttun1999@gmail.com)
+[debug] [2026-05-06T08:16:45.114Z] Checked if tokens are valid: false, expires at: 1777992980417
+[debug] [2026-05-06T08:16:45.114Z] Checked if tokens are valid: false, expires at: 1777992980417
+[debug] [2026-05-06T08:16:45.115Z] > refreshing access token with scopes: []
+[debug] [2026-05-06T08:16:45.116Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-05-06T08:16:45.116Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-05-06T08:16:45.432Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-05-06T08:16:45.432Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-05-06T08:16:45.449Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/learn-arduino-with-ace [none]
+[debug] [2026-05-06T08:16:46.463Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/learn-arduino-with-ace 200
+[debug] [2026-05-06T08:16:46.464Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/learn-arduino-with-ace {"projectId":"learn-arduino-with-ace","projectNumber":"100033192953","displayName":"Learn Arduino with Ace","name":"projects/learn-arduino-with-ace","resources":{"hostingSite":"learn-arduino-with-ace"},"state":"ACTIVE","etag":"1_9edd893f-d3ff-4f4a-a4f5-92f623c8a0a6"}
+[info] i  Using project learn-arduino-with-ace (Learn Arduino with Ace) . 
+[info] 
+=== Firestore Setup
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-05-06T08:16:46.477Z] Checked if tokens are valid: true, expires at: 1778059004433
+[debug] [2026-05-06T08:16:46.477Z] Checked if tokens are valid: true, expires at: 1778059004433
+[debug] [2026-05-06T08:16:46.477Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/learn-arduino-with-ace/databases [none]
+[debug] [2026-05-06T08:16:47.239Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/learn-arduino-with-ace/databases 200
+[debug] [2026-05-06T08:16:47.239Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/learn-arduino-with-ace/databases {"databases":[{"name":"projects/learn-arduino-with-ace/databases/(default)","uid":"bee682d4-f6e0-4ce3-ac03-b6fa7d3b1315","createTime":"2026-05-05T03:59:47.677160Z","updateTime":"2026-05-05T03:59:47.677160Z","locationId":"asia-southeast1","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2026-05-06T07:16:47.273324Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"zas","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","etag":"IKClq8ecpJQDMIOQwuCwoZQD"}]}
+[info] 
+[info] Firestore Security Rules allow you to define how and when to allow
+[info] requests. You can keep these rules in your project directory
+[info] and publish them with firebase deploy.
+[info] 
+[debug] [2026-05-06T08:16:47.241Z] Checked if tokens are valid: true, expires at: 1778059004433
+[debug] [2026-05-06T08:16:47.241Z] Checked if tokens are valid: true, expires at: 1778059004433
+[debug] [2026-05-06T08:16:47.241Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/learn-arduino-with-ace/releases pageSize=10&pageToken=
+[debug] [2026-05-06T08:16:48.942Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/learn-arduino-with-ace/releases 200
+[debug] [2026-05-06T08:16:48.943Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/learn-arduino-with-ace/releases {"releases":[{"name":"projects/learn-arduino-with-ace/releases/cloud.firestore","rulesetName":"projects/learn-arduino-with-ace/rulesets/1ff7e51b-207b-4855-a993-f95d63043ad6","createTime":"2026-05-05T04:00:19.440281Z","updateTime":"2026-05-05T14:28:42.176194Z"}]}
+[debug] [2026-05-06T08:16:48.943Z] Checked if tokens are valid: true, expires at: 1778059004433
+[debug] [2026-05-06T08:16:48.943Z] Checked if tokens are valid: true, expires at: 1778059004433
+[debug] [2026-05-06T08:16:48.944Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/learn-arduino-with-ace/rulesets/1ff7e51b-207b-4855-a993-f95d63043ad6 [none]
+[debug] [2026-05-06T08:16:50.316Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/learn-arduino-with-ace/rulesets/1ff7e51b-207b-4855-a993-f95d63043ad6 200
+[debug] [2026-05-06T08:16:50.317Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/learn-arduino-with-ace/rulesets/1ff7e51b-207b-4855-a993-f95d63043ad6 [omitted]
+[info] i  Downloaded the existing Firestore Security Rules from the Firebase console 
+[info] i  firestore.rules is unchanged 
+[info] 
+[info] Firestore indexes allow you to perform complex queries while
+[info] maintaining performance that scales with the size of the result
+[info] set. You can keep index definitions in your project directory
+[info] and publish them with firebase deploy.
+[info] 
+[debug] [2026-05-06T08:16:50.319Z] Checked if tokens are valid: true, expires at: 1778059004433
+[debug] [2026-05-06T08:16:50.319Z] Checked if tokens are valid: true, expires at: 1778059004433
+[debug] [2026-05-06T08:16:50.319Z] Checked if tokens are valid: true, expires at: 1778059004433
+[debug] [2026-05-06T08:16:50.319Z] Checked if tokens are valid: true, expires at: 1778059004433
+[debug] [2026-05-06T08:16:50.320Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/learn-arduino-with-ace/databases/(default)/collectionGroups/-/indexes [none]
+[debug] [2026-05-06T08:16:50.320Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/learn-arduino-with-ace/databases/(default)/collectionGroups/-/fields?filter=indexConfig.usesAncestorConfig=false OR ttlConfig:* [none]
+[debug] [2026-05-06T08:16:50.523Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/learn-arduino-with-ace/databases/(default)/collectionGroups/-/indexes 200
+[debug] [2026-05-06T08:16:50.524Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/learn-arduino-with-ace/databases/(default)/collectionGroups/-/indexes {}
+[debug] [2026-05-06T08:16:50.659Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/learn-arduino-with-ace/databases/(default)/collectionGroups/-/fields?filter=indexConfig.usesAncestorConfig=false OR ttlConfig:* 200
+[debug] [2026-05-06T08:16:50.660Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/learn-arduino-with-ace/databases/(default)/collectionGroups/-/fields?filter=indexConfig.usesAncestorConfig=false OR ttlConfig:* {"fields":[{"name":"projects/learn-arduino-with-ace/databases/(default)/collectionGroups/__default__/fields/*","indexConfig":{"indexes":[{"queryScope":"COLLECTION","fields":[{"fieldPath":"*","order":"ASCENDING"}],"state":"READY"},{"queryScope":"COLLECTION","fields":[{"fieldPath":"*","order":"DESCENDING"}],"state":"READY"},{"queryScope":"COLLECTION","fields":[{"fieldPath":"*","arrayConfig":"CONTAINS"}],"state":"READY"}]}}]}
+[info] i  Downloaded the existing Firestore indexes from the Firebase console 
+[info] i  firestore.indexes.json is unchanged 
+[info] 
+=== Hosting Setup
+[debug] [2026-05-06T08:16:54.454Z] Checked if tokens are valid: true, expires at: 1778059004433
+[debug] [2026-05-06T08:16:54.454Z] Checked if tokens are valid: true, expires at: 1778059004433
+[debug] [2026-05-06T08:16:54.454Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/learn-arduino-with-ace [none]
+[debug] [2026-05-06T08:16:54.970Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/learn-arduino-with-ace 200
+[debug] [2026-05-06T08:16:54.971Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/learn-arduino-with-ace {"projectId":"learn-arduino-with-ace","projectNumber":"100033192953","displayName":"Learn Arduino with Ace","name":"projects/learn-arduino-with-ace","resources":{"hostingSite":"learn-arduino-with-ace"},"state":"ACTIVE","etag":"1_9edd893f-d3ff-4f4a-a4f5-92f623c8a0a6"}
+[info] 
+[info] Your public directory is the folder (relative to your project directory) that
+[info] will contain Hosting assets to be uploaded with firebase deploy. If you
+[info] have a build process for your assets, use your build's output directory.
+[info] 
+[info] 
+[info] i  Didn't detect a .git folder. Assuming /Users/masterace/Desktop/Html,CSS/Projects/Fullstack is the project root. 
+[info] i  Authorizing with GitHub to upload your service account to a GitHub repository's secrets store. 
+[info] 
+[info] Visit this URL on this device to log in:
+[info] https://github.com/login/oauth/authorize?client_id=89cf50f02ac6aaed3484&state=224479805&redirect_uri=http%3A%2F%2Flocalhost%3A9005&scope=read%3Auser%20repo%20public_repo
+[info] 
+[info] Waiting for authentication...
+[debug] [2026-05-06T08:17:39.587Z] >>> [apiv2][query] POST https://github.com/login/oauth/access_token [none]
+[debug] [2026-05-06T08:17:39.587Z] >>> [apiv2][body] POST https://github.com/login/oauth/access_token [stream]
+[debug] [2026-05-06T08:17:40.276Z] <<< [apiv2][status] POST https://github.com/login/oauth/access_token 200
+[debug] [2026-05-06T08:17:40.276Z] <<< [apiv2][body] POST https://github.com/login/oauth/access_token {"access_token":"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","token_type":"bearer","scope":"read:user,repo"}
+[debug] [2026-05-06T08:17:40.285Z] >>> [apiv2][query] GET https://api.github.com/user [none]
+[debug] [2026-05-06T08:17:40.919Z] <<< [apiv2][status] GET https://api.github.com/user 200
+[debug] [2026-05-06T08:17:40.919Z] <<< [apiv2][body] GET https://api.github.com/user {"login":"KyawKhantTun","id":254929638,"node_id":"U_kgDODzHq5g","avatar_url":"https://avatars.githubusercontent.com/u/254929638?v=4","gravatar_id":"","url":"https://api.github.com/users/KyawKhantTun","html_url":"https://github.com/KyawKhantTun","followers_url":"https://api.github.com/users/KyawKhantTun/followers","following_url":"https://api.github.com/users/KyawKhantTun/following{/other_user}","gists_url":"https://api.github.com/users/KyawKhantTun/gists{/gist_id}","starred_url":"https://api.github.com/users/KyawKhantTun/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/KyawKhantTun/subscriptions","organizations_url":"https://api.github.com/users/KyawKhantTun/orgs","repos_url":"https://api.github.com/users/KyawKhantTun/repos","events_url":"https://api.github.com/users/KyawKhantTun/events{/privacy}","received_events_url":"https://api.github.com/users/KyawKhantTun/received_events","type":"User","user_view_type":"private","site_admin":false,"name":null,"company":null,"blog":"","location":null,"email":null,"hireable":null,"bio":null,"twitter_username":null,"notification_email":null,"public_repos":5,"public_gists":0,"followers":0,"following":1,"created_at":"2026-01-14T14:58:50Z","updated_at":"2026-03-28T11:02:23Z","private_gists":0,"total_private_repos":0,"owned_private_repos":0,"disk_usage":16543,"collaborators":0,"two_factor_authentication":false,"plan":{"name":"free","space":976562499,"collaborators":0,"private_repos":10000}}
+[info] 
+[info] ✔  Success! Logged into GitHub as KyawKhantTun 
+[info] 

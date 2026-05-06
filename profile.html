@@ -241,9 +241,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:grid;gri
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="js/supabase-client.js"></script>
-<script src="js/auth-guard.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:'AIzaSyD6kfvr-6qVSWMwWgp9PfKnGNT3u5K-4zk',authDomain:'learn-arduino-with-ace.firebaseapp.com',projectId:'learn-arduino-with-ace',storageBucket:'learn-arduino-with-ace.firebasestorage.app',messagingSenderId:'100033192953',appId:'1:100033192953:web:c331698eea56c1a34c5328'};
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(); const db=firebase.firestore();
+</script>
 <script>
 const LESSONS = [
   {id:'proj1', name:'Light It Up',     icon:'💡'},
@@ -269,136 +274,121 @@ const ACHIEVEMENTS = [
 
 function timeAgo(ts){
   if(!ts)return '—';
-  const d=Date.now()-new Date(ts).getTime(),m=Math.floor(d/60000);
+  const date=ts?.toDate?ts.toDate():new Date(ts);
+  const d=Date.now()-date.getTime(),m=Math.floor(d/60000);
   if(m<2)return 'Just now';if(m<60)return m+'m ago';
   const h=Math.floor(m/60);if(h<24)return h+'h ago';
   return Math.floor(h/24)+'d ago';
 }
 
-(async function init(){
-  const {session, profile} = await authGuard();
+auth.onAuthStateChanged(async (user) => {
+  if (!user) { window.location.replace('index.html'); return; }
+  const snap = await db.collection('users').doc(user.uid).get();
+  if (!snap.exists) { window.location.replace('index.html'); return; }
+  const profile = snap.data();
   initNavAccount(profile);
-  await loadProfile(profile, session);
-})();
+  await loadProfile(user.uid, profile);
+});
 
-async function loadProfile(profile, session){
-  // Set hero
-  const letter = (profile.full_name||profile.username||'?').charAt(0).toUpperCase();
-  document.getElementById('profileAv').textContent      = letter;
-  document.getElementById('profileName').textContent    = profile.full_name || profile.username;
-  document.getElementById('profileHandle').textContent  = '@'+profile.username+' · '+profile.email;
-
-  // Fetch progress + quizzes + activity in parallel
-  const [progressRes, quizRes, activityRes] = await Promise.all([
-    apiFetch('/api/progress'),
-    apiFetch('/api/quiz/scores'),
-    supabase.from('activity_log').select('*').eq('user_id', profile.id).order('created_at',{ascending:false}).limit(8),
+async function loadProfile(uid, profile){
+  const [actSnap, progSnap, quizSnap] = await Promise.all([
+    db.collection('activity').where('uid','==',uid).orderBy('createdAt','desc').limit(8).get().catch(()=>({docs:[]})),
+    db.collection('progress').where('uid','==',uid).get().catch(()=>({docs:[]})),
+    db.collection('quizScores').where('uid','==',uid).orderBy('createdAt','desc').get().catch(()=>({docs:[]})),
   ]);
+  const activityRows = actSnap.docs.map(d=>d.data());
+  const progressRows = progSnap.docs.map(d=>d.data());
+  const quizScores   = quizSnap.docs.map(d=>d.data());
 
-  const progressRows = progressRes.progress || [];
-  const quizScores   = quizRes.scores || [];
-  const activityRows = activityRes.data || [];
+  // Hero
+  const letter=(profile.displayName||profile.username||'?').charAt(0).toUpperCase();
+  document.getElementById('profileAv').textContent     = letter;
+  document.getElementById('profileName').textContent   = profile.displayName||profile.username;
+  document.getElementById('profileHandle').textContent = '@'+(profile.username||'')+' · '+(profile.email||'');
 
-  // Aggregate stats
-  const completed   = progressRows.filter(r=>r.completed).length;
-  const totalPct    = progressRows.length ? Math.round(progressRows.reduce((s,r)=>s+r.progress_pct,0)/Math.max(progressRows.length,1)) : 0;
-  const projsDone   = progressRows.filter(r=>r.lesson_id.startsWith('proj')&&r.completed).length;
-
+  // Stats
+  const completed = progressRows.filter(r=>r.completed).length || profile.lessons_completed||0;
+  const totalPct  = progressRows.length ? Math.round(progressRows.reduce((s,r)=>s+(r.progress_pct||0),0)/progressRows.length) : (profile.avg_progress||0);
+  const projsDone = progressRows.filter(r=>(r.lesson_id||'').startsWith('proj')&&r.completed).length;
   document.getElementById('miniPct').textContent        = totalPct+'%';
   document.getElementById('miniProj').textContent       = projsDone;
   document.getElementById('statLessons').textContent    = completed;
   document.getElementById('statLessonsSub').textContent = 'out of 50 total lessons';
   document.getElementById('statProjs').textContent      = projsDone;
-  document.getElementById('statProjsSub').textContent   = (LESSONS.filter(l=>l.id.startsWith('proj')).length - projsDone)+' in progress';
+  document.getElementById('statProjsSub').textContent   = (LESSONS.filter(l=>l.id.startsWith('proj')).length-projsDone)+' in progress';
   document.getElementById('statQuizzes').textContent    = quizScores.length;
-  document.getElementById('statQuizSub').textContent    = quizScores.length ? 'avg '+ Math.round(quizScores.reduce((s,q)=>s+(q.score/q.max_score)*100,0)/quizScores.length)+'%' : '—';
+  document.getElementById('statQuizSub').textContent    = quizScores.length?'avg '+Math.round(quizScores.reduce((s,q)=>s+(q.score/q.max_score)*100,0)/quizScores.length)+'%':'—';
 
-  // Streak badge
-  const badges = [`<span class="badge teal">⚡ Arduino Learner</span>`];
-  if(profile.streak_days>=5) badges.push(`<span class="badge orange">🔥 ${profile.streak_days}-Day Streak</span>`);
+  // Badges
+  const badges=[`<span class="badge teal">⚡ Arduino Learner</span>`];
+  if((profile.streak_days||0)>=5) badges.push(`<span class="badge orange">🔥 ${profile.streak_days}-Day Streak</span>`);
   if(completed>=10) badges.push(`<span class="badge teal">📚 Dedicated Learner</span>`);
-  document.getElementById('profileBadges').innerHTML = badges.join('');
+  document.getElementById('profileBadges').innerHTML=badges.join('');
 
   // Progress rows
-  const progressMap = Object.fromEntries(progressRows.map(r=>[r.lesson_id, r]));
-  document.getElementById('progressRows').innerHTML = LESSONS.map(l=>{
-    const row = progressMap[l.id];
-    const pct = row?.progress_pct || 0;
-    const colorClass = pct===100 ? 'teal' : pct>0 ? 'orange' : 'gray';
-    const color      = pct===100 ? 'var(--teal)' : pct>0 ? '#ffa726' : 'var(--muted)';
-    return `<div class="progress-row">
-      <div class="progress-icon">${l.icon}</div>
-      <div class="progress-info">
-        <div class="progress-name">${l.name}</div>
-        <div class="progress-bar-wrap"><div class="progress-bar-fill ${colorClass}" style="width:${pct}%"></div></div>
-      </div>
-      <div class="progress-pct" style="color:${color};">${pct}%</div>
-    </div>`;
+  const progressMap=Object.fromEntries(progressRows.map(r=>[r.lesson_id,r]));
+  document.getElementById('progressRows').innerHTML=LESSONS.map(l=>{
+    const row=progressMap[l.id];const pct=row?.progress_pct||0;
+    const colorClass=pct===100?'teal':pct>0?'orange':'gray';
+    const color=pct===100?'var(--teal)':pct>0?'#ffa726':'var(--muted)';
+    return `<div class="progress-row"><div class="progress-icon">${l.icon}</div><div class="progress-info"><div class="progress-name">${l.name}</div><div class="progress-bar-wrap"><div class="progress-bar-fill ${colorClass}" style="width:${pct}%"></div></div></div><div class="progress-pct" style="color:${color};">${pct}%</div></div>`;
   }).join('');
 
-  // Projects grid
-  const projDefs = [
-    {id:'proj1',icon:'💡',name:'Light It Up'},
-    {id:'proj2',icon:'✨',name:'Light Coding'},
-    {id:'proj3',icon:'🔘',name:'Switch It Up'},
-    {id:'proj4',icon:'🎹',name:'Electric Piano'},
-    {id:'proj5',icon:'🏁',name:'Reaction Race'},
-    {id:'proj6',icon:'🌡️',name:'Weather Station'},
-  ];
-  document.getElementById('projectsGrid').innerHTML = projDefs.map(p=>{
-    const row=progressMap[p.id];
-    const pct=row?.progress_pct||0;
-    let cls='locked', lbl='🔒 Locked';
-    if(pct>=100){cls='done';lbl='✓ Done';}
-    else if(pct>0){cls='wip';lbl='⏳ In Progress';}
-    else if(p.id==='proj1'||progressMap['proj'+( parseInt(p.id.replace('proj',''))-1)]?.completed){cls='';lbl='Start →';}
+  // Projects
+  const projDefs=[{id:'proj1',icon:'💡',name:'Light It Up'},{id:'proj2',icon:'✨',name:'Light Coding'},{id:'proj3',icon:'🔘',name:'Switch It Up'},{id:'proj4',icon:'🎹',name:'Electric Piano'},{id:'proj5',icon:'🏁',name:'Reaction Race'},{id:'proj6',icon:'🌡️',name:'Weather Station'}];
+  document.getElementById('projectsGrid').innerHTML=projDefs.map(p=>{
+    const row=progressMap[p.id];const pct=row?.progress_pct||0;
+    let cls='locked',lbl='🔒 Locked';
+    if(pct>=100){cls='done';lbl='✓ Done';}else if(pct>0){cls='wip';lbl='⏳ In Progress';}
+    else if(p.id==='proj1'||progressMap['proj'+(parseInt(p.id.replace('proj',''))-1)]?.completed){cls='';lbl='Start →';}
     return `<div class="proj-mini"><div class="proj-mini-icon">${p.icon}</div><div class="proj-mini-name">${p.name}</div><span class="status-badge ${cls}">${lbl}</span></div>`;
   }).join('');
 
   // Activity
-  const dotMap={lesson_completed:'teal',quiz_submitted:'teal',login:'teal',account_created:'purple'};
-  document.getElementById('activityList').innerHTML = activityRows.length
-    ? activityRows.map(a=>`<div class="activity-item"><div class="act-dot ${dotMap[a.action]||'orange'}"></div><div class="act-text">${a.details||a.action}</div><div class="act-time">${timeAgo(a.created_at)}</div></div>`).join('')
-    : `<div style="color:var(--muted);font-size:13px;padding:12px 0;">No activity yet — start a lesson!</div>`;
+  document.getElementById('activityList').innerHTML=activityRows.length
+    ?activityRows.map(a=>`<div class="activity-item"><div class="act-dot teal"></div><div class="act-text">${a.details||a.action}</div><div class="act-time">${timeAgo(a.createdAt)}</div></div>`).join('')
+    :`<div style="color:var(--muted);font-size:13px;padding:12px 0;">No activity yet — start a lesson!</div>`;
 
   // Quiz history
-  document.getElementById('quizHistory').innerHTML = quizScores.length
-    ? `<table style="width:100%;border-collapse:collapse;">
-        <thead><tr>
-          <th style="text-align:left;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;padding:8px 12px;background:rgba(0,151,157,0.05);border-bottom:1px solid var(--border);">Quiz</th>
-          <th style="text-align:left;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;padding:8px 12px;background:rgba(0,151,157,0.05);border-bottom:1px solid var(--border);">Score</th>
-          <th style="text-align:left;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;padding:8px 12px;background:rgba(0,151,157,0.05);border-bottom:1px solid var(--border);">When</th>
-        </tr></thead>
-        <tbody>${quizScores.map(q=>{
-          const pct=Math.round((q.score/q.max_score)*100);
-          const col=pct>=80?'#66bb6a':pct>=50?'#ffa726':'#ef9a9a';
-          return `<tr>
-            <td style="padding:10px 12px;font-size:13px;color:#fff;border-bottom:1px solid rgba(255,255,255,0.04);">${q.quiz_name}</td>
-            <td style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04);"><span style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:${col};">${q.score}/${q.max_score} (${pct}%)</span></td>
-            <td style="padding:10px 12px;font-size:12px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.04);font-family:'DM Mono',monospace;">${timeAgo(q.taken_at)}</td>
-          </tr>`;
-        }).join('')}</tbody>
-      </table>`
-    : `<div style="color:var(--muted);font-size:13px;padding:12px 0;">No quizzes taken yet — complete a lesson to unlock quizzes.</div>`;
+  document.getElementById('quizHistory').innerHTML=quizScores.length
+    ?`<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;padding:8px 12px;background:rgba(0,151,157,0.05);border-bottom:1px solid var(--border);">Quiz</th><th style="text-align:left;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;padding:8px 12px;background:rgba(0,151,157,0.05);border-bottom:1px solid var(--border);">Score</th><th style="text-align:left;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;padding:8px 12px;background:rgba(0,151,157,0.05);border-bottom:1px solid var(--border);">When</th></tr></thead><tbody>${quizScores.map(q=>{const pct=Math.round((q.score/q.max_score)*100);const col=pct>=80?'#66bb6a':pct>=50?'#ffa726':'#ef9a9a';return `<tr><td style="padding:10px 12px;font-size:13px;color:#fff;border-bottom:1px solid rgba(255,255,255,0.04);">${q.quiz_name}</td><td style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04);"><span style="font-size:13px;font-weight:700;color:${col};">${q.score}/${q.max_score} (${pct}%)</span></td><td style="padding:10px 12px;font-size:12px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.04);">${timeAgo(q.createdAt)}</td></tr>`;}).join('')}</tbody></table>`
+    :`<div style="color:var(--muted);font-size:13px;padding:12px 0;">No quizzes taken yet.</div>`;
 
-  // Achievements — determine which are unlocked
-  const unlocked = new Set();
+  // Achievements
+  const unlocked=new Set();
   if(progressRows.some(r=>r.lesson_id==='proj1'&&r.completed)) unlocked.add('first_blink');
-  if(profile.streak_days>=5) unlocked.add('streak_5');
+  if((profile.streak_days||0)>=5) unlocked.add('streak_5');
   if(quizScores.some(q=>q.score===q.max_score)) unlocked.add('quiz_100');
   if(progressRows.some(r=>r.lesson_id==='proj4'&&r.completed)) unlocked.add('piano_done');
-
-  document.getElementById('achievementGrid').innerHTML = ACHIEVEMENTS.map(a=>`
-    <div class="achievement ${unlocked.has(a.key)?'':'locked'}">
-      <div class="achievement-icon">${a.icon}</div>
-      <div class="achievement-name">${a.name}</div>
-      <div class="achievement-desc">${a.desc}</div>
-    </div>`).join('');
+  document.getElementById('achievementGrid').innerHTML=ACHIEVEMENTS.map(a=>`<div class="achievement ${unlocked.has(a.key)?'':'locked'}"><div class="achievement-icon">${a.icon}</div><div class="achievement-name">${a.name}</div><div class="achievement-desc">${a.desc}</div></div>`).join('');
 
   // Reveal animations
   const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.08});
   document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 }
+
+function initNavAccount(p){
+  const l=(p.displayName||p.username||'?').charAt(0).toUpperCase();
+  document.getElementById('navAccAv').textContent=l;
+  document.getElementById('navAccBigAv').textContent=l;
+  document.getElementById('navAccName').textContent=p.displayName||p.username||'Account';
+  document.getElementById('navAccNameFull').textContent=p.displayName||p.username||'';
+  document.getElementById('navAccEmail').textContent=p.email||'';
+  const pct=p.avg_progress||0,cnt=p.lessons_completed||0;
+  document.getElementById('navProgressPct').textContent=pct+'%';
+  document.getElementById('navProgressFill').style.width=pct+'%';
+  document.getElementById('navProgressCount').textContent=cnt+' / 50 lessons';
+}
+async function handleLogout(){
+  if(!confirm('Log out?'))return;
+  await auth.signOut();
+  window.location.replace('index.html');
+}
+document.querySelector('[data-acc-toggle]').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('accountDropdown').classList.toggle('open');
+});
+document.addEventListener('click',()=>document.getElementById('accountDropdown').classList.remove('open'));
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),3200);}
 </script>

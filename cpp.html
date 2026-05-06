@@ -213,28 +213,30 @@ pre.code-pre { padding:18px; overflow-x:auto; font-family:'DM Mono',monospace; f
     </div>
     <!-- Account button + dropdown -->
 <div class="account-wrap">
-      <button class="nav-account" onclick="toggleAccount(event)">
-        <div class="acc-av">👤</div>Account
+      <button class="nav-account" data-acc-toggle>
+        <div class="acc-av" id="navAccAv">?</div>
+        <span id="navAccName">Account</span>
       </button>
       <div class="account-dropdown" id="accountDropdown">
         <div class="acc-header">
-          <div class="acc-big-avatar">👤</div>
-          <div><div class="acc-name">Student Name</div><div class="acc-email">student@school.edu</div></div>
+          <div class="acc-big-avatar" id="navAccBigAv">?</div>
+          <div><div class="acc-name" id="navAccNameFull">Loading…</div><div class="acc-email" id="navAccEmail"></div></div>
         </div>
         <div class="acc-progress-wrap">
-          <div class="acc-progress-label"><span>Lessons Completed</span><span>42%</span></div>
-          <div class="acc-progress-bar"><div class="acc-progress-fill" style="width:42%"></div></div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;">21 / 50 lessons</div>
+          <div class="acc-progress-label"><span>Lessons Completed</span><span id="navProgressPct">0%</span></div>
+          <div class="acc-progress-bar"><div class="acc-progress-fill" id="navProgressFill" style="width:0%"></div></div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;" id="navProgressCount">0 / 50 lessons</div>
         </div>
         <div class="acc-menu">
           <a class="acc-item" href="profile.html"><div class="acc-item-icon">👤</div>View Profile</a>
-          <a class="acc-item" href="projects_3d.html"><div class="acc-item-icon">🔧</div>Your Projects</a>
+          <a class="acc-item" href="projects.html"><div class="acc-item-icon">🔧</div>Your Projects</a>
           <div class="acc-divider"></div>
           <a class="acc-item" href="settings.html"><div class="acc-item-icon">⚙️</div>Settings</a>
           <div class="acc-divider"></div>
-          <button class="acc-logout" onclick="logout()">🚪 Log Out</button>
+          <button class="acc-logout" onclick="handleLogout()">🚪 Log Out</button>
         </div>
       </div>
+    </div>
     </div>
 </nav>
 
@@ -1080,12 +1082,63 @@ function navSearch(q) {
   }
 }
 
-function toggleAccount(e){e.stopPropagation();document.getElementById('accountDropdown').classList.toggle('open');}
 document.addEventListener('click',()=>document.getElementById('accountDropdown')?.classList.remove('open'));
-function logout(){if(confirm('Log out?'))alert('Logged out!');}
+
 
 const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.08});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+if(!firebase.apps.length){
+  firebase.initializeApp({
+    apiKey:'AIzaSyD6kfvr-6qVSWMwWgp9PfKnGNT3u5K-4zk',
+    authDomain:'learn-arduino-with-ace.firebaseapp.com',
+    projectId:'learn-arduino-with-ace',
+    storageBucket:'learn-arduino-with-ace.firebasestorage.app',
+    messagingSenderId:'100033192953',
+    appId:'1:100033192953:web:c331698eea56c1a34c5328'
+  });
+}
+const auth=firebase.auth();
+const db=firebase.firestore();
+
+auth.onAuthStateChanged(async(user)=>{
+  if(!user){window.location.replace('index.html');return;}
+  const snap=await db.collection('users').doc(user.uid).get();
+  if(!snap.exists){window.location.replace('index.html');return;}
+  const p=snap.data();
+
+  // Populate nav
+  const l=(p.displayName||p.username||'?').charAt(0).toUpperCase();
+  document.getElementById('navAccAv').textContent=l;
+  document.getElementById('navAccBigAv').textContent=l;
+  document.getElementById('navAccName').textContent=p.displayName||p.username||'Account';
+  document.getElementById('navAccNameFull').textContent=p.displayName||p.username||'';
+  document.getElementById('navAccEmail').textContent=p.email||'';
+  const pct=p.avg_progress||0, cnt=p.lessons_completed||0;
+  document.getElementById('navProgressPct').textContent=pct+'%';
+  document.getElementById('navProgressFill').style.width=pct+'%';
+  document.getElementById('navProgressCount').textContent=cnt+' / 50 lessons';
+});
+
+// Dropdown toggle
+document.querySelector('[data-acc-toggle]').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('accountDropdown').classList.toggle('open');
+});
+document.addEventListener('click',()=>{
+  document.getElementById('accountDropdown').classList.remove('open');
+});
+
+async function handleLogout(){
+  if(!confirm('Log out?'))return;
+  await auth.signOut();
+  window.location.replace('index.html');
+}
 </script>
 </body>
 </html>
