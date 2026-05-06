@@ -377,12 +377,32 @@ async function doGoogleLogin(){
   provider.setCustomParameters({ prompt: 'select_account' });
 
   try {
-    manualLogin = true;
-    await auth.signInWithPopup(provider);
+    const result = await auth.signInWithPopup(provider);
+    const user = result.user;
+
+    // ✅ Create Firestore doc if this is their first Google sign-in
+    const userRef = db.collection('users').doc(user.uid);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) {
+      await userRef.set({
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || user.email.split('@')[0],
+        username: user.email.split('@')[0].toLowerCase(),
+        role: 'student',
+        avg_progress: 0,
+        lessons_completed: 0,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
     showToast('✓ Signed in with Google! Redirecting…');
-    setTimeout(() => { window.location.replace('arduino.html'); }, 900);
+    setTimeout(() => {
+      const role = userDoc.exists ? userDoc.data().role : 'student';
+      window.location.replace(role === 'admin' ? 'admin.html' : 'arduino.html');
+    }, 900);
+
   } catch (err) {
-    btn.disabled = false;
     manualLogin = false;
     setGoogleLoading(false);
     if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
