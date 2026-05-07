@@ -1,6 +1,3 @@
-
-html
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -253,7 +250,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Student</th><th>Grade</th><th>Status</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Student</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody id="dashTable"><tr class="empty-row"><td colspan="4">Loading…</td></tr></tbody>
             </table>
           </div>
@@ -263,13 +260,12 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 
       <!-- ───────── CREATE ACCOUNT ───────── -->
       <div class="section" id="section-create">
-        <p class="section-desc">Fill in the form below to create a new student account. No email required — just a name, username, and password. Share the credentials with the student after creation.</p>
+        <p class="section-desc">Fill in the form below to create a new student account. The credentials will be shown after creation — make sure to share them with the student.</p>
 
         <div class="panel">
           <div class="panel-head"><div class="panel-title">New Student Account</div></div>
           <div class="panel-body">
 
-            <!-- Row 1: First + Last Name -->
             <div class="form-grid" style="margin-bottom:14px;">
               <div class="form-group">
                 <label>First Name</label>
@@ -287,7 +283,6 @@ tr:hover td{background:rgba(255,255,255,0.02);}
               </div>
             </div>
 
-            <!-- Row 2: Username + Grade -->
             <div class="form-grid" style="margin-bottom:14px;">
               <div class="form-group">
                 <label>Username</label>
@@ -310,7 +305,16 @@ tr:hover td{background:rgba(255,255,255,0.02);}
               </div>
             </div>
 
-            <!-- Row 3: Password -->
+            <div class="form-grid full" style="margin-bottom:14px;">
+              <div class="form-group">
+                <label>Email</label>
+                <div class="field-wrap">
+                  <span class="field-icon">✉️</span>
+                  <input type="email" id="f_email" placeholder="student@school.com">
+                </div>
+              </div>
+            </div>
+
             <div class="form-grid full" style="margin-bottom:4px;">
               <div class="form-group">
                 <label>Password</label>
@@ -348,6 +352,13 @@ tr:hover td{background:rgba(255,255,255,0.02);}
                   <button class="btn-copy" onclick="copyText(this, document.getElementById('credPass').textContent)">Copy</button>
                 </div>
               </div>
+              <div class="cred-row">
+                <span class="cred-label">Email</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="cred-val" id="credEmail"></span>
+                  <button class="btn-copy" onclick="copyText(this, document.getElementById('credEmail').textContent)">Copy</button>
+                </div>
+              </div>
               <div class="cred-warn">⚠️ Save these credentials now — the password won't be shown again. Share them directly with the student.</div>
             </div>
 
@@ -373,8 +384,8 @@ tr:hover td{background:rgba(255,255,255,0.02);}
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Student</th><th>Grade</th><th>Progress</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="usersTable"><tr class="empty-row"><td colspan="5">Loading…</td></tr></tbody>
+              <thead><tr><th>Student</th><th>Email</th><th>Grade</th><th>Progress</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="usersTable"><tr class="empty-row"><td colspan="6">Loading…</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -403,20 +414,10 @@ tr:hover td{background:rgba(255,255,255,0.02);}
   <div class="modal-box">
     <div class="modal-icon">🔑</div>
     <div class="modal-title">Reset Password</div>
-    <div class="modal-desc" id="resetModalBody"></div>
-    <div class="form-group" style="margin-bottom:16px;">
-      <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">New Password</label>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <div class="field-wrap" style="flex:1;">
-          <span class="field-icon">🔑</span>
-          <input type="text" id="resetNewPw" placeholder="Min. 6 characters" style="width:100%;background:rgba(255,255,255,0.04);border:1.5px solid var(--border);border-radius:11px;padding:12px 13px 12px 40px;font-size:13.5px;font-family:'DM Sans',sans-serif;color:#fff;outline:none;">
-        </div>
-        <button class="btn-gen" onclick="genPw('resetNewPw')">🎲</button>
-      </div>
-    </div>
+    <div class="modal-desc" id="resetDesc">Send a password reset email to this student?</div>
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeReset()">Cancel</button>
-      <button class="btn-modal-primary" onclick="confirmReset()">Set Password</button>
+      <button class="btn-modal-primary" onclick="confirmReset()">Send Reset Email</button>
     </div>
   </div>
 </div>
@@ -429,7 +430,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-// ── FIREBASE CONFIG ──────────────────────────────────────────
+// ── PASTE YOUR FIREBASE CONFIG ──────────────────────────────
 const firebaseConfig = {
   apiKey: "AIzaSyD6kfvr-6qVSWMwWgp9PfKnGNT3u5K-4zk",
   authDomain: "learn-arduino-with-ace.firebaseapp.com",
@@ -443,9 +444,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.firestore();
-
-// Internal email domain — never shown to students
-const EMAIL_DOMAIN = 'students.learnace.internal';
 
 let allUsers = [], currentFilter = 'all', deleteTargetId = null, resetTargetId = null;
 
@@ -505,7 +503,7 @@ async function loadDashboard(){
       ? recent.map(u => `
           <tr>
             <td>${userCell(u)}</td>
-            <td style="font-size:13px;">${u.grade||'—'}</td>
+            <td class="mono">${u.email||'—'}</td>
             <td>${u.suspended ? '<span class="badge badge-suspended">Suspended</span>' : '<span class="badge badge-active">Active</span>'}</td>
             <td>${actionBtns(u)}</td>
           </tr>`).join('')
@@ -531,6 +529,7 @@ function renderUsers(filter){
     ? list.map(u => `
         <tr>
           <td>${userCell(u)}</td>
+          <td class="mono" style="font-size:12.5px;">${u.email||'—'}</td>
           <td style="font-size:13px;">${u.grade||'—'}</td>
           <td>
             <div style="display:flex;align-items:center;">
@@ -541,7 +540,7 @@ function renderUsers(filter){
           <td>${u.suspended ? '<span class="badge badge-suspended">Suspended</span>' : '<span class="badge badge-active">Active</span>'}</td>
           <td>${actionBtns(u)}</td>
         </tr>`).join('')
-    : '<tr class="empty-row"><td colspan="5">No students found.</td></tr>';
+    : '<tr class="empty-row"><td colspan="6">No students found.</td></tr>';
 }
 
 function filterUsers(f, btn){
@@ -556,12 +555,14 @@ function searchUsers(q){
   const ql = q.toLowerCase();
   const filtered = allUsers.filter(u =>
     u.displayName?.toLowerCase().includes(ql) ||
-    u.username?.toLowerCase().includes(ql)
+    u.username?.toLowerCase().includes(ql) ||
+    u.email?.toLowerCase().includes(ql)
   );
   document.getElementById('usersTable').innerHTML = filtered.length
     ? filtered.map(u => `
         <tr>
           <td>${userCell(u)}</td>
+          <td class="mono" style="font-size:12.5px;">${u.email||'—'}</td>
           <td style="font-size:13px;">${u.grade||'—'}</td>
           <td>
             <div style="display:flex;align-items:center;">
@@ -572,7 +573,7 @@ function searchUsers(q){
           <td>${u.suspended ? '<span class="badge badge-suspended">Suspended</span>' : '<span class="badge badge-active">Active</span>'}</td>
           <td>${actionBtns(u)}</td>
         </tr>`).join('')
-    : '<tr class="empty-row"><td colspan="5">No results for "' + q + '"</td></tr>';
+    : '<tr class="empty-row"><td colspan="6">No results for "' + q + '"</td></tr>';
 }
 
 // ── ROW HELPERS ──────────────────────────────────────────────
@@ -600,15 +601,13 @@ function actionBtns(u){
 async function createAccount(){
   const fname = document.getElementById('f_fname').value.trim();
   const lname = document.getElementById('f_lname').value.trim();
-  const uname = document.getElementById('f_username').value.trim().toLowerCase();
+  const uname = document.getElementById('f_username').value.trim();
+  const email = document.getElementById('f_email').value.trim();
   const pass  = document.getElementById('f_password').value.trim();
   const grade = document.getElementById('f_grade').value;
 
-  if (!fname||!lname||!uname||!pass) { showToast('⚠ Please fill in all fields.'); return; }
-  if (pass.length < 6)               { showToast('⚠ Password must be at least 6 characters.'); return; }
-
-  // Auto-generate an internal email — never shown to the student
-  const internalEmail = `${uname}@${EMAIL_DOMAIN}`;
+  if (!fname||!lname||!uname||!email||!pass) { showToast('⚠ Please fill in all fields.'); return; }
+  if (pass.length < 6)                        { showToast('⚠ Password must be at least 6 characters.'); return; }
 
   const btn = document.getElementById('createBtn');
   const lbl = document.getElementById('createBtnLabel');
@@ -618,7 +617,7 @@ async function createAccount(){
 
   try {
     // Check username not taken
-    const existCheck = await db.collection('usernames').doc(uname).get();
+    const existCheck = await db.collection('usernames').doc(uname.toLowerCase()).get();
     if (existCheck.exists) throw new Error('Username "' + uname + '" is already taken.');
 
     // Use secondary Firebase app so admin stays logged in
@@ -629,16 +628,17 @@ async function createAccount(){
       secondaryApp = firebase.initializeApp(firebaseConfig, 'secondary');
     }
     const secAuth = secondaryApp.auth();
-    const result  = await secAuth.createUserWithEmailAndPassword(internalEmail, pass);
+    const result  = await secAuth.createUserWithEmailAndPassword(email, pass);
     const uid     = result.user.uid;
     await result.user.updateProfile({ displayName: fname + ' ' + lname });
     await secAuth.signOut();
 
-    // Save to Firestore (no real email stored)
+    // Save to Firestore
     await db.collection('users').doc(uid).set({
       uid,
       displayName:       fname + ' ' + lname,
-      username:          uname,
+      username:          uname.toLowerCase(),
+      email:             email.toLowerCase(),
       grade:             grade||'—',
       role:              'student',
       suspended:         false,
@@ -646,11 +646,12 @@ async function createAccount(){
       lessons_completed: 0,
       createdAt:         firebase.firestore.FieldValue.serverTimestamp()
     });
-    await db.collection('usernames').doc(uname).set({ uid });
+    await db.collection('usernames').doc(uname.toLowerCase()).set({ uid });
 
-    // Show credentials (username + password only)
-    document.getElementById('credUser').textContent = uname;
-    document.getElementById('credPass').textContent = pass;
+    // Show credentials
+    document.getElementById('credUser').textContent  = uname;
+    document.getElementById('credPass').textContent  = pass;
+    document.getElementById('credEmail').textContent = email;
     document.getElementById('credBox').classList.add('show');
 
     showToast(`✅ Account created for ${fname} ${lname}`);
@@ -658,7 +659,9 @@ async function createAccount(){
     await loadDashboard();
 
   } catch(err){
-    showToast('⚠ ' + err.message);
+    const msg = err.code === 'auth/email-already-in-use'
+      ? 'That email is already registered.' : err.message;
+    showToast('⚠ ' + msg);
   } finally {
     btn.disabled = false;
     lbl.textContent = 'Create Account →';
@@ -666,7 +669,7 @@ async function createAccount(){
 }
 
 function clearCreateForm(keepCred = false){
-  ['f_fname','f_lname','f_username','f_password'].forEach(id => document.getElementById(id).value = '');
+  ['f_fname','f_lname','f_username','f_email','f_password'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f_grade').value = '';
   if (!keepCred) document.getElementById('credBox').classList.remove('show');
 }
@@ -693,36 +696,21 @@ async function toggleSuspend(id){
 }
 
 // ── RESET PASSWORD ────────────────────────────────────────────
-// Since there's no real email, the admin sets a new password directly
 function openReset(id){
   resetTargetId = id;
   const u = allUsers.find(x => x.id === id);
-  document.getElementById('resetModalBody').innerHTML =
-    `Set a new password for <strong style="color:#fff;">${u?.displayName||u?.username}</strong>:`;
-  document.getElementById('resetNewPw').value = '';
+  document.getElementById('resetDesc').innerHTML =
+    `Send a password reset link to <strong style="color:#fff;">${u?.displayName||u?.username}</strong>?<br><span style="font-size:12px;color:var(--muted);margin-top:4px;display:block;">${u?.email}</span>`;
   document.getElementById('resetModal').classList.add('open');
 }
-function closeReset(){
-  document.getElementById('resetModal').classList.remove('open');
-  resetTargetId = null;
-}
+function closeReset(){ document.getElementById('resetModal').classList.remove('open'); resetTargetId = null; }
 async function confirmReset(){
-  const newPw = document.getElementById('resetNewPw').value.trim();
-  if (!newPw || newPw.length < 6) { showToast('⚠ Password must be at least 6 characters.'); return; }
-
   const u = allUsers.find(x => x.id === resetTargetId);
   if (!u) return;
-
-  // Re-sign in with the secondary app using the internal email to update password
-  const internalEmail = `${u.username}@${EMAIL_DOMAIN}`;
-
   try {
-    // We can't update another user's password client-side without their current password.
-    // Best practice: use a Cloud Function. As a fallback, show the admin the new credentials to share.
-    // Here we store the new password hash note in Firestore (admin-to-student handoff).
-    // If you have a Cloud Function for admin password reset, call it here instead.
-    showToast(`⚠ To reset passwords, use Firebase Console or set up a Cloud Function.`);
+    await auth.sendPasswordResetEmail(u.email);
     closeReset();
+    showToast('📧 Reset email sent to ' + u.email);
   } catch(e){ showToast('⚠ ' + e.message); }
 }
 
