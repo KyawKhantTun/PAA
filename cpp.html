@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arduino C++ — Logo 3D</title>
+<title>Arduino C++ — Coming Soon</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="responsive.css">
 <style>
@@ -15,11 +15,11 @@
   --border: rgba(255,255,255,0.08); --muted: rgba(255,255,255,0.45);
   --faint: rgba(255,255,255,0.05);
 }
-html { scroll-behavior: smooth; }
-body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: #fff; overflow-x: hidden; }
+html, body { height: 100%; }
+body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: #fff; overflow-x: hidden; display: flex; flex-direction: column; }
 
 #bg-canvas { position: fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
-.cursor-glow { position:fixed; pointer-events:none; z-index:999; width:380px; height:380px; background:radial-gradient(circle, rgba(171,71,188,0.06) 0%, transparent 70%); border-radius:50%; transform:translate(-50%,-50%); transition: opacity .3s; }
+.cursor-glow { position:fixed; pointer-events:none; z-index:999; width:380px; height:380px; background:radial-gradient(circle, rgba(171,71,188,0.06) 0%, transparent 70%); border-radius:50%; transform:translate(-50%,-50%); }
 
 /* NAV */
 nav {
@@ -30,6 +30,7 @@ nav {
   border-bottom: 1px solid rgba(171,71,188,0.12);
 }
 .nav-logo { font-family:'Fraunces',serif; font-size:24px; font-weight:900; font-style:italic; color:var(--teal); letter-spacing:-1px; text-decoration:none; text-shadow:0 0 30px rgba(0,151,157,0.35); }
+.nav-logo .orange { color: var(--orange); }
 .nav-links { display:flex; gap:4px; list-style:none; }
 .nav-links a { font-size:13px; font-weight:500; color:var(--muted); text-decoration:none; padding:6px 13px; border-radius:8px; transition:all .2s; }
 .nav-links a:hover, .nav-links a.active { background: var(--teal-light); color: var(--teal); }
@@ -38,158 +39,84 @@ nav {
 .nav-search svg { width:13px; color:var(--muted); }
 .nav-search input { background:none; border:none; outline:none; font-family:'DM Sans',sans-serif; font-size:12.5px; color:#fff; width:100%; }
 .nav-search input::placeholder { color:rgba(255,255,255,0.2); }
+
+.account-wrap { position:relative; }
 .nav-account { display:flex; align-items:center; gap:8px; background:var(--teal); color:#fff; border:none; padding:7px 16px 7px 9px; border-radius:100px; font-size:13px; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .2s; }
 .nav-account:hover { background:var(--teal-dark); }
 .acc-av { width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:12px; }
-.nav-logo .orange{ color: var(--orange);}
-.back-btn { position:fixed; top:78px; left:36px; z-index:210; display:flex; align-items:center; gap:7px; background:rgba(5,7,8,0.88); border:1px solid var(--border); color:rgba(255,255,255,0.7); padding:7px 15px 7px 11px; border-radius:100px; font-size:12.5px; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; text-decoration:none; backdrop-filter:blur(10px); transition:all .22s; }
-.back-btn:hover { background:var(--teal-light); border-color:var(--teal); color:#fff; transform:translateX(-2px); }
-.back-btn svg { width:13px; }
+.account-dropdown { position:absolute; top:calc(100% + 10px); right:0; width:280px; background:#181c1e; border:1px solid var(--border); border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.6); overflow:hidden; opacity:0; pointer-events:none; transform:translateY(-8px); transition:opacity .22s,transform .22s; z-index:300; }
+.account-dropdown.open { opacity:1; pointer-events:all; transform:translateY(0); }
+.acc-header { background:linear-gradient(135deg,#00979d,#007a7f); padding:20px 18px; display:flex; align-items:center; gap:14px; }
+.acc-big-avatar { width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,0.22); display:flex; align-items:center; justify-content:center; font-size:22px; border:2px solid rgba(255,255,255,0.3); flex-shrink:0; }
+.acc-name { font-size:14px; font-weight:700; color:#fff; }
+.acc-email { font-size:11px; color:rgba(255,255,255,0.6); margin-top:2px; }
+.acc-progress-wrap { padding:14px 16px; border-bottom:1px solid var(--border); }
+.acc-progress-label { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:7px; }
+.acc-progress-bar { height:5px; background:rgba(255,255,255,0.08); border-radius:100px; overflow:hidden; }
+.acc-progress-fill { height:100%; background:linear-gradient(90deg,var(--teal),var(--teal-dark)); border-radius:100px; }
+.acc-menu { padding:6px; }
+.acc-item { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:9px; cursor:pointer; text-decoration:none; color:rgba(255,255,255,0.8); font-size:13px; font-weight:500; transition:background .15s; }
+.acc-item:hover { background:rgba(0,151,157,0.1); color:var(--teal); }
+.acc-item-icon { width:30px; height:30px; border-radius:8px; background:var(--faint); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+.acc-divider { height:1px; background:var(--border); margin:4px 12px; }
+.acc-logout { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:9px; cursor:pointer; font-size:13px; font-weight:500; color:#f28b82; transition:background .15s; border:none; background:none; width:100%; font-family:'DM Sans',sans-serif; margin-bottom:4px; }
+.acc-logout:hover { background:rgba(242,139,130,0.08); }
 
-.account-wrap{position:relative;}
-.nav-account{display:flex;align-items:center;gap:8px;background:var(--teal);color:#fff;border:none;padding:7px 16px 7px 9px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
-.nav-account:hover{background:var(--teal-dark);}
-.acc-av{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;}
-.account-dropdown{position:absolute;top:calc(100% + 10px);right:0;width:280px;background:#181c1e;border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .22s,transform .22s;z-index:300;}
-.account-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0);}
-.acc-header{background:linear-gradient(135deg,#00979d,#007a7f);padding:20px 18px;display:flex;align-items:center;gap:14px;}
-.acc-big-avatar{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid rgba(255,255,255,0.3);flex-shrink:0;}
-.acc-name{font-size:14px;font-weight:700;color:#fff;}
-.acc-email{font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;}
-.acc-progress-wrap{padding:14px 16px;border-bottom:1px solid var(--border);}
-.acc-progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:7px;}
-.acc-progress-bar{height:5px;background:rgba(255,255,255,0.08);border-radius:100px;overflow:hidden;}
-.acc-progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-dark));border-radius:100px;}
-.acc-menu{padding:6px;}
-.acc-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;text-decoration:none;color:rgba(255,255,255,0.8);font-size:13px;font-weight:500;transition:background .15s;}
-.acc-item:hover{background:rgba(0,151,157,0.1);color:var(--teal);}
-.acc-item-icon{width:30px;height:30px;border-radius:8px;background:var(--faint);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
-.acc-divider{height:1px;background:var(--border);margin:4px 12px;}
-.acc-logout{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:#f28b82;transition:background .15s;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:4px;}
-.acc-logout:hover{background:rgba(242,139,130,0.08);}
-.back-btn{position:fixed;top:78px;left:36px;z-index:210;display:flex;align-items:center;gap:7px;background:rgba(5,7,8,0.88);border:1px solid var(--border);color:rgba(255,255,255,0.7);padding:7px 15px 7px 11px;border-radius:100px;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:none;backdrop-filter:blur(10px);transition:all .22s;}
-.back-btn:hover{background:var(--teal-light);border-color:var(--teal);color:#fff;transform:translateX(-2px);}
-.back-btn svg{width:13px;}
-
-/* HERO */
-.page-hero {
-  min-height: 100vh; display: flex; align-items: center;
-  padding: 120px 80px 80px; position: relative; overflow: hidden;
-  background: linear-gradient(135deg, #08060d 0%, #050708 55%, #0d0a06 100%);
+/* COMING SOON */
+.coming-soon {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 40px 80px;
+  position: relative;
+  z-index: 2;
 }
-.page-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 70% 50%, rgba(171,71,188,0.08) 0%, transparent 60%); pointer-events:none; }
-#hero-canvas { position:absolute; inset:0; width:100%; height:100%; z-index:1; }
-.hero-content { position:relative; z-index:5; max-width:580px; }
-
-.hero-badge { display:inline-flex; align-items:center; gap:8px; background:var(--purple-light); border:1px solid rgba(171,71,188,0.3); color:#ce93d8; padding:6px 16px; border-radius:100px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:24px; }
-.badge-dot { width:6px; height:6px; border-radius:50%; background:#ab47bc; animation:pulse 2s ease-in-out infinite; }
+.cs-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--purple-light); border: 1px solid rgba(171,71,188,0.3);
+  color: #ce93d8; padding: 6px 18px; border-radius: 100px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+  margin-bottom: 28px;
+}
+.badge-dot { width:6px; height:6px; border-radius:50%; background:#ab47bc; animation: pulse 2s ease-in-out infinite; }
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.5)} }
 
-.hero-title { font-family:'Fraunces',serif; font-size:clamp(50px,7vw,88px); font-weight:900; line-height:0.9; letter-spacing:-3px; margin-bottom:20px; opacity:0; animation:riseUp .7s .3s ease forwards; }
-.hero-title .accent { color:#ce93d8; font-style:italic; text-shadow:0 0 40px rgba(171,71,188,0.4); }
-.hero-sub { font-size:15px; color:var(--muted); line-height:1.8; margin-bottom:36px; max-width:460px; opacity:0; animation:riseUp .7s .5s ease forwards; }
-.hero-ctas { display:flex; gap:14px; flex-wrap:wrap; opacity:0; animation:riseUp .7s .7s ease forwards; }
-.btn-primary { display:inline-flex; align-items:center; gap:8px; background:var(--teal); color:#fff; border:none; padding:14px 30px; border-radius:100px; font-size:14px; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .22s; box-shadow:0 6px 24px rgba(0,151,157,0.35); text-decoration:none; }
-.btn-primary:hover { background:var(--teal-dark); transform:translateY(-2px); }
-.btn-outline { display:inline-flex; align-items:center; gap:8px; background:transparent; color:var(--muted); border:1.5px solid var(--border); padding:13px 26px; border-radius:100px; font-size:14px; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .22s; text-decoration:none; }
-.btn-outline:hover { border-color:var(--teal); color:var(--teal); }
+.cs-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(52px, 8vw, 96px);
+  font-weight: 900;
+  letter-spacing: -3px;
+  line-height: 0.92;
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: riseUp .7s .2s ease forwards;
+}
+.cs-title .accent { color: #ce93d8; font-style: italic; }
+.cs-desc {
+  font-size: 15px; color: var(--muted); line-height: 1.8;
+  max-width: 460px; margin-bottom: 44px;
+  opacity: 0; animation: riseUp .7s .4s ease forwards;
+}
+.cs-back {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--teal); color: #fff; border: none;
+  padding: 14px 32px; border-radius: 100px;
+  font-size: 14px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; text-decoration: none; transition: all .22s;
+  box-shadow: 0 6px 24px rgba(48,127,255,0.35);
+  opacity: 0; animation: riseUp .7s .6s ease forwards;
+}
+.cs-back:hover { background: var(--teal-dark); transform: translateY(-2px); }
+
+.cs-icon {
+  font-size: 72px; margin-bottom: 24px;
+  opacity: 0; animation: riseUp .7s .05s ease forwards;
+}
 
 @keyframes riseUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-
-/* TOC */
-.toc-bar { background:var(--dark3); border-bottom:1px solid var(--border); padding:18px 80px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; position:relative; z-index:10; }
-.toc-label { font-size:10px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:2px; margin-right:8px; white-space:nowrap; }
-.toc-link { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); text-decoration:none; padding:5px 11px; border-radius:6px; border:1px solid var(--border); transition:all .18s; white-space:nowrap; }
-.toc-link:hover { background:var(--teal-light); border-color:var(--teal); color:var(--teal); }
-
-/* MAIN */
-main { background: var(--dark2); position: relative; z-index: 10; }
-.section { padding:72px 80px; border-bottom:1px solid var(--border); scroll-margin-top:64px; }
-.section:last-child { border-bottom:none; }
-.section-label { font-size:10px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:3px; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
-.section-label::before { content:''; width:24px; height:2px; background:var(--teal); border-radius:2px; flex-shrink:0; }
-.section-title { font-family:'Fraunces',serif; font-size:clamp(28px,3.5vw,44px); font-weight:900; letter-spacing:-1.5px; margin-bottom:14px; line-height:1.05; }
-.section-title .accent { color:var(--teal); font-style:italic; }
-.section-desc { font-size:14px; color:var(--muted); line-height:1.8; max-width:700px; }
-
-.two-col { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:start; margin-top:32px; }
-.three-col { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:28px; }
-.one-col { margin-top:28px; }
-
-/* CODE BLOCKS */
-.code-block { background:#0d1117; border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-top:18px; margin-bottom:16px; transition: box-shadow .25s; }
-.code-block:hover { box-shadow: 0 0 0 1px rgba(0,151,157,0.3), 0 8px 32px rgba(0,0,0,0.4); }
-.code-header { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:rgba(255,255,255,0.03); border-bottom:1px solid var(--border); }
-.code-lang { font-family:'DM Mono',monospace; font-size:10px; font-weight:600; color:var(--teal); text-transform:uppercase; letter-spacing:1px; }
-.copy-btn { background:none; border:1px solid var(--border); color:var(--muted); padding:3px 10px; border-radius:6px; font-size:10px; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .18s; }
-.copy-btn:hover { background:var(--teal-light); border-color:var(--teal); color:var(--teal); }
-pre.code-pre { padding:18px; overflow-x:auto; font-family:'DM Mono',monospace; font-size:12px; line-height:1.8; color:#c9d1d9; margin:0; scrollbar-width:thin; }
-.kw{color:#ff7b72;} .fn{color:#d2a8ff;} .cm{color:#8b949e;} .st{color:#a5d6ff;} .nm{color:#79c0ff;}
-
-/* INFO CARDS */
-.info-card { background:var(--dark3); border:1px solid var(--border); border-radius:16px; padding:24px; transition:all .3s; }
-.info-card:hover { border-color:rgba(0,151,157,0.3); transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,0.3); }
-.info-card-icon { font-size:30px; margin-bottom:12px; display:block; }
-.info-card-title { font-family:'Fraunces',serif; font-size:18px; font-weight:700; margin-bottom:7px; }
-.info-card-text { font-size:13px; color:var(--muted); line-height:1.7; }
-
-/* TABLES */
-.data-table { width:100%; border-collapse:collapse; margin-top:18px; font-size:12.5px; }
-.data-table th { text-align:left; font-size:10px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:1.5px; padding:10px 14px; background:rgba(0,151,157,0.08); border-bottom:1px solid var(--border); }
-.data-table td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--muted); }
-.data-table tr:last-child td { border-bottom:none; }
-.data-table td:first-child { color:#fff; font-weight:600; font-family:'DM Mono',monospace; }
-.data-table td:last-child { color:#a5d6ff; font-family:'DM Mono',monospace; font-size:11.5px; }
-
-/* OPERATORS */
-.op-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-top:20px; }
-.op-card { background:var(--dark3); border:1px solid var(--border); border-radius:12px; padding:18px; transition:all .25s; }
-.op-card:hover { border-color:rgba(0,151,157,0.25); transform:translateY(-2px); }
-.op-card-title { font-size:10px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:12px; }
-.op-row { display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:12px; }
-.op-row:last-child { border-bottom:none; }
-.op-sym { font-family:'DM Mono',monospace; font-weight:700; color:#d2a8ff; font-size:14px; }
-.op-name { color:var(--muted); }
-.op-ex { color:#a5d6ff; font-family:'DM Mono',monospace; font-size:10px; }
-
-/* STEPS */
-.steps { display:flex; flex-direction:column; }
-.step-row { display:flex; gap:18px; align-items:flex-start; padding:18px 0; border-bottom:1px solid var(--border); }
-.step-row:last-child { border-bottom:none; }
-.step-num { width:36px; height:36px; border-radius:50%; background:var(--teal-light); border:1px solid rgba(0,151,157,0.3); display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-size:15px; font-weight:900; color:var(--teal); flex-shrink:0; }
-.step-title { font-size:14px; font-weight:600; color:#fff; margin-bottom:4px; }
-.step-text { font-size:13px; color:var(--muted); line-height:1.7; }
-
-/* TIP / WARN BOXES */
-.tip-box { background:rgba(0,151,157,0.07); border:1px solid rgba(0,151,157,0.2); border-radius:14px; padding:16px 20px; display:flex; gap:14px; align-items:flex-start; margin-top:18px; }
-.warn-box { background:rgba(232,80,10,0.07); border:1px solid rgba(232,80,10,0.2); border-radius:14px; padding:16px 20px; display:flex; gap:14px; align-items:flex-start; margin-top:18px; }
-.tip-icon { font-size:18px; flex-shrink:0; }
-.tip-text { font-size:13px; color:var(--muted); line-height:1.7; }
-.tip-text strong { color:#fff; }
-
-/* CHEAT SHEET */
-.cheat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:24px; }
-.cheat-card { background:var(--dark3); border:1px solid var(--border); border-radius:14px; overflow:hidden; transition:all .25s; }
-.cheat-card:hover { border-color:rgba(0,151,157,0.3); transform:translateY(-3px); }
-.cheat-header { background:rgba(0,151,157,0.1); border-bottom:1px solid var(--border); padding:10px 16px; font-size:11px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:1.5px; }
-.cheat-body { padding:14px 16px; }
-.cheat-body pre { font-family:'DM Mono',monospace; font-size:11px; line-height:1.85; color:#c9d1d9; }
-
-/* BOTTOM CTA */
-.bottom-cta { background:var(--dark); padding:100px 80px; text-align:center; position:relative; overflow:hidden; border-top:1px solid rgba(171,71,188,0.15); }
-.bottom-cta::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 50%, rgba(0,151,157,0.1) 0%, transparent 65%); }
-.bottom-cta-content { position:relative; z-index:1; }
-.bottom-cta-label { font-size:11px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:3px; margin-bottom:16px; }
-.bottom-cta-title { font-family:'Fraunces',serif; font-size:clamp(36px,5vw,58px); font-weight:900; letter-spacing:-2px; margin-bottom:16px; }
-.bottom-cta-desc { font-size:15px; color:var(--muted); margin-bottom:36px; max-width:460px; margin-left:auto; margin-right:auto; line-height:1.7; }
-.btn-cta-row { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
-.btn-cta { display:inline-flex; align-items:center; gap:10px; background:var(--teal); color:#fff; border:none; padding:16px 40px; border-radius:100px; font-size:15px; font-weight:700; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .25s; box-shadow:0 8px 32px rgba(0,151,157,0.4); text-decoration:none; }
-.btn-cta:hover { background:var(--teal-dark); transform:translateY(-3px); }
-.btn-cta-sec { display:inline-flex; align-items:center; gap:10px; background:transparent; color:var(--muted); border:1.5px solid var(--border); padding:15px 32px; border-radius:100px; font-size:14px; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .25s; text-decoration:none; }
-.btn-cta-sec:hover { border-color:var(--teal); color:var(--teal); transform:translateY(-2px); }
-
-.reveal { opacity:0; transform:translateY(24px); transition:opacity .6s ease,transform .6s ease; }
-.reveal.visible { opacity:1; transform:translateY(0); }
 </style>
 </head>
 <body>
@@ -209,10 +136,9 @@ pre.code-pre { padding:18px; overflow-x:auto; font-family:'DM Mono',monospace; f
   <div class="nav-right">
     <div class="nav-search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input placeholder="Search…" oninput="navSearch(this.value)">
+      <input placeholder="Search…">
     </div>
-    <!-- Account button + dropdown -->
-<div class="account-wrap">
+    <div class="account-wrap">
       <button class="nav-account" data-acc-toggle>
         <div class="acc-av" id="navAccAv">?</div>
         <span id="navAccName">Account</span>
@@ -237,619 +163,18 @@ pre.code-pre { padding:18px; overflow-x:auto; font-family:'DM Mono',monospace; f
         </div>
       </div>
     </div>
-    </div>
+  </div>
 </nav>
 
-<a class="back-btn" href="arduino.html">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-  Back to Home
-</a>
-
-<!-- ═══ HERO ═══ -->
-<section class="page-hero">
-  <canvas id="hero-canvas"></canvas>
-  <div class="hero-content">
-    <div class="hero-badge"><div class="badge-dot"></div>Advanced · Real Code · Arduino IDE</div>
-    <h1 class="hero-title">Arduino<br><span class="accent">C++ Code</span></h1>
-    <p class="hero-sub">Write real C++ programs in the Arduino IDE. Full hardware control, custom functions, libraries — everything a professional needs. Master the actual language that powers every Arduino project.</p>
-    <div class="hero-ctas">
-      <a href="https://www.arduino.cc/en/software" target="_blank" class="btn-primary">⬇️ Download Arduino IDE</a>
-      <a href="mblock.html" class="btn-outline">← Switch to mBlock</a>
-    </div>
-  </div>
-</section>
-
-<!-- TOC -->
-<div class="toc-bar">
-  <span class="toc-label">Jump to:</span>
-  <a class="toc-link" href="#structure">Structure</a>
-  <a class="toc-link" href="#variables">Variables</a>
-  <a class="toc-link" href="#operators">Operators</a>
-  <a class="toc-link" href="#control">If / Else</a>
-  <a class="toc-link" href="#loops">Loops</a>
-  <a class="toc-link" href="#functions">Functions</a>
-  <a class="toc-link" href="#io">Digital & Analog I/O</a>
-  <a class="toc-link" href="#time">Time</a>
-  <a class="toc-link" href="#serial">Serial</a>
-  <a class="toc-link" href="#libraries">Libraries</a>
-  <a class="toc-link" href="#debug">Debugging</a>
-  <a class="toc-link" href="#cheatsheet">Cheat Sheet</a>
+<!-- COMING SOON -->
+<div class="coming-soon">
+  <div class="cs-icon">🚧</div>
+  <div class="cs-badge"><div class="badge-dot"></div>In Development</div>
+  <h1 class="cs-title">Coming<br><span class="accent">Soon</span></h1>
+  <p class="cs-desc">The Arduino C++ learning module is being built. Check back soon — it'll cover everything from variables and loops to sensors, libraries, and real projects.</p>
+  <a href="arduino.html" class="cs-back">← Back to Home</a>
 </div>
 
-<main>
-
-<!-- INTRO -->
-<section class="section reveal">
-  <div class="section-label">Introduction</div>
-  <h2 class="section-title">What is <span class="accent">Arduino C++?</span></h2>
-  <p class="section-desc">Arduino uses a simplified version of C/C++. You write code in the Arduino IDE, compile it, and upload it to the board. The code then runs directly on the microcontroller — controlling LEDs, motors, sensors, and anything you connect.</p>
-  <div class="two-col">
-    <div>
-      <div class="steps" style="margin-top:24px;">
-        <div class="step-row"><div class="step-num">1</div><div><div class="step-title">Download Arduino IDE from arduino.cc</div><div class="step-text">Free for Windows, Mac and Linux. The official editor with built-in compiler and uploader.</div></div></div>
-        <div class="step-row"><div class="step-num">2</div><div><div class="step-title">Connect Arduino via USB</div><div class="step-text">Use a USB-A to USB-B cable. Windows auto-installs drivers; Mac/Linux usually plug-and-play.</div></div></div>
-        <div class="step-row"><div class="step-num">3</div><div><div class="step-title">Select Board & Port</div><div class="step-text">Tools → Board → Arduino Uno. Then Tools → Port → COM3 (Windows) or /dev/cu.usbmodem (Mac).</div></div></div>
-        <div class="step-row"><div class="step-num">4</div><div><div class="step-title">Write, Verify, Upload</div><div class="step-text">Write code → click ✓ Verify to check for errors → click → Upload to flash your Arduino.</div></div></div>
-      </div>
-    </div>
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">Your First Program — Hello Arduino</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="kw">void</span> <span class="fn">setup</span>() {
-  <span class="cm">// Runs ONCE when Arduino starts</span>
-  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
-  Serial.<span class="fn">println</span>(<span class="st">"Hello, Arduino!"</span>);
-}
-
-<span class="kw">void</span> <span class="fn">loop</span>() {
-  <span class="cm">// Runs FOREVER after setup()</span>
-  Serial.<span class="fn">println</span>(<span class="st">"This repeats forever!"</span>);
-  <span class="fn">delay</span>(<span class="nm">1000</span>); <span class="cm">// Wait 1 second</span>
-}</pre>
-      </div>
-      <div class="tip-box"><div class="tip-icon">💡</div><div class="tip-text"><strong>Two functions, always:</strong> setup() runs once, loop() runs forever. Every Arduino program has exactly these two — nothing else is required to start.</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- STRUCTURE -->
-<section id="structure" class="section reveal">
-  <div class="section-label">Chapter 2</div>
-  <h2 class="section-title">Program <span class="accent">Structure</span></h2>
-  <p class="section-desc">Every Arduino C++ program follows the same basic structure. Understanding this skeleton is the most important thing you will learn.</p>
-  <div class="two-col">
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">Basic Structure</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="kw">void</span> <span class="fn">setup</span>() {
-  <span class="cm">// Runs ONCE at startup</span>
-  <span class="cm">// Initialise pins, Serial, etc.</span>
-}
-
-<span class="kw">void</span> <span class="fn">loop</span>() {
-  <span class="cm">// Runs REPEATEDLY forever</span>
-  <span class="cm">// Main program logic goes here</span>
-}
-
-<span class="kw">void</span> <span class="fn">myFunction</span>() {
-  <span class="cm">// Your custom functions go here</span>
-}</pre>
-      </div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">Comments & Semicolons</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="cm">// Single line comment</span>
-
-<span class="cm">/* Multi-line
-   comment here */</span>
-
-<span class="cm">// Every statement MUST end with ;</span>
-<span class="fn">digitalWrite</span>(<span class="nm">13</span>, HIGH);  <span class="cm">// correct ✓</span>
-<span class="fn">digitalWrite</span>(<span class="nm">13</span>, HIGH)   <span class="cm">// ERROR ✗ missing ;</span></pre>
-      </div>
-    </div>
-    <div>
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <div class="info-card"><span class="info-card-icon">📌</span><div class="info-card-title">setup() — Runs Once</div><div class="info-card-text">Think of setup() as your preparation step. Set pin modes here, start Serial communication, initialise sensors. It runs exactly once when power is applied or the reset button is pressed.</div></div>
-        <div class="info-card"><span class="info-card-icon">🔁</span><div class="info-card-title">loop() — Runs Forever</div><div class="info-card-text">After setup() completes, loop() starts and runs continuously until power is removed. This is where your main logic lives — reading sensors, controlling outputs, checking conditions.</div></div>
-        <div class="info-card"><span class="info-card-icon">{ }</span><div class="info-card-title">Curly Braces & Semicolons</div><div class="info-card-text">Curly braces group code into blocks. Every statement inside a function MUST end with a semicolon. Missing one is the most common beginner error — the compiler tells you exactly which line.</div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- VARIABLES -->
-<section id="variables" class="section reveal">
-  <div class="section-label">Chapter 3</div>
-  <h2 class="section-title">Variables & <span class="accent">Data Types</span></h2>
-  <p class="section-desc">Variables are named containers that store values. You must declare the type before using one — this tells Arduino how much memory to set aside.</p>
-  <table class="data-table reveal">
-    <thead><tr><th>Type</th><th>Size</th><th>Range</th><th>Example</th></tr></thead>
-    <tbody>
-      <tr><td>byte</td><td>1 byte</td><td>0 to 255</td><td>byte age = 25;</td></tr>
-      <tr><td>int</td><td>2 bytes</td><td>-32,768 to 32,767</td><td>int count = 500;</td></tr>
-      <tr><td>long</td><td>4 bytes</td><td>-2.1B to 2.1B</td><td>long bigNum = 123456;</td></tr>
-      <tr><td>float</td><td>4 bytes</td><td>±3.4×10³⁸</td><td>float temp = 23.5;</td></tr>
-      <tr><td>bool</td><td>1 byte</td><td>true / false</td><td>bool isOn = true;</td></tr>
-      <tr><td>char</td><td>1 byte</td><td>Single character</td><td>char letter = 'A';</td></tr>
-      <tr><td>String</td><td>Variable</td><td>Text</td><td>String name = "Arduino";</td></tr>
-    </tbody>
-  </table>
-  <div class="two-col">
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">Declaring Variables</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="cm">// Declaration only</span>
-<span class="st">int</span> x;
-
-<span class="cm">// Declaration + value</span>
-<span class="st">int</span> x = <span class="nm">10</span>;
-
-<span class="cm">// Multiple same type</span>
-<span class="st">int</span> a = <span class="nm">5</span>, b = <span class="nm">10</span>, c = <span class="nm">15</span>;
-
-<span class="cm">// String</span>
-<span class="st">String</span> message = <span class="st">"Hello World"</span>;
-
-<span class="cm">// Boolean</span>
-<span class="st">bool</span> ledOn = <span class="kw">true</span>;</pre>
-      </div>
-    </div>
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">Variable Scope</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="st">int</span> globalVar = <span class="nm">100</span>; <span class="cm">// everywhere</span>
-
-<span class="kw">void</span> <span class="fn">setup</span>() {
-  <span class="st">int</span> localVar = <span class="nm">50</span>; <span class="cm">// only here</span>
-}
-
-<span class="kw">void</span> <span class="fn">loop</span>() {
-  Serial.<span class="fn">println</span>(globalVar); <span class="cm">// ✓ Works</span>
-  <span class="cm">// Serial.println(localVar); // ✗ ERROR</span>
-}</pre>
-      </div>
-      <div class="tip-box"><div class="tip-icon">💡</div><div class="tip-text"><strong>Global vs Local:</strong> Variables needed in multiple functions go at the top (global). Variables only needed in one function go inside it (local).</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- OPERATORS -->
-<section id="operators" class="section reveal">
-  <div class="section-label">Chapter 4</div>
-  <h2 class="section-title"><span class="accent">Operators</span></h2>
-  <p class="section-desc">Operators perform calculations and comparisons on variables. Understanding them is essential for writing any logic.</p>
-  <div class="op-grid reveal">
-    <div class="op-card">
-      <div class="op-card-title">Arithmetic</div>
-      <div class="op-row"><span class="op-sym">+</span><span class="op-name">Addition</span><span class="op-ex">5+3 = 8</span></div>
-      <div class="op-row"><span class="op-sym">-</span><span class="op-name">Subtraction</span><span class="op-ex">5-3 = 2</span></div>
-      <div class="op-row"><span class="op-sym">*</span><span class="op-name">Multiply</span><span class="op-ex">5*3 = 15</span></div>
-      <div class="op-row"><span class="op-sym">/</span><span class="op-name">Divide</span><span class="op-ex">15/3 = 5</span></div>
-      <div class="op-row"><span class="op-sym">%</span><span class="op-name">Remainder</span><span class="op-ex">17%5 = 2</span></div>
-    </div>
-    <div class="op-card">
-      <div class="op-card-title">Comparison</div>
-      <div class="op-row"><span class="op-sym">==</span><span class="op-name">Equal to</span><span class="op-ex">5==5 true</span></div>
-      <div class="op-row"><span class="op-sym">!=</span><span class="op-name">Not equal</span><span class="op-ex">5!=3 true</span></div>
-      <div class="op-row"><span class="op-sym">&lt;</span><span class="op-name">Less than</span><span class="op-ex">3&lt;5 true</span></div>
-      <div class="op-row"><span class="op-sym">&gt;</span><span class="op-name">Greater than</span><span class="op-ex">5&gt;3 true</span></div>
-      <div class="op-row"><span class="op-sym">&lt;= &gt;=</span><span class="op-name">Or equal</span><span class="op-ex">5&lt;=5 true</span></div>
-    </div>
-    <div class="op-card">
-      <div class="op-card-title">Logical & Assignment</div>
-      <div class="op-row"><span class="op-sym">&&</span><span class="op-name">AND</span><span class="op-ex">both true</span></div>
-      <div class="op-row"><span class="op-sym">||</span><span class="op-name">OR</span><span class="op-ex">one true</span></div>
-      <div class="op-row"><span class="op-sym">!</span><span class="op-name">NOT</span><span class="op-ex">reverses</span></div>
-      <div class="op-row"><span class="op-sym">+=</span><span class="op-name">Add & assign</span><span class="op-ex">x+=5</span></div>
-      <div class="op-row"><span class="op-sym">++</span><span class="op-name">Increment</span><span class="op-ex">x++</span></div>
-    </div>
-  </div>
-</section>
-
-<!-- IF / ELSE -->
-<section id="control" class="section reveal">
-  <div class="section-label">Chapter 5</div>
-  <h2 class="section-title">Control Statements <span class="accent">(If / Else)</span></h2>
-  <p class="section-desc">Control statements let your program make decisions — run different code depending on sensor readings, button presses, or any condition.</p>
-  <div class="two-col">
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">If / Else If / Else</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="cm">// Simple if</span>
-<span class="st">int</span> temperature = <span class="nm">25</span>;
-<span class="kw">if</span> (temperature > <span class="nm">20</span>) {
-  Serial.<span class="fn">println</span>(<span class="st">"It's warm!"</span>);
-}
-
-<span class="cm">// If-else</span>
-<span class="st">int</span> lightLevel = <span class="nm">30</span>;
-<span class="kw">if</span> (lightLevel > <span class="nm">100</span>) {
-  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, HIGH);
-} <span class="kw">else</span> {
-  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, LOW);
-}
-
-<span class="cm">// Ladder — check multiple conditions</span>
-<span class="st">int</span> score = <span class="nm">85</span>;
-<span class="kw">if</span> (score >= <span class="nm">90</span>) {
-  Serial.<span class="fn">println</span>(<span class="st">"A - Excellent!"</span>);
-} <span class="kw">else if</span> (score >= <span class="nm">80</span>) {
-  Serial.<span class="fn">println</span>(<span class="st">"B - Good!"</span>);
-} <span class="kw">else</span> {
-  Serial.<span class="fn">println</span>(<span class="st">"F - Fail"</span>);
-}</pre>
-      </div>
-    </div>
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">Switch Statement</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="cm">// Cleaner for multiple values</span>
-<span class="st">int</span> buttonPressed = <span class="nm">2</span>;
-<span class="kw">switch</span> (buttonPressed) {
-  <span class="kw">case</span> <span class="nm">1</span>:
-    Serial.<span class="fn">println</span>(<span class="st">"Button 1"</span>);
-    <span class="kw">break</span>; <span class="cm">// prevents fall-through</span>
-  <span class="kw">case</span> <span class="nm">2</span>:
-    Serial.<span class="fn">println</span>(<span class="st">"Button 2"</span>);
-    <span class="kw">break</span>;
-  <span class="kw">default</span>:
-    Serial.<span class="fn">println</span>(<span class="st">"Unknown"</span>);
-}</pre>
-      </div>
-      <div class="warn-box"><div class="tip-icon">⚠️</div><div class="tip-text"><strong>Always add break!</strong> Without break, execution "falls through" to the next case — a very common bug. The default case runs if no case matches.</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- LOOPS -->
-<section id="loops" class="section reveal">
-  <div class="section-label">Chapter 6</div>
-  <h2 class="section-title"><span class="accent">Loops</span></h2>
-  <p class="section-desc">Loops repeat a block of code. They save you from copy-pasting the same instruction many times.</p>
-  <div class="two-col">
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">For Loop — specific count</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="cm">// Blink LED 5 times</span>
-<span class="kw">for</span> (<span class="st">int</span> blink = <span class="nm">0</span>; blink &lt; <span class="nm">5</span>; blink++) {
-  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, HIGH);
-  <span class="fn">delay</span>(<span class="nm">500</span>);
-  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, LOW);
-  <span class="fn">delay</span>(<span class="nm">500</span>);
-}
-
-<span class="cm">// Fade LED up (PWM)</span>
-<span class="kw">for</span> (<span class="st">int</span> b = <span class="nm">0</span>; b &lt;= <span class="nm">255</span>; b++) {
-  <span class="fn">analogWrite</span>(<span class="nm">9</span>, b);
-  <span class="fn">delay</span>(<span class="nm">8</span>);
-}</pre>
-      </div>
-    </div>
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">While & Do-While</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="cm">// While — check BEFORE running</span>
-<span class="st">int</span> count = <span class="nm">0</span>;
-<span class="kw">while</span> (count &lt; <span class="nm">5</span>) {
-  Serial.<span class="fn">println</span>(count);
-  count++; <span class="cm">// MUST change to exit loop!</span>
-}
-
-<span class="cm">// Break & Continue</span>
-<span class="kw">for</span> (<span class="st">int</span> i = <span class="nm">0</span>; i &lt; <span class="nm">10</span>; i++) {
-  <span class="kw">if</span> (i == <span class="nm">5</span>) <span class="kw">break</span>;    <span class="cm">// exit</span>
-  <span class="kw">if</span> (i == <span class="nm">3</span>) <span class="kw">continue</span>; <span class="cm">// skip</span>
-  Serial.<span class="fn">println</span>(i);
-}</pre>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FUNCTIONS -->
-<section id="functions" class="section reveal">
-  <div class="section-label">Chapter 7</div>
-  <h2 class="section-title">Functions — <span class="accent">Reusable Code</span></h2>
-  <p class="section-desc">Functions let you wrap a block of code with a name and call it whenever you need it. They make programs shorter, cleaner, and easier to debug.</p>
-  <div class="two-col">
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">Defining & Calling Functions</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="cm">// No return value (void)</span>
-<span class="kw">void</span> <span class="fn">blinkLED</span>() {
-  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, HIGH);
-  <span class="fn">delay</span>(<span class="nm">500</span>);
-  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, LOW);
-  <span class="fn">delay</span>(<span class="nm">500</span>);
-}
-
-<span class="cm">// With parameters</span>
-<span class="kw">void</span> <span class="fn">blinkTimes</span>(<span class="st">int</span> pin, <span class="st">int</span> times) {
-  <span class="kw">for</span> (<span class="st">int</span> i = <span class="nm">0</span>; i &lt; times; i++) {
-    <span class="fn">digitalWrite</span>(pin, HIGH); <span class="fn">delay</span>(<span class="nm">200</span>);
-    <span class="fn">digitalWrite</span>(pin, LOW);  <span class="fn">delay</span>(<span class="nm">200</span>);
-  }
-}
-
-<span class="cm">// Returns a value</span>
-<span class="st">int</span> <span class="fn">add</span>(<span class="st">int</span> a, <span class="st">int</span> b) {
-  <span class="kw">return</span> a + b;
-}
-
-<span class="kw">void</span> <span class="fn">loop</span>() {
-  <span class="fn">blinkLED</span>();          <span class="cm">// call it</span>
-  <span class="fn">blinkTimes</span>(<span class="nm">13</span>, <span class="nm">3</span>);  <span class="cm">// 3 blinks</span>
-  <span class="st">int</span> sum = <span class="fn">add</span>(<span class="nm">5</span>, <span class="nm">3</span>); <span class="cm">// sum = 8</span>
-}</pre>
-      </div>
-    </div>
-    <div>
-      <div class="info-card" style="margin-bottom:14px;"><span class="info-card-icon">📦</span><div class="info-card-title">Why Use Functions?</div><div class="info-card-text">Instead of writing the same 5 lines 10 times, write one function and call it 10 times. If you find a bug, fix it in one place. Functions make code modular, readable, and testable.</div></div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">Arrays — Lists of Values</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="cm">// Declare an array</span>
-<span class="st">int</span> pins[] = {<span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">6</span>};
-
-<span class="cm">// Access by index (starts at 0)</span>
-Serial.<span class="fn">println</span>(pins[<span class="nm">0</span>]); <span class="cm">// 2</span>
-
-<span class="cm">// Loop through all pins</span>
-<span class="kw">for</span> (<span class="st">int</span> i = <span class="nm">0</span>; i &lt; <span class="nm">5</span>; i++) {
-  <span class="fn">pinMode</span>(pins[i], OUTPUT);
-}</pre>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- DIGITAL & ANALOG I/O -->
-<section id="io" class="section reveal">
-  <div class="section-label">Chapter 10 & 11</div>
-  <h2 class="section-title">Digital & Analog <span class="accent">I/O</span></h2>
-  <p class="section-desc">These four functions are the most important in all of Arduino. They are how your code talks to the physical world.</p>
-  <div class="two-col">
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">Digital I/O — On / Off</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="cm">// Set up a pin first</span>
-<span class="fn">pinMode</span>(<span class="nm">13</span>, OUTPUT); <span class="cm">// LED pin</span>
-<span class="fn">pinMode</span>(<span class="nm">2</span>,  INPUT_PULLUP); <span class="cm">// Button</span>
-
-<span class="cm">// digitalWrite — turn HIGH (on) or LOW (off)</span>
-<span class="fn">digitalWrite</span>(<span class="nm">13</span>, HIGH); <span class="cm">// LED ON</span>
-<span class="fn">digitalWrite</span>(<span class="nm">13</span>, LOW);  <span class="cm">// LED OFF</span>
-
-<span class="cm">// digitalRead — check HIGH or LOW</span>
-<span class="st">int</span> buttonState = <span class="fn">digitalRead</span>(<span class="nm">2</span>);
-<span class="kw">if</span> (buttonState == LOW) {
-  Serial.<span class="fn">println</span>(<span class="st">"Button pressed!"</span>);
-}</pre>
-      </div>
-    </div>
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">Analog I/O — Variable Values</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="cm">// analogRead — returns 0 to 1023</span>
-<span class="st">int</span> light = <span class="fn">analogRead</span>(A0);
-<span class="kw">if</span> (light > <span class="nm">500</span>) Serial.<span class="fn">println</span>(<span class="st">"Bright"</span>);
-
-<span class="cm">// analogWrite — PWM, 0 to 255</span>
-<span class="cm">// Only on pins: 3, 5, 6, 9, 10, 11</span>
-<span class="fn">analogWrite</span>(<span class="nm">9</span>, <span class="nm">128</span>);  <span class="cm">// 50% brightness</span>
-<span class="fn">analogWrite</span>(<span class="nm">9</span>, <span class="nm">255</span>);  <span class="cm">// Full brightness</span>
-
-<span class="cm">// map() converts between ranges</span>
-<span class="st">int</span> val = <span class="fn">analogRead</span>(A0);      <span class="cm">// 0-1023</span>
-<span class="st">int</span> pwm = <span class="fn">map</span>(val,<span class="nm">0</span>,<span class="nm">1023</span>,<span class="nm">0</span>,<span class="nm">255</span>); <span class="cm">// 0-255</span>
-<span class="fn">analogWrite</span>(<span class="nm">9</span>, pwm);</pre>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- TIME -->
-<section id="time" class="section reveal">
-  <div class="section-label">Chapter 12</div>
-  <h2 class="section-title">Time Functions — <span class="accent">delay & millis</span></h2>
-  <p class="section-desc">Timing is essential in hardware projects. delay() is simple but blocks everything. millis() is non-blocking — the professional way to time events.</p>
-  <div class="two-col">
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">delay() — Simple but Blocking</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="kw">void</span> <span class="fn">loop</span>() {
-  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, HIGH);
-  <span class="fn">delay</span>(<span class="nm">500</span>);  <span class="cm">// Wait 0.5 seconds</span>
-  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, LOW);
-  <span class="fn">delay</span>(<span class="nm">500</span>);
-  <span class="cm">// During delay, nothing else runs!</span>
-}</pre>
-      </div>
-    </div>
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">millis() — Non-Blocking Timing</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="st">unsigned long</span> lastBlink = <span class="nm">0</span>;
-
-<span class="kw">void</span> <span class="fn">loop</span>() {
-  <span class="kw">if</span> (<span class="fn">millis</span>() - lastBlink >= <span class="nm">500</span>) {
-    <span class="fn">digitalWrite</span>(<span class="nm">13</span>, !<span class="fn">digitalRead</span>(<span class="nm">13</span>));
-    lastBlink = <span class="fn">millis</span>();
-  }
-  <span class="cm">// Other code runs here FREELY</span>
-}</pre>
-      </div>
-    </div>
-  </div>
-  <div class="tip-box reveal"><div class="tip-icon">⚡</div><div class="tip-text"><strong>Use millis() for real projects.</strong> delay() freezes your whole program — buttons won't respond, sensors won't read. millis() lets you time events while other code keeps running smoothly.</div></div>
-</section>
-
-<!-- SERIAL -->
-<section id="serial" class="section reveal">
-  <div class="section-label">Chapter 13</div>
-  <h2 class="section-title">Serial <span class="accent">Communication</span></h2>
-  <p class="section-desc">Serial lets Arduino send messages to your computer through USB. It's your most powerful debugging tool — see exactly what values your sensors are reading in real time.</p>
-  <div class="two-col">
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">Serial Monitor — Send & Receive</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="kw">void</span> <span class="fn">setup</span>() {
-  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>); <span class="cm">// Start at 9600 baud</span>
-}
-
-<span class="kw">void</span> <span class="fn">loop</span>() {
-  Serial.<span class="fn">print</span>(<span class="st">"Value: "</span>);
-  Serial.<span class="fn">println</span>(<span class="nm">42</span>);
-
-  <span class="st">int</span> sensor = <span class="fn">analogRead</span>(A0);
-  Serial.<span class="fn">print</span>(<span class="st">"Sensor: "</span>);
-  Serial.<span class="fn">println</span>(sensor);
-
-  <span class="cm">// Read typed input from monitor</span>
-  <span class="kw">if</span> (Serial.<span class="fn">available</span>()) {
-    <span class="st">char</span> c = Serial.<span class="fn">read</span>();
-    <span class="kw">if</span> (c == <span class="st">'1'</span>) <span class="fn">digitalWrite</span>(<span class="nm">13</span>, HIGH);
-    <span class="kw">if</span> (c == <span class="st">'0'</span>) <span class="fn">digitalWrite</span>(<span class="nm">13</span>, LOW);
-  }
-  <span class="fn">delay</span>(<span class="nm">1000</span>);
-}</pre>
-      </div>
-    </div>
-    <div>
-      <table class="data-table">
-        <thead><tr><th>Function</th><th>What it does</th></tr></thead>
-        <tbody>
-          <tr><td>Serial.begin(9600)</td><td>Start serial at 9600 baud speed</td></tr>
-          <tr><td>Serial.print(val)</td><td>Send text/number (no newline)</td></tr>
-          <tr><td>Serial.println(val)</td><td>Send text/number (with newline)</td></tr>
-          <tr><td>Serial.read()</td><td>Read one character from input</td></tr>
-          <tr><td>Serial.available()</td><td>Check if data is waiting to be read</td></tr>
-          <tr><td>Serial.write(byte)</td><td>Send a raw byte value</td></tr>
-        </tbody>
-      </table>
-      <div class="tip-box" style="margin-top:16px;"><div class="tip-icon">🔍</div><div class="tip-text"><strong>Open Serial Monitor:</strong> Tools → Serial Monitor (Ctrl+Shift+M). Make sure the baud rate matches your Serial.begin() value — 9600 is standard.</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- LIBRARIES -->
-<section id="libraries" class="section reveal">
-  <div class="section-label">Chapter 14</div>
-  <h2 class="section-title">Libraries — <span class="accent">Pre-Written Code</span></h2>
-  <p class="section-desc">Libraries are packages of functions someone else wrote. Instead of programming a sensor from scratch, you include one line and get 20 useful functions instantly.</p>
-  <div class="two-col">
-    <div>
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">Using a Library</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre class="code-pre"><span class="cm">// 1. Include at the top of your sketch</span>
-<span class="kw">#include</span> &lt;<span class="st">Servo.h</span>&gt;
-
-<span class="cm">// 2. Create an object</span>
-Servo myServo;
-
-<span class="kw">void</span> <span class="fn">setup</span>() {
-  myServo.<span class="fn">attach</span>(<span class="nm">9</span>); <span class="cm">// pin 9</span>
-}
-
-<span class="kw">void</span> <span class="fn">loop</span>() {
-  myServo.<span class="fn">write</span>(<span class="nm">0</span>);   <span class="fn">delay</span>(<span class="nm">1000</span>);
-  myServo.<span class="fn">write</span>(<span class="nm">90</span>);  <span class="fn">delay</span>(<span class="nm">1000</span>);
-  myServo.<span class="fn">write</span>(<span class="nm">180</span>); <span class="fn">delay</span>(<span class="nm">1000</span>);
-}</pre>
-      </div>
-    </div>
-    <div>
-      <div class="steps">
-        <div class="step-row"><div class="step-num">①</div><div><div class="step-title">Open Library Manager</div><div class="step-text">Sketch → Include Library → Manage Libraries (or Ctrl+Shift+I)</div></div></div>
-        <div class="step-row"><div class="step-num">②</div><div><div class="step-title">Search & Install</div><div class="step-text">Type the library name (e.g. "DHT sensor library"), click Install. Downloads and adds to IDE automatically.</div></div></div>
-        <div class="step-row"><div class="step-num">③</div><div><div class="step-title">Include & Use</div><div class="step-text">Add #include &lt;LibraryName.h&gt; at the top. Now all the library's functions are available.</div></div></div>
-      </div>
-      <table class="data-table" style="margin-top:18px;">
-        <thead><tr><th>Library</th><th>What it controls</th></tr></thead>
-        <tbody>
-          <tr><td>Servo.h</td><td>Servo motor position</td></tr>
-          <tr><td>DHT.h</td><td>Temperature & humidity sensors</td></tr>
-          <tr><td>LiquidCrystal.h</td><td>LCD displays</td></tr>
-          <tr><td>Wire.h</td><td>I2C sensors & modules</td></tr>
-          <tr><td>SPI.h</td><td>SPI communication protocol</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<!-- DEBUGGING -->
-<section id="debug" class="section reveal">
-  <div class="section-label">Chapter 15</div>
-  <h2 class="section-title"><span class="accent">Debugging</span> Tips</h2>
-  <p class="section-desc">Bugs happen to every programmer. Here's how to find and fix them quickly.</p>
-  <div class="three-col reveal">
-    <div class="info-card"><span class="info-card-icon">❌</span><div class="info-card-title">Syntax Error</div><div class="info-card-text">Missing semicolon, bracket, or typo. Code won't compile. The error message shows the line number — go there and look for what's missing.</div></div>
-    <div class="info-card"><span class="info-card-icon">🔢</span><div class="info-card-title">Variable Not Declared</div><div class="info-card-text">Used a variable without declaring its type first. Add the type (int, float, bool…) before the first use. Check spelling — C++ is case-sensitive.</div></div>
-    <div class="info-card"><span class="info-card-icon">🤔</span><div class="info-card-title">Logic Error</div><div class="info-card-text">Code compiles and uploads but does the wrong thing. Use Serial.println() to print variable values and trace where things go wrong.</div></div>
-  </div>
-  <div class="code-block reveal" style="margin-top:24px;">
-    <div class="code-header"><span class="code-lang">Debugging with Serial.println()</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-    <pre class="code-pre"><span class="kw">void</span> <span class="fn">loop</span>() {
-  Serial.<span class="fn">println</span>(<span class="st">"--- Loop start ---"</span>);
-
-  <span class="st">int</span> value = <span class="fn">analogRead</span>(A0);
-  Serial.<span class="fn">print</span>(<span class="st">"Sensor: "</span>); Serial.<span class="fn">println</span>(value);
-
-  <span class="kw">if</span> (value > <span class="nm">500</span>) {
-    Serial.<span class="fn">println</span>(<span class="st">"Triggered!"</span>);
-    <span class="fn">digitalWrite</span>(<span class="nm">13</span>, HIGH);
-  } <span class="kw">else</span> {
-    <span class="fn">digitalWrite</span>(<span class="nm">13</span>, LOW);
-  }
-  <span class="fn">delay</span>(<span class="nm">500</span>); <span class="cm">// Slow down to read output</span>
-}</pre>
-  </div>
-</section>
-
-<!-- CHEAT SHEET -->
-<section id="cheatsheet" class="section reveal">
-  <div class="section-label">Quick Reference</div>
-  <h2 class="section-title">C++ <span class="accent">Cheat Sheet</span></h2>
-  <p class="section-desc">The most important functions and syntax at a glance. Bookmark this page.</p>
-  <div class="cheat-grid reveal">
-    <div class="cheat-card"><div class="cheat-header">Basic Structure</div><div class="cheat-body"><pre><span style="color:#ff7b72;">void</span> <span style="color:#d2a8ff;">setup</span>() { }  <span style="color:#8b949e;">// runs once</span>
-<span style="color:#ff7b72;">void</span> <span style="color:#d2a8ff;">loop</span>() { }   <span style="color:#8b949e;">// runs forever</span></pre></div></div>
-    <div class="cheat-card"><div class="cheat-header">Digital I/O</div><div class="cheat-body"><pre><span style="color:#d2a8ff;">pinMode</span>(pin, OUTPUT);
-<span style="color:#d2a8ff;">digitalWrite</span>(pin, HIGH);
-<span style="color:#d2a8ff;">digitalRead</span>(pin); <span style="color:#8b949e;">// HIGH/LOW</span></pre></div></div>
-    <div class="cheat-card"><div class="cheat-header">Analog I/O</div><div class="cheat-body"><pre><span style="color:#d2a8ff;">analogRead</span>(A0);      <span style="color:#8b949e;">// 0-1023</span>
-<span style="color:#d2a8ff;">analogWrite</span>(pin,val); <span style="color:#8b949e;">// 0-255 PWM</span>
-<span style="color:#d2a8ff;">map</span>(val, 0,1023, 0,255);</pre></div></div>
-    <div class="cheat-card"><div class="cheat-header">Time</div><div class="cheat-body"><pre><span style="color:#d2a8ff;">delay</span>(<span style="color:#79c0ff;">1000</span>);     <span style="color:#8b949e;">// 1 second</span>
-<span style="color:#d2a8ff;">millis</span>();         <span style="color:#8b949e;">// ms since start</span>
-<span style="color:#d2a8ff;">micros</span>();         <span style="color:#8b949e;">// microseconds</span></pre></div></div>
-    <div class="cheat-card"><div class="cheat-header">Control Flow</div><div class="cheat-body"><pre><span style="color:#ff7b72;">if</span> (x > <span style="color:#79c0ff;">10</span>) { }
-<span style="color:#ff7b72;">else if</span> (x > <span style="color:#79c0ff;">5</span>) { }
-<span style="color:#ff7b72;">for</span> (<span style="color:#a5d6ff;">int</span> i=<span style="color:#79c0ff;">0</span>; i&lt;<span style="color:#79c0ff;">10</span>; i++) { }
-<span style="color:#ff7b72;">while</span> (condition) { }</pre></div></div>
-    <div class="cheat-card"><div class="cheat-header">Serial Monitor</div><div class="cheat-body"><pre>Serial.<span style="color:#d2a8ff;">begin</span>(<span style="color:#79c0ff;">9600</span>);
-Serial.<span style="color:#d2a8ff;">println</span>(value);
-Serial.<span style="color:#d2a8ff;">print</span>(<span style="color:#a5d6ff;">"text"</span>);
-Serial.<span style="color:#d2a8ff;">read</span>();</pre></div></div>
-  </div>
-</section>
-
-</main>
-
-<!-- BOTTOM CTA -->
-<div class="bottom-cta">
-  <div class="bottom-cta-content">
-    <div class="bottom-cta-label">Ready to Build?</div>
-    <h2 class="bottom-cta-title">Go to Projects</h2>
-    <p class="bottom-cta-desc">You now know how Arduino C++ works. Time to put it all together and build real projects — LED circuits, sensors, robots, and more.</p>
-    <div class="btn-cta-row">
-      <a href="projects_3d.html" class="btn-cta">Go to Projects →</a>
-      <a href="https://www.arduino.cc/en/software" target="_blank" class="btn-cta-sec">⬇️ Download IDE</a>
-    </div>
-  </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* CURSOR GLOW */
 document.addEventListener('mousemove', e => {
@@ -887,213 +212,21 @@ document.addEventListener('mousemove', e => {
   addEventListener('resize',resize); resize(); loop();
 })();
 
-/* HERO 3D — floating code tokens + terminal window */
-(function(){
-  const canvas = document.getElementById('hero-canvas');
-  const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 100);
-  camera.position.set(0, 0, 16);
-
-  // Lighting — purple & teal theme
-  scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-  const l1 = new THREE.PointLight(0xab47bc, 3.5, 30); l1.position.set(8, 6, 6); scene.add(l1);
-  const l2 = new THREE.PointLight(0x00979d, 2, 25);   l2.position.set(-7, -4, 5); scene.add(l2);
-  const l3 = new THREE.PointLight(0xff7b72, 1.5, 20); l3.position.set(0, -8, 3); scene.add(l3);
-
-  // Central "terminal" window — flat panel
-  const panelGroup = new THREE.Group();
-  scene.add(panelGroup);
-
-  // Panel body
-  const panelGeo = new THREE.BoxGeometry(6.5, 4.5, 0.1);
-  const panelMat = new THREE.MeshPhongMaterial({color: 0x0d1117, shininess:40, specular:0x333333});
-  panelGroup.add(new THREE.Mesh(panelGeo, panelMat));
-
-  // Title bar
-  const barGeo = new THREE.BoxGeometry(6.5, 0.45, 0.12);
-  const barMat = new THREE.MeshPhongMaterial({color: 0x161b22});
-  const bar = new THREE.Mesh(barGeo, barMat);
-  bar.position.set(0, 2.02, 0.01);
-  panelGroup.add(bar);
-
-  // Traffic-light dots on title bar
-  const dotColors = [0xff5f57, 0xfebc2e, 0x28c840];
-  dotColors.forEach((col, i) => {
-    const dg = new THREE.CircleGeometry(0.1, 16);
-    const dm = new THREE.MeshPhongMaterial({color: col, emissive: col, emissiveIntensity:0.6});
-    const d = new THREE.Mesh(dg, dm);
-    d.position.set(-2.8 + i * 0.28, 2.02, 0.07);
-    panelGroup.add(d);
-  });
-
-  // Code lines (flat colored bars representing syntax)
-  const lineData = [
-    {col: 0xff7b72, x:-1.8, y:1.5, w:1.2},   // keyword
-    {col: 0xd2a8ff, x:-0.3, y:1.5, w:1.8},   // function
-    {col: 0xffffff, x:1.7,  y:1.5, w:0.6},   // paren
-    {col: 0x8b949e, x:-2.8, y:0.9, w:3.2},   // comment
-    {col: 0xff7b72, x:-2.8, y:0.3, w:1.0},   // keyword
-    {col: 0xd2a8ff, x:-1.5, y:0.3, w:1.6},   // fn
-    {col: 0x79c0ff, x:0.3,  y:0.3, w:0.9},   // number
-    {col: 0xffffff, x:1.4,  y:0.3, w:0.6},
-    {col: 0xa5d6ff, x:-2.8, y:-0.3, w:0.7},  // string
-    {col: 0x00979d, x:-1.8, y:-0.3, w:2.4},
-    {col: 0x79c0ff, x:0.9,  y:-0.3, w:1.2},
-    {col: 0xff7b72, x:-2.8, y:-0.9, w:0.8},
-    {col: 0xd2a8ff, x:-1.7, y:-0.9, w:1.4},
-    {col: 0x8b949e, x:0.0,  y:-0.9, w:2.0},
-    {col: 0xffffff, x:-2.8, y:-1.5, w:0.3},
-  ];
-  lineData.forEach(l => {
-    const geo = new THREE.BoxGeometry(l.w, 0.18, 0.05);
-    const mat = new THREE.MeshPhongMaterial({color: l.col, emissive: l.col, emissiveIntensity: 0.2});
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set(l.x + l.w/2 - 2.8, l.y, 0.1);
-    panelGroup.add(mesh);
-  });
-
-  // Border glow ring around panel
-  const borderGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(6.6, 4.6, 0.15));
-  const borderMat = new THREE.LineBasicMaterial({color: 0xab47bc, opacity: 0.5, transparent: true});
-  panelGroup.add(new THREE.LineSegments(borderGeo, borderMat));
-
-  panelGroup.position.set(9, 0, 0);
-
-  // Floating syntax token spheres
-  const tokenDefs = [
-    {sym:'{}', color:0xd2a8ff, pos:[5, 3, 0]},
-    {sym:'()', color:0x79c0ff, pos:[6,-3, 1]},
-    {sym:';',  color:0xff7b72, pos:[3, 0,-1]},
-    {sym:'++', color:0x00979d, pos:[2,  4,-1]},
-    {sym:'[]', color:0xffa726, pos:[-1, 1.5, 0.5]},
-    {sym:'!=', color:0xce93d8, pos:[0, -1.5, -0.5]},
-  ];
-  const tokens = tokenDefs.map((t, i) => {
-    const group = new THREE.Group();
-    // Small cube with emissive color
-    const geo = new THREE.BoxGeometry(0.7, 0.7, 0.25);
-    const mat = new THREE.MeshPhongMaterial({color: t.color, emissive: t.color, emissiveIntensity:0.5, shininess:80});
-    group.add(new THREE.Mesh(geo, mat));
-    // Glow sphere behind
-    const sGeo = new THREE.SphereGeometry(0.9, 12, 12);
-    const sMat = new THREE.MeshPhongMaterial({color: t.color, opacity:0.12, transparent:true});
-    group.add(new THREE.Mesh(sGeo, sMat));
-
-    group.position.set(...t.pos);
-    group.rotation.set(Math.random()*.3, Math.random()*.4, Math.random()*.2);
-    scene.add(group);
-    return {group, basePos:[...t.pos], speed: .25 + Math.random()*.4, offset:(i/tokenDefs.length)*Math.PI*2};
-  });
-
-  // Floating binary digits ribbon
-  const digitGroup = new THREE.Group();
-  scene.add(digitGroup);
-  for(let i = 0; i < 20; i++){
-    const dg = new THREE.BoxGeometry(0.12, 0.35, 0.08);
-    const dm = new THREE.MeshPhongMaterial({color: Math.random()>.5 ? 0x00979d : 0xab47bc, opacity:.4, transparent:true});
-    const d = new THREE.Mesh(dg, dm);
-    d.position.set(-2 + i*0.7, (Math.random()-.5)*8, -3);
-    digitGroup.add(d);
-  }
-
-  let mx = 0, my = 0;
-  document.addEventListener('mousemove', e => {
-    mx = (e.clientX/innerWidth - .5)*2;
-    my = -(e.clientY/innerHeight - .5)*2;
-  });
-
-  function resize(){
-    renderer.setSize(innerWidth, innerHeight);
-    camera.aspect = innerWidth/innerHeight;
-    camera.updateProjectionMatrix();
-  }
-
-  // Cursor blink on panel
-  let blinkT = 0;
-  const cursorGeo = new THREE.BoxGeometry(0.12, 0.2, 0.06);
-  const cursorMat = new THREE.MeshPhongMaterial({color:0x00979d, emissive:0x00979d, emissiveIntensity:1});
-  const cursor = new THREE.Mesh(cursorGeo, cursorMat);
-  cursor.position.set(-0.5, 0.3, 0.12);
-  panelGroup.add(cursor);
-
-  let t = 0;
-  function animate(){
-    requestAnimationFrame(animate);
-    t += 0.012;
-    blinkT += 0.06;
-
-    // Panel gentle sway
-    panelGroup.rotation.y += (mx * 0.25 - panelGroup.rotation.y) * 0.04;
-    panelGroup.rotation.x += (-my * 0.15 - panelGroup.rotation.x) * 0.04;
-    panelGroup.position.y = Math.sin(t * 0.4) * 0.12;
-
-    // Cursor blink
-    cursor.visible = Math.sin(blinkT) > 0;
-
-    // Token animations
-    tokens.forEach(tok => {
-      tok.group.position.y = tok.basePos[1] + Math.sin(t * tok.speed + tok.offset) * 0.4;
-      tok.group.position.x = tok.basePos[0] + Math.cos(t * tok.speed * 0.6 + tok.offset) * 0.15;
-      tok.group.rotation.y += 0.015;
-      tok.group.rotation.z = Math.sin(t * tok.speed * 0.4 + tok.offset) * 0.1;
-    });
-
-    // Binary ribbon slow drift
-    digitGroup.position.x = Math.sin(t * 0.15) * 0.3;
-
-    camera.position.x += (mx * 1 - camera.position.x) * 0.03;
-    camera.position.y += (my * 0.8 - camera.position.y) * 0.03;
-    camera.lookAt(0, 0, 0);
-
-    renderer.render(scene, camera);
-  }
-
-  resize(); addEventListener('resize', resize); animate();
-})();
-
-/* COPY CODE */
-function copyCode(btn) {
-  const pre = btn.closest('.code-block').querySelector('pre');
-  navigator.clipboard.writeText(pre.innerText).then(() => {
-    btn.textContent = '✓ Copied!';
-    setTimeout(() => { btn.textContent = 'Copy'; }, 1800);
-  });
-}
-
-/* SCROLL REVEAL */
-function navSearch(q) {
-  q = q.toLowerCase().trim();
-  if (!q) return;
-  // Map keywords to pages
-  const routes = [
-    { keywords: ['led','resistor','buzzer','sensor','servo','motor','lcd','oled','rfid','bluetooth','relay','ultrasonic','component'], page: 'components.html' },
-    { keywords: ['mblock','block','scratch','drag','beginner'], page: 'mblock.html' },
-    { keywords: ['c++','cpp','code','variable','loop','function','serial'], page: 'cpp.html' },
-    { keywords: ['project','light','piano','switch','reaction','blink'], page: 'projects.html' },
-  ];
-  for (const route of routes) {
-    if (route.keywords.some(k => q.includes(k))) {
-      window.location.href = route.page + '?search=' + encodeURIComponent(q);
-      return;
-    }
-  }
-}
-
-document.addEventListener('click',()=>document.getElementById('accountDropdown')?.classList.remove('open'));
-
-
-const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.08});
-document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+/* ACCOUNT DROPDOWN */
+document.querySelector('[data-acc-toggle]').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('accountDropdown').classList.toggle('open');
+});
+document.addEventListener('click', () => {
+  document.getElementById('accountDropdown').classList.remove('open');
+});
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-if(!firebase.apps.length){
+if (!firebase.apps.length) {
   firebase.initializeApp({
     apiKey:'AIzaSyD6kfvr-6qVSWMwWgp9PfKnGNT3u5K-4zk',
     authDomain:'learn-arduino-with-ace.firebaseapp.com',
@@ -1103,39 +236,28 @@ if(!firebase.apps.length){
     appId:'1:100033192953:web:c331698eea56c1a34c5328'
   });
 }
-const auth=firebase.auth();
-const db=firebase.firestore();
+const auth = firebase.auth();
+const db   = firebase.firestore();
 
-auth.onAuthStateChanged(async(user)=>{
-  if(!user){window.location.replace('index.html');return;}
-  const snap=await db.collection('users').doc(user.uid).get();
-  if(!snap.exists){window.location.replace('index.html');return;}
-  const p=snap.data();
-
-  // Populate nav
-  const l=(p.displayName||p.username||'?').charAt(0).toUpperCase();
-  document.getElementById('navAccAv').textContent=l;
-  document.getElementById('navAccBigAv').textContent=l;
-  document.getElementById('navAccName').textContent=p.displayName||p.username||'Account';
-  document.getElementById('navAccNameFull').textContent=p.displayName||p.username||'';
-  document.getElementById('navAccEmail').textContent=p.email||'';
-  const pct=p.avg_progress||0, cnt=p.lessons_completed||0;
-  document.getElementById('navProgressPct').textContent=pct+'%';
-  document.getElementById('navProgressFill').style.width=pct+'%';
-  document.getElementById('navProgressCount').textContent=cnt+' / 50 lessons';
+auth.onAuthStateChanged(async (user) => {
+  if (!user) { window.location.replace('index.html'); return; }
+  const snap = await db.collection('users').doc(user.uid).get();
+  if (!snap.exists) { window.location.replace('index.html'); return; }
+  const p = snap.data();
+  const l = (p.displayName || p.username || '?').charAt(0).toUpperCase();
+  document.getElementById('navAccAv').textContent = l;
+  document.getElementById('navAccBigAv').textContent = l;
+  document.getElementById('navAccName').textContent = p.displayName || p.username || 'Account';
+  document.getElementById('navAccNameFull').textContent = p.displayName || p.username || '';
+  document.getElementById('navAccEmail').textContent = p.email || '';
+  const pct = p.avg_progress || 0, cnt = p.lessons_completed || 0;
+  document.getElementById('navProgressPct').textContent = pct + '%';
+  document.getElementById('navProgressFill').style.width = pct + '%';
+  document.getElementById('navProgressCount').textContent = cnt + ' / 50 lessons';
 });
 
-// Dropdown toggle
-document.querySelector('[data-acc-toggle]').addEventListener('click',e=>{
-  e.stopPropagation();
-  document.getElementById('accountDropdown').classList.toggle('open');
-});
-document.addEventListener('click',()=>{
-  document.getElementById('accountDropdown').classList.remove('open');
-});
-
-async function handleLogout(){
-  if(!confirm('Log out?'))return;
+async function handleLogout() {
+  if (!confirm('Log out?')) return;
   await auth.signOut();
   window.location.replace('index.html');
 }
