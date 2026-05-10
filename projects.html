@@ -6,6 +6,12 @@
 <title>Arduino Projects — Logo 3D</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="responsive.css">
+
+<!-- ✅ FIX 1: Firebase SDK (compat) — must load BEFORE the firebase init script -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -44,9 +50,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:grid;gri
 .back-btn svg{width:13px;}
 
 .account-wrap{position:relative;}
-.nav-account{display:flex;align-items:center;gap:8px;background:var(--teal);color:#fff;border:none;padding:7px 16px 7px 9px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
-.nav-account:hover{background:var(--teal-dark);}
-.acc-av{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;}
 .account-dropdown{position:absolute;top:calc(100% + 10px);right:0;width:280px;background:#181c1e;border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .22s,transform .22s;z-index:300;}
 .account-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0);}
 .acc-header{background:linear-gradient(135deg,#00979d,#007a7f);padding:20px 18px;display:flex;align-items:center;gap:14px;}
@@ -64,9 +67,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:grid;gri
 .acc-divider{height:1px;background:var(--border);margin:4px 12px;}
 .acc-logout{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:#f28b82;transition:background .15s;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:4px;}
 .acc-logout:hover{background:rgba(242,139,130,0.08);}
-.back-btn{position:fixed;top:78px;left:36px;z-index:210;display:flex;align-items:center;gap:7px;background:rgba(5,7,8,0.88);border:1px solid var(--border);color:rgba(255,255,255,0.7);padding:7px 15px 7px 11px;border-radius:100px;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:none;backdrop-filter:blur(10px);transition:all .22s;}
-.back-btn:hover{background:var(--teal-light);border-color:var(--teal);color:#fff;transform:translateX(-2px);}
-.back-btn svg{width:13px;}
 
 /* HERO */
 .page-hero{min-height:100vh;display:flex;align-items:center;padding:120px 80px 80px;position:relative;overflow:hidden;}
@@ -163,6 +163,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:grid;gri
 .circuit-slot-icon img{width:990px;max-height:650px;border-radius:12px;}
 .circuit-slot-label{font-size:15px;color:var(--muted);line-height:1.5;}
 .circuit-slot-label code{display:block;font-family:'DM Mono',monospace;font-size:12px;color:rgba(0,151,157,0.7);margin-top:3px;}
+
 /* Sub-tabs */
 .sub-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
 .sub-tab{padding:7px 17px;border-radius:100px;border:1px solid var(--border);background:var(--faint);font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;}
@@ -180,8 +181,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:grid;gri
 .mblock-screenshot-icon{font-size:32px;}
 .mblock-screenshot-icon img{width:500px;min-height:500px;border-radius:12px;}
 
-
-
 /* Code blocks */
 .code-block{background:#0d1117;border:1px solid var(--border);border-radius:13px;overflow:hidden;margin-top:0;transition:box-shadow .25s;}
 .code-block:hover{box-shadow:0 0 0 1px rgba(0,151,157,0.3);}
@@ -192,6 +191,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:grid;gri
 .copy-btn:hover{background:var(--teal-light);border-color:var(--teal);color:var(--teal);}
 pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-size:13px;line-height:1.8;color:#c9d1d9;margin:0;scrollbar-width:thin;}
 .kw{color:#ff7b72;}.fn{color:#d2a8ff;}.cm{color:#8b949e;}.st{color:#a5d6ff;}.nm{color:#79c0ff;}
+
+/* ✅ FIX 2: Algorithm box styles (used in Projects 6–9 but were missing) */
+.algo-box{background:rgba(0,47,157,0.07);border:1px solid rgba(48,127,255,0.2);border-radius:16px;padding:22px 24px;margin-bottom:20px;}
+.algo-box-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
+.algo-box-icon{font-size:28px;flex-shrink:0;margin-top:2px;}
+.algo-box-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;}
+.algo-box-sub{font-size:12px;color:var(--muted);}
+.algo-steps{list-style:none;display:flex;flex-direction:column;gap:12px;padding:0;}
+.algo-steps li{display:flex;align-items:flex-start;gap:12px;font-size:13px;color:var(--muted);line-height:1.65;}
+.algo-step-num{width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-family:'DM Mono',monospace;}
+.algo-condition{display:inline-block;background:rgba(232,80,10,0.15);color:#ff8a65;border:1px solid rgba(232,80,10,0.3);border-radius:5px;padding:1px 7px;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;margin:0 2px;}
+.algo-code{display:inline-block;background:rgba(0,151,157,0.12);color:var(--teal);border-radius:5px;padding:1px 7px;font-size:12px;font-family:'DM Mono',monospace;margin:0 1px;}
 
 /* Quiz */
 .quiz-wrap{background:var(--dark);border:1px solid var(--border);border-radius:16px;padding:22px 26px;}
@@ -274,8 +285,7 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input placeholder="Search…" oninput="navSearch(this.value)">
     </div>
-    <!-- Account button + dropdown -->
-<div class="account-wrap">
+    <div class="account-wrap">
       <button class="nav-account" data-acc-toggle>
         <div class="acc-av" id="navAccAv">?</div>
         <span id="navAccName">Account</span>
@@ -300,7 +310,7 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
         </div>
       </div>
     </div>
-    </div>
+  </div>
 </nav>
 
 <a class="back-btn" href="arduino.html">
@@ -337,13 +347,15 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
     <a class="toc-proj-btn" href="#proj4">04 · 🎹 Electric Piano</a>
     <a class="toc-proj-btn" href="#proj5">05 · 🏁 Reaction Race</a>
     <div class="toc-section-hd">🔥 Intermediate</div>
-    <a class="toc-proj-btn" href="#intermediate">06 · 🌡️ Weather Station</a>
-    <a class="toc-proj-btn" href="#intermediate">07 · 🤖 Robot Car</a>
-    <a class="toc-proj-btn" href="#intermediate">08 · 🔒 Smart Lock</a>
+    <a class="toc-proj-btn" href="#proj6">06 · 🌻 Setting It Up</a>
+    <a class="toc-proj-btn" href="#proj7">07 · 🚨 Intruder!</a>
+    <a class="toc-proj-btn" href="#projPark">08 · 🅿️ Car Parking</a>
+    <a class="toc-proj-btn" href="#proj8">09 · 💨 Spin It!</a>
+    <a class="toc-proj-btn" href="#proj9">10 · 🚗 Arduino Car</a>
     <div class="toc-section-hd">🚀 Advanced</div>
-    <a class="toc-proj-btn" href="#advanced">09 · 📡 Bluetooth Control</a>
-    <a class="toc-proj-btn" href="#advanced">10 · 🌈 LED Matrix</a>
-    <a class="toc-proj-btn" href="#advanced">11 · 🏠 Smart Home</a>
+    <a class="toc-proj-btn" href="#advanced">10 · 📡 Bluetooth Control</a>
+    <a class="toc-proj-btn" href="#advanced">11 · 🌈 LED Matrix</a>
+    <a class="toc-proj-btn" href="#advanced">12 · 🏠 Smart Home</a>
   </aside>
 
   <!-- MAIN -->
@@ -371,7 +383,7 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
           </div>
           <div class="difficulty-row"><span class="diff-label">Difficulty</span><div class="diff-stars"><div class="diff-star on"></div><div class="diff-star"></div><div class="diff-star"></div><div class="diff-star"></div><div class="diff-star"></div></div></div>
         </div>
-        <div class="proj-chevron open">▾</div>
+        <div class="proj-chevron">▾</div>
       </div>
       <div class="proj-body open">
         <div class="proj-section">
@@ -659,33 +671,33 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
               <div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p3s01.png"></div></div><div class="circuit-slot-label">Series Switch — both buttons must be pressed (AND Gate)</div>
               <div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p3s02.png"></div></div><div class="circuit-slot-label">Parallel Switch — either button completes the circuit (OR Gate)</div>
             </div>
-            <p style="font-size:13px;color:var(--muted);margin-top:14px;line-height:1.7;"><strong style="color:#fff;">Series:</strong> both switches must be closed for current to flow — AND logic. <strong style="color:#fff;">Parallel:</strong> either switch can complete the circuit — OR logic. These are hardware-only circuits — no code needed.</p>
           </div>
           <div class="sub-panel" id="p3s1">
             <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p2s1.png"></div></div><div class="circuit-slot-label">Single Switch + LED (software triggers the Arduino via serial/mBlock broadcast)</div></div>
             <div class="code-compare">
-            <div><div class="code-col-label mblock">🧩 mBlock Sprite</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s1-mblock1.png"></div></div><p style="font-size:15px;color:var(--muted);margin-top:10px;">A sprite detects a keypress (e.g. Space) and broadcasts to the Arduino sprite, which sets pin 13 HIGH or LOW.</p></div>
-            <div><div class="code-col-label mblock">🧩 mBlock Device</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s1-mblock2.png"></div></div>
-          </div></div></div>
-
-          <div class="sub-panel" id="p3s2"><div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p2s1.png"></div></div><div class="circuit-slot-label">Same input switch circuit — press once to toggle LED on, press again to toggle off</div></div>
-          <div class="code-compare">
-            <div><div class="code-col-label mblock">🧩 mBlock Sprite</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s2-mblock.png"></div></div></div>
+            <div><div class="code-col-label mblock">🧩 mBlock Sprite</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s1-mblock1.png"></div></div></div>
             <div><div class="code-col-label mblock">🧩 mBlock Device</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s1-mblock2.png"></div></div></div>
-          </div></div>
-          
-          <div class="sub-panel" id="p3s3"><div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p3s3.png"></div></div><div class="circuit-slot-label">Input Switch with Pull-Down resistor on Pin 2</div></div>
-          <div class="code-compare">
-
-            <div><div class="code-col-label mblock">🧩 mBlock Device</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s3-mblock1.png"></div></div><p style="font-size:12px;color:var(--muted);margin-top:10px;">Use: "read digital pin 2" — when it equals 1, broadcast "message" in device.</p></div>
-  <div><div class="code-col-label mblock">🧩 mBlock Sprite</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s3-mblock2.png"></div></div><p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;">Use: When I recieve "message" - say hello in sprite.</p></div>
-            </div></div>
-
-<div class="sub-panel" id="p3s4"><div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p3s4.png"></div></div>
-<div class="circuit-slot-label">Input Switch with Pull-Down resistor on Pin 2</div></div>
-<div class="code-compare">
-  <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s4-mblock.png"></div></div><p style="font-size:12px;color:var(--muted);margin-top:10px;">Use "read digital pin 2" — when it equals 1, turn on an LED.</p></div>
-            <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">const</span> <span class="st">int</span> btnPin = <span class="nm">2</span>;
+            </div>
+          </div>
+          <div class="sub-panel" id="p3s2">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p2s1.png"></div></div><div class="circuit-slot-label">Same input switch circuit — press once to toggle LED on, press again to toggle off</div></div>
+            <div class="code-compare">
+              <div><div class="code-col-label mblock">🧩 mBlock Sprite</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s2-mblock.png"></div></div></div>
+              <div><div class="code-col-label mblock">🧩 mBlock Device</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s1-mblock2.png"></div></div></div>
+            </div>
+          </div>
+          <div class="sub-panel" id="p3s3">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p3s3.png"></div></div><div class="circuit-slot-label">Input Switch with Pull-Down resistor on Pin 2</div></div>
+            <div class="code-compare">
+              <div><div class="code-col-label mblock">🧩 mBlock Device</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s3-mblock1.png"></div></div></div>
+              <div><div class="code-col-label mblock">🧩 mBlock Sprite</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s3-mblock2.png"></div></div></div>
+            </div>
+          </div>
+          <div class="sub-panel" id="p3s4">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p3s4.png"></div></div><div class="circuit-slot-label">Input Switch with Pull-Down resistor on Pin 2</div></div>
+            <div class="code-compare">
+              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p3s4-mblock.png"></div></div></div>
+              <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">const</span> <span class="st">int</span> btnPin = <span class="nm">2</span>;
 <span class="kw">const</span> <span class="st">int</span> ledPin = <span class="nm">13</span>;
 <span class="kw">void</span> <span class="fn">setup</span>() {
   <span class="fn">pinMode</span>(btnPin, INPUT);
@@ -695,9 +707,8 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
   <span class="st">int</span> state = <span class="fn">digitalRead</span>(btnPin);
   <span class="fn">digitalWrite</span>(ledPin, state);
 }</pre></div></div>
-  
-
-</div></div>
+            </div>
+          </div>
         </div>
         <div class="proj-section"><div class="sect-label">Quick Quiz</div><div class="quiz-wrap"><div class="quiz-title"><span>🧠</span> Test Your Understanding</div><div class="quiz-q"><div class="quiz-question">1. What is the purpose of the pull-down resistor (10kΩ to GND) on pin 2?</div><div class="quiz-options"><div class="quiz-opt" onclick="answer(this,'wrong','The pull-down resistor is for INPUT pins, not LED output brightness.')"><span class="quiz-opt-letter">A</span>To make the LED brighter</div><div class="quiz-opt" onclick="answer(this,'correct','Without the pull-down, pin 2 floats between HIGH and LOW randomly. The resistor pulls it firmly to LOW so we get a clean OFF signal.')"><span class="quiz-opt-letter">B</span>To give pin 2 a stable LOW signal when the button is not pressed</div><div class="quiz-opt" onclick="answer(this,'wrong','Switches are physical hardware — they don\'t need protection from heat.')"><span class="quiz-opt-letter">C</span>To stop the switch from overheating</div></div><div class="quiz-feedback"></div></div></div></div>
         <div class="proj-section"><div class="sect-label">Ask a Question</div><div class="message-box"><div class="message-box-title"><span>💬</span> Got a question about Project 3?</div><div class="message-box-sub">Button not responding? Ask your coach below.</div><div class="msg-row"><textarea class="msg-input" placeholder="Type your question here…"></textarea><button class="msg-send" onclick="sendMsg(this)">Send →</button></div><div class="msg-sent">✓ Message sent!</div></div></div>
@@ -745,10 +756,11 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
             <button class="sub-tab active" onclick="switchSub(this,'p4s1')">Version A — Fruit Piano</button>
             <button class="sub-tab" onclick="switchSub(this,'p4s2')">Version B — Button Piano</button>
           </div>
-          <div class="sub-panel active" id="p4s1"><div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p4s1.png"></div></div><div class="circuit-slot-label">Fruit / Play-Doh keys — 1MΩ+ resistors on analog pins A0–A5, ground wire held by player</div></div>
-          <div class="code-compare">
-            <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p4s1-mblock.png"></div></div><p style="font-size:12px;color:var(--muted);margin-top:10px;">Forever loop: if analog pin A5 &lt; Trigger (800) → broadcast "Piano A" → wait until A5 &gt; Trigger.</p></div>
-            <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ (Upload Mode)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="cm">// Fruit piano — analog touch</span>
+          <div class="sub-panel active" id="p4s1">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p4s1.png"></div></div><div class="circuit-slot-label">Fruit / Play-Doh keys — 1MΩ+ resistors on analog pins A0–A5, ground wire held by player</div></div>
+            <div class="code-compare">
+              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p4s1-mblock.png"></div></div></div>
+              <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ (Upload Mode)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="cm">// Fruit piano — analog touch</span>
 <span class="kw">const</span> <span class="st">int</span> buzzer = <span class="nm">5</span>;
 <span class="st">int</span> notes[] = {<span class="nm">262</span>,<span class="nm">294</span>,<span class="nm">330</span>,<span class="nm">349</span>,<span class="nm">392</span>,<span class="nm">440</span>};
 <span class="kw">const</span> <span class="st">int</span> threshold = <span class="nm">700</span>;
@@ -762,15 +774,17 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
       <span class="kw">while</span>(<span class="fn">analogRead</span>(i) &lt; threshold);
     }
   }
-}</pre></div></div></div></div>
-          <div class="sub-panel" id="p4s2"><div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p4s2.png"></div></div><div class="circuit-slot-label">8 push buttons on pins 6–13 with 1kΩ pull-down resistors, buzzer on pin 5</div></div>
-          <div class="code-compare"><div>
-          <div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p4s2-mblock.png"></div></div></div>
-          <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ (Upload Mode + Buzzer)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="cm">// Button piano: pins 6-13, buzzer pin 5</span>
+}</pre></div></div>
+            </div>
+          </div>
+          <div class="sub-panel" id="p4s2">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p4s2.png"></div></div><div class="circuit-slot-label">8 push buttons on pins 6–13 with 1kΩ pull-down resistors, buzzer on pin 5</div></div>
+            <div class="code-compare">
+              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p4s2-mblock.png"></div></div></div>
+              <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ (Upload Mode + Buzzer)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="cm">// Button piano: pins 6-13, buzzer pin 5</span>
 <span class="kw">const</span> <span class="st">int</span> buzzer = <span class="nm">5</span>;
 <span class="st">int</span> btns[]  = {<span class="nm">6</span>,<span class="nm">7</span>,<span class="nm">8</span>,<span class="nm">9</span>,<span class="nm">10</span>,<span class="nm">11</span>,<span class="nm">12</span>,<span class="nm">13</span>};
 <span class="st">int</span> notes[] = {<span class="nm">262</span>,<span class="nm">294</span>,<span class="nm">330</span>,<span class="nm">349</span>,<span class="nm">392</span>,<span class="nm">440</span>,<span class="nm">494</span>,<span class="nm">523</span>};
-<span class="cm">// Do  Re   Mi   Fa   So  La  Ti  Do(hi)</span>
 
 <span class="kw">void</span> <span class="fn">setup</span>() {
   <span class="kw">for</span>(<span class="st">int</span> i=<span class="nm">0</span>;i&lt;<span class="nm">8</span>;i++) <span class="fn">pinMode</span>(btns[i], INPUT);
@@ -783,7 +797,9 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
       <span class="fn">noTone</span>(buzzer);
     }
   }
-}</pre></div></div></div></div>
+}</pre></div></div>
+            </div>
+          </div>
         </div>
         <div class="proj-section"><div class="sect-label">Quick Quiz</div><div class="quiz-wrap"><div class="quiz-title"><span>🧠</span> Test Your Understanding</div><div class="quiz-q"><div class="quiz-question">1. Why do we need 1MΩ+ (mega ohm) resistors for the fruit piano, not regular 220Ω ones?</div><div class="quiz-options"><div class="quiz-opt" onclick="answer(this,'wrong','High resistance keeps the analog value stable at HIGH, not LOW.')"><span class="quiz-opt-letter">A</span>To make the analog value stay LOW</div><div class="quiz-opt" onclick="answer(this,'correct','Fruit has very high resistance. We need a resistor higher than the fruit\'s resistance so that touching the fruit pulls the pin LOW noticeably.')"><span class="quiz-opt-letter">B</span>The fruit/Play-Doh has high resistance — we need even higher to pull up correctly</div><div class="quiz-opt" onclick="answer(this,'wrong','The resistance value has nothing to do with which musical note plays.')"><span class="quiz-opt-letter">C</span>Different resistance = different musical notes</div></div><div class="quiz-feedback"></div></div></div></div>
         <div class="proj-section"><div class="sect-label">Ask a Question</div><div class="message-box"><div class="message-box-title"><span>💬</span> Got a question about Project 4?</div><div class="message-box-sub">Piano not making sound? Ask your coach below.</div><div class="msg-row"><textarea class="msg-input" placeholder="Type your question here…"></textarea><button class="msg-send" onclick="sendMsg(this)">Send →</button></div><div class="msg-sent">✓ Message sent!</div></div></div>
@@ -809,19 +825,17 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
       <div class="proj-body">
         <div class="proj-section">
           <div class="sect-label">Introduction</div>
-          <p class="proj-overview">Build a 2-player reaction speed game! Both players have a button. A traffic light (Red → Yellow → Green) counts down on real LEDs. The first player to press their button after the green light scores a point. First to 5 wins. You'll combine everything you've learned — circuits, inputs, outputs, and game logic.</p>
+          <p class="proj-overview">Build a 2-player reaction speed game! Both players have a button. A traffic light (Red → Yellow → Green) counts down on real LEDs. The first player to press their button after the green light scores a point. First to 5 wins.</p>
           <div class="intro-grid">
             <div class="intro-card"><div class="intro-card-icon">🧰</div><div class="intro-card-title">What You Need</div><div class="intro-card-text">Arduino Uno, breadboard, 2× push buttons, 3× LEDs (Red, Yellow, Green), 2× 10kΩ resistors, 3× 220Ω resistors, jumper wires, mBlock.</div></div>
-            <div class="intro-card"><div class="intro-card-icon">⚡</div><div class="intro-card-title">What You'll Learn</div><div class="intro-card-text">Combining inputs & outputs in one project, game logic with variables, player scores, anti-cheat detection, sprites and game design.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">⚡</div><div class="intro-card-title">What You'll Learn</div><div class="intro-card-text">Combining inputs &amp; outputs in one project, game logic with variables, player scores, anti-cheat detection, sprites and game design.</div></div>
             <div class="intro-card"><div class="intro-card-icon">🌍</div><div class="intro-card-title">Real World Use</div><div class="intro-card-text">Arcade games, quiz buzzers, drag racing start lights, reaction time training devices, game show buzzers.</div></div>
           </div>
           <ul class="proj-list">
             <li>Buttons connect to pins 2 and 3 via pull-down resistors — LOW by default, HIGH when pressed.</li>
             <li>Traffic LEDs: Red=pin 13, Yellow=pin 12, Green=pin 11 — same wiring as Project 2.</li>
             <li>Game logic: spacebar starts the game → Red 1s → Yellow 1s → Green → detect who presses first.</li>
-            <li>Use mBlock sprites for each player (Panda, Bee) with score variables displayed on screen.</li>
-            <li>Anti-cheat: if button is already held when Green lights up, it doesn't count — must release and re-press.</li>
-            <li>Challenge: detect a tie (both buttons within same loop cycle) and display "TIE!" message.</li>
+            <li>Anti-cheat: if button is already held when Green lights up, it doesn't count.</li>
           </ul>
         </div>
         <div class="proj-section">
@@ -833,20 +847,16 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
           </div>
           <div class="sub-panel active" id="p5s1">
             <div class="circuit-grid"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p5s1.png"></div></div><div class="circuit-slot-label">2 input buttons (pins 2 &amp; 3) with 10kΩ pull-down resistors</div></div>
-            <p style="font-size:13px;color:var(--muted);margin-top:14px;line-height:1.7;">Wire Player 1's button to pin 2 and Player 2's button to pin 3. Each needs a 10kΩ pull-down resistor to GND so pins read stable LOW when the button is not pressed.</p>
           </div>
           <div class="sub-panel" id="p5s2">
-            <div class="circuit-grid"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p2s3.png"></div></div><div class="circuit-slot-label">Traffic light LEDs — Red=pin 13, Yellow=pin 12, Green=pin 11 (same as Project 2)</div></div>
-            <p style="font-size:13px;color:var(--muted);margin-top:14px;line-height:1.7;">Wire Red LED to pin 11, Yellow to pin 12, Green to pin 13 — each with a 220Ω resistor. This is the same traffic light circuit from Project 2.</p>
+            <div class="circuit-grid"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p2s3.png"></div></div><div class="circuit-slot-label">Traffic light LEDs — Red=pin 13, Yellow=pin 12, Green=pin 11</div></div>
           </div>
           <div class="sub-panel" id="p5s3">
             <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p5.png"></div></div><div class="circuit-slot-label">Full game circuit — both buttons + traffic light LEDs combined</div></div>
             <div class="code-compare">
-            <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p5-mblock.png"></div></div><p style="font-size:12px;color:var(--muted);margin-top:10px;">Game flow: Space pressed → Red LED (1s) → Yellow (1s) → Green → forever loop checking pins 2 &amp; 3 → winner gets +1 score → repeat.</p>
-            
-          </div>
-            <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="st">int</span> p1=<span class="nm">2</span>, p2=<span class="nm">3</span>;     <span class="cm">// button pins</span>
-<span class="st">int</span> r=<span class="nm">11</span>, y=<span class="nm">12</span>, g=<span class="nm">13</span>; <span class="cm">// LED pins</span>
+              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p5-mblock.png"></div></div></div>
+              <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="st">int</span> p1=<span class="nm">2</span>, p2=<span class="nm">3</span>;
+<span class="st">int</span> r=<span class="nm">11</span>, y=<span class="nm">12</span>, g=<span class="nm">13</span>;
 <span class="st">int</span> score1=<span class="nm">0</span>, score2=<span class="nm">0</span>;
 
 <span class="kw">void</span> <span class="fn">setup</span>() {
@@ -862,23 +872,22 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
   <span class="fn">digitalWrite</span>(y,LOW);
   <span class="fn">digitalWrite</span>(g,HIGH);
   <span class="kw">while</span>(<span class="kw">true</span>) {
-    <span class="kw">if</span>(<span class="fn">digitalRead</span>(p1)==HIGH) { score1++; <span class="kw">break</span>; }
-    <span class="kw">if</span>(<span class="fn">digitalRead</span>(p2)==HIGH) { score2++; <span class="kw">break</span>; }
+    <span class="kw">if</span>(<span class="fn">digitalRead</span>(p1)==HIGH){score1++;<span class="kw">break</span>;}
+    <span class="kw">if</span>(<span class="fn">digitalRead</span>(p2)==HIGH){score2++;<span class="kw">break</span>;}
   }
   <span class="fn">digitalWrite</span>(g,LOW);
-  Serial.<span class="fn">print</span>(<span class="st">"P1:"</span>); Serial.<span class="fn">print</span>(score1);
-  Serial.<span class="fn">print</span>(<span class="st">" P2:"</span>); Serial.<span class="fn">println</span>(score2);
+  Serial.<span class="fn">print</span>(<span class="st">"P1:"</span>);Serial.<span class="fn">print</span>(score1);
+  Serial.<span class="fn">print</span>(<span class="st">" P2:"</span>);Serial.<span class="fn">println</span>(score2);
 }
 <span class="kw">void</span> <span class="fn">loop</span>() {
-  <span class="fn">delay</span>(<span class="nm">3000</span>);
-  <span class="fn">runRace</span>();
+  <span class="fn">delay</span>(<span class="nm">3000</span>); <span class="fn">runRace</span>();
 }</pre></div></div>
-          </div>
+            </div>
           </div>
         </div>
-        <div class="proj-section"><div class="sect-label">Quick Quiz</div><div class="quiz-wrap"><div class="quiz-title"><span>🧠</span> Test Your Understanding</div><div class="quiz-q"><div class="quiz-question">1. A player holds their button down before the green light. How do you prevent them from cheating?</div><div class="quiz-options"><div class="quiz-opt" onclick="answer(this,'wrong','Disqualifying them forever is too harsh — they might have pressed by accident.')"><span class="quiz-opt-letter">A</span>Disqualify them from the entire game</div><div class="quiz-opt" onclick="answer(this,'correct','Before starting the countdown, check if any button is already pressed. If so, wait until it\'s released before showing green. This forces players to release first.')"><span class="quiz-opt-letter">B</span>Check if button is held before green — make them release first</div><div class="quiz-opt" onclick="answer(this,'wrong','Adding more LEDs doesn\'t fix the cheat detection logic.')"><span class="quiz-opt-letter">C</span>Add more LEDs to confuse the player</div></div><div class="quiz-feedback"></div></div></div></div>
+        <div class="proj-section"><div class="sect-label">Quick Quiz</div><div class="quiz-wrap"><div class="quiz-title"><span>🧠</span> Test Your Understanding</div><div class="quiz-q"><div class="quiz-question">1. A player holds their button down before the green light. How do you prevent them from cheating?</div><div class="quiz-options"><div class="quiz-opt" onclick="answer(this,'wrong','Disqualifying them forever is too harsh — they might have pressed by accident.')"><span class="quiz-opt-letter">A</span>Disqualify them from the entire game</div><div class="quiz-opt" onclick="answer(this,'correct','Before starting the countdown, check if any button is already pressed. If so, wait until it\'s released before showing green.')"><span class="quiz-opt-letter">B</span>Check if button is held before green — make them release first</div><div class="quiz-opt" onclick="answer(this,'wrong','Adding more LEDs doesn\'t fix the cheat detection logic.')"><span class="quiz-opt-letter">C</span>Add more LEDs to confuse the player</div></div><div class="quiz-feedback"></div></div></div></div>
         <div class="proj-section"><div class="sect-label">Ask a Question</div><div class="message-box"><div class="message-box-title"><span>💬</span> Got a question about Project 5?</div><div class="message-box-sub">Game logic confusing? Ask your coach below.</div><div class="msg-row"><textarea class="msg-input" placeholder="Type your question here…"></textarea><button class="msg-send" onclick="sendMsg(this)">Send →</button></div><div class="msg-sent">✓ Message sent!</div></div></div>
-        <div class="proj-section"><div class="sect-label">Bonus Challenges</div><div class="bonus-box"><div class="bonus-icon">🌟</div><div><div class="bonus-title">Ready for more?</div><ul class="bonus-list"><li>Prevent cheating: if a button is held when the green light turns on, disqualify that player.</li><li>Check both buttons in parallel so neither player has a code advantage.</li><li>Detect a tie: if both buttons are pressed within 50ms of each other, declare a draw.</li><li>Make it a 3-player game: add a third button on pin 4 and a third sprite.</li><li>Add a scoreboard: first player to reach 5 points wins and the game resets.</li></ul></div></div></div>
+        <div class="proj-section"><div class="sect-label">Bonus Challenges</div><div class="bonus-box"><div class="bonus-icon">🌟</div><div><div class="bonus-title">Ready for more?</div><ul class="bonus-list"><li>Prevent cheating: if a button is held when the green light turns on, disqualify that player.</li><li>Detect a tie: if both buttons are pressed within 50ms of each other, declare a draw.</li><li>Make it a 3-player game: add a third button on pin 4.</li><li>Add a scoreboard: first player to reach 5 points wins and the game resets.</li></ul></div></div></div>
       </div>
     </div>
 
@@ -893,14 +902,1158 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
     <div class="tier-band inter reveal">
       <div class="tier-label">Level 2</div>
       <h2 class="tier-title">Intermediate</h2>
-      <p class="tier-desc">Ready to go further? These projects combine sensors, displays, motors, and more advanced coding.</p>
+      <p class="tier-desc">Sensors, servos, motors, and smarter algorithms. These four projects bridge circuits and the real world — culminating in a fully autonomous obstacle-avoiding car.</p>
     </div>
-    <div class="coming-grid">
-      <div class="coming-card reveal"><div class="coming-icon">🌡️</div><div class="coming-title">Weather Station</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">DHT22 temp & humidity sensor + LCD display showing live readings. Includes threshold alerts with buzzer.</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 06</div></div>
-      <div class="coming-card reveal"><div class="coming-icon">🤖</div><div class="coming-title">Robot Car</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">L298N motor driver + DC motors + ultrasonic sensor for obstacle avoidance. Drive your first robot!</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 07</div></div>
-      <div class="coming-card reveal"><div class="coming-icon">🔒</div><div class="coming-title">Smart Lock</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">4×4 keypad + servo motor + LCD. Enter the correct code to unlock. Lockout after 3 wrong attempts.</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 08</div></div>
+
+    <!-- PROJECT 6 -->
+    <div class="project-card reveal" id="proj6">
+      <div class="proj-header" onclick="toggleProject(this)">
+        <div>
+          <div class="proj-num">Intermediate · Project 06</div>
+          <div class="proj-title">🌻 Setting It Up</div>
+          <div class="proj-meta"><span class="proj-tag teal">mBlock</span><span class="proj-tag orange">Photoresistor · Servo Motor</span><span class="proj-tag gray">2 Sub-Projects</span><span class="time-badge">⏱ 60–90 min</span></div>
+          <div class="difficulty-row"><span class="diff-label">Difficulty</span><div class="diff-stars"><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star"></div><div class="diff-star"></div></div></div>
+        </div>
+        <div class="proj-chevron">▾</div>
+      </div>
+      <div class="proj-body">
+        <div class="proj-section">
+          <div class="sect-label">Introduction</div>
+          <p class="proj-overview">In this project we use a photoresistor (light sensor) to control a servo motor. As the light changes, the servo rotates — just like a sunflower tracking the sun! You'll learn how analog sensors feed real-world data into code, and how servo motors respond with precise motion.</p>
+          <div class="intro-grid">
+            <div class="intro-card"><div class="intro-card-icon">🧰</div><div class="intro-card-title">What You Need</div><div class="intro-card-text">Arduino Uno, photoresistor (LDR), servo motor (SG90), 10kΩ or 220Ω resistor, jumper wires, mBlock.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">⚡</div><div class="intro-card-title">What You'll Learn</div><div class="intro-card-text">Analog sensor reading with analogRead(), servo control with the Servo library, mapping values between ranges with map(), and conditional logic for direction control.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">🌍</div><div class="intro-card-title">Real World Use</div><div class="intro-card-text">Solar panel trackers, automatic window blinds, motion-activated camera mounts, self-orienting antennas, light-following robots.</div></div>
+          </div>
+          <ul class="proj-list">
+            <li>A photoresistor changes resistance depending on light — more light = lower resistance = higher analog reading.</li>
+            <li>The SG90 servo rotates from 0° to 180°. Connect its orange signal wire to a PWM pin (e.g. pin 9).</li>
+            <li>Use <code style="font-family:'DM Mono',monospace;color:var(--teal);">map(value, 0, 1023, 0, 180)</code> to translate the sensor reading into a servo angle.</li>
+            <li>The Full project uses two photoresistors so the servo tracks which side has more light.</li>
+          </ul>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Sub-Projects — Circuit &amp; Code</div>
+          <div class="sub-tabs">
+            <button class="sub-tab active" onclick="switchSub(this,'p6s1')">Basic — Single LDR + Servo</button>
+            <button class="sub-tab" onclick="switchSub(this,'p6s2')">Full — Sunflower Tracker</button>
+          </div>
+          <div class="sub-panel active" id="p6s1">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p6s1.png"></div></div><div class="circuit-slot-label">Photoresistor on A0 with 10kΩ pull-down resistor; SG90 signal wire to Pin 9</div></div>
+            <div class="algo-box">
+              <div class="algo-box-header"><div class="algo-box-icon">🧠</div><div><div class="algo-box-title">Algorithm — Basic LDR Servo</div><div class="algo-box-sub">Understand the logic before writing code</div></div></div>
+              <ol class="algo-steps">
+                <li><div class="algo-step-num">1</div>Read the analog value from the photoresistor on <span class="algo-code">A0</span> — this gives a number from 0 to 1023.</li>
+                <li><div class="algo-step-num">2</div>Map that value to a servo angle: <span class="algo-code">map(lightValue, 0, 1023, 0, 180)</span> converts 0→0° and 1023→180°.</li>
+                <li><div class="algo-step-num">3</div>Write the mapped angle to the servo using <span class="algo-code">servo.write(angle)</span>.</li>
+                <li><div class="algo-step-num">4</div>Add a small delay so the servo has time to physically move before the next reading.</li>
+                <li><div class="algo-step-num">5</div>Loop forever — the servo will continuously track any light changes.</li>
+              </ol>
+            </div>
+            <div class="code-compare">
+              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p6s1-mblock.png"></div></div></div>
+              <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">#include</span> <span class="st">&lt;Servo.h&gt;</span>
+
+Servo myServo;
+<span class="kw">const</span> <span class="st">int</span> ldrPin = A0;
+<span class="kw">const</span> <span class="st">int</span> servoPin = <span class="nm">9</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  myServo.<span class="fn">attach</span>(servoPin);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="st">int</span> lightVal = <span class="fn">analogRead</span>(ldrPin);
+  <span class="st">int</span> angle = <span class="fn">map</span>(lightVal,<span class="nm">0</span>,<span class="nm">1023</span>,<span class="nm">0</span>,<span class="nm">180</span>);
+  myServo.<span class="fn">write</span>(angle);
+  Serial.<span class="fn">print</span>(<span class="st">"Light: "</span>); Serial.<span class="fn">print</span>(lightVal);
+  Serial.<span class="fn">print</span>(<span class="st">"  Angle: "</span>); Serial.<span class="fn">println</span>(angle);
+  <span class="fn">delay</span>(<span class="nm">100</span>);
+}</pre></div></div>
+            </div>
+          </div>
+          <div class="sub-panel" id="p6s2">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p6s2.png"></div></div><div class="circuit-slot-label">Two LDRs on A0 (left) and A1 (right); servo signal on Pin 9.</div></div>
+            <div class="algo-box">
+              <div class="algo-box-header"><div class="algo-box-icon">🧠</div><div><div class="algo-box-title">Algorithm — Dual LDR Sunflower</div><div class="algo-box-sub">Two sensors compete — the brighter side wins</div></div></div>
+              <ol class="algo-steps">
+                <li><div class="algo-step-num">1</div>Read LDR left (<span class="algo-code">A0</span>) and LDR right (<span class="algo-code">A1</span>) simultaneously.</li>
+                <li><div class="algo-step-num">2</div><span class="algo-condition">IF</span> left &lt; right (left side is brighter) → rotate servo toward 0° (left).</li>
+                <li><div class="algo-step-num">3</div><span class="algo-condition">ELSE IF</span> right &lt; left (right side is brighter) → rotate servo toward 180° (right).</li>
+                <li><div class="algo-step-num">4</div><span class="algo-condition">ELSE</span> both are equal → hold current position.</li>
+                <li><div class="algo-step-num">5</div>Move the servo <strong style="color:#fff;">one degree at a time</strong> with a small delay for realistic motion.</li>
+              </ol>
+            </div>
+            <div class="code-compare">
+              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p6s2-mblock.png"></div></div></div>
+              <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">#include</span> <span class="st">&lt;Servo.h&gt;</span>
+
+Servo myServo;
+<span class="st">int</span> currentAngle = <span class="nm">90</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  myServo.<span class="fn">attach</span>(<span class="nm">9</span>);
+  myServo.<span class="fn">write</span>(currentAngle);
+}
+
+<span class="kw">void</span> <span class="fn">slowMove</span>(<span class="st">int</span> target) {
+  <span class="kw">while</span>(currentAngle != target) {
+    currentAngle += (target > currentAngle) ? <span class="nm">1</span> : -<span class="nm">1</span>;
+    myServo.<span class="fn">write</span>(currentAngle);
+    <span class="fn">delay</span>(<span class="nm">15</span>);
+  }
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="st">int</span> L = <span class="fn">analogRead</span>(A0);
+  <span class="st">int</span> R = <span class="fn">analogRead</span>(A1);
+  <span class="st">int</span> diff = L - R;
+  <span class="kw">if</span>(diff &lt; -<span class="nm">50</span>)      <span class="fn">slowMove</span>(<span class="nm">0</span>);
+  <span class="kw">else if</span>(diff &gt; <span class="nm">50</span>) <span class="fn">slowMove</span>(<span class="nm">180</span>);
+  <span class="fn">delay</span>(<span class="nm">50</span>);
+}</pre></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="proj-section"><div class="sect-label">Quick Quiz</div><div class="quiz-wrap"><div class="quiz-title"><span>🧠</span> Test Your Understanding</div><div class="quiz-q"><div class="quiz-question">1. The light reading is 800. After map(800, 0, 1023, 0, 180), what is the servo angle?</div><div class="quiz-options"><div class="quiz-opt" onclick="answer(this,'wrong','90° would be the result of half the range (512). 800 is higher than that.')"><span class="quiz-opt-letter">A</span>90°</div><div class="quiz-opt" onclick="answer(this,'correct','map(800, 0, 1023, 0, 180) ≈ 141°. The map function scales proportionally: 800/1023 × 180 ≈ 140.8°')"><span class="quiz-opt-letter">B</span>≈ 141°</div><div class="quiz-opt" onclick="answer(this,'wrong','180° is only reached when the reading is 1023 (maximum).')"><span class="quiz-opt-letter">C</span>180°</div></div><div class="quiz-feedback"></div></div></div></div>
+        <div class="proj-section"><div class="sect-label">Ask a Question</div><div class="message-box"><div class="message-box-title"><span>💬</span> Got a question about Project 6?</div><div class="message-box-sub">Servo not moving? Ask your coach below.</div><div class="msg-row"><textarea class="msg-input" placeholder="Type your question here…"></textarea><button class="msg-send" onclick="sendMsg(this)">Send →</button></div><div class="msg-sent">✓ Message sent!</div></div></div>
+        <div class="proj-section"><div class="sect-label">Bonus Challenges</div><div class="bonus-box"><div class="bonus-icon">🌟</div><div><div class="bonus-title">Want to go further?</div><ul class="bonus-list"><li>Add a deadband: only move the servo if the difference between the two sensors is greater than 50 — this stops jittering in equal light.</li><li>Add a Serial Monitor readout: print both sensor values and the current angle every half second.</li><li>Reverse the logic — make the sunflower point AWAY from the light.</li></ul></div></div></div>
+      </div>
     </div>
+
+    <div class="next-strip reveal">
+      <div class="next-strip-text"><div class="next-strip-label">Up Next</div><div class="next-strip-title">Project 07: Intruder! Intruder! — build a proximity alarm with an ultrasonic sensor and buzzer</div></div>
+      <a class="btn-next-proj" href="#proj7" onclick="openProject('proj7')">Start Project 07 →</a>
     </div>
+
+    <!-- PROJECT 7 -->
+    <div class="project-card reveal" id="proj7">
+      <div class="proj-header" onclick="toggleProject(this)">
+        <div>
+          <div class="proj-num">Intermediate · Project 07</div>
+          <div class="proj-title">🚨 Intruder! Intruder!</div>
+          <div class="proj-meta"><span class="proj-tag teal">Upload Mode</span><span class="proj-tag orange">Ultrasonic · Buzzer</span><span class="proj-tag gray">Security Alarm</span><span class="time-badge">⏱ 45–75 min</span></div>
+          <div class="difficulty-row"><span class="diff-label">Difficulty</span><div class="diff-stars"><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star"></div><div class="diff-star"></div></div></div>
+        </div>
+        <div class="proj-chevron">▾</div>
+      </div>
+      <div class="proj-body">
+        <div class="proj-section">
+          <div class="sect-label">Introduction</div>
+          <p class="proj-overview">Build a cookie-jar security alarm! An ultrasonic sensor constantly measures the distance in front of it. If anything gets closer than your threshold (e.g. 30 cm), a piezo buzzer sounds the alarm.</p>
+          <div class="intro-grid">
+            <div class="intro-card"><div class="intro-card-icon">🧰</div><div class="intro-card-title">What You Need</div><div class="intro-card-text">Arduino Uno, HC-SR04 ultrasonic sensor, piezo buzzer, breadboard, jumper wires. Upload mode required.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">⚡</div><div class="intro-card-title">What You'll Learn</div><div class="intro-card-text">How ultrasonic distance sensing works (ping → echo → time → distance), pulseIn(), tone() and noTone(), threshold-based triggering.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">🌍</div><div class="intro-card-title">Real World Use</div><div class="intro-card-text">Parking sensors, motion-triggered security systems, automatic door openers, robotic obstacle detection.</div></div>
+          </div>
+          <ul class="proj-list">
+            <li>Distance formula: <code style="font-family:'DM Mono',monospace;color:var(--teal);">distance = duration / 58.0</code> (duration in microseconds → centimetres).</li>
+            <li>Wiring: TRIG → Pin 9, ECHO → Pin 10, Buzzer + → Pin 8, Buzzer – → GND.</li>
+            <li>Always trigger with a 10 µs pulse, then wait for the echo.</li>
+          </ul>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Circuit &amp; Code</div>
+          <div class="sub-tabs">
+            <button class="sub-tab active" onclick="switchSub(this,'p7s1')">Ultrasonic Reading</button>
+            <button class="sub-tab" onclick="switchSub(this,'p7s2')">Buzzer Test</button>
+            <button class="sub-tab" onclick="switchSub(this,'p7s3')">Full Alarm</button>
+          </div>
+          <div class="sub-panel active" id="p7s1">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p7s1.png"></div></div><div class="circuit-slot-label">HC-SR04: VCC→5V, GND→GND, TRIG→Pin 9, ECHO→Pin 10.</div></div>
+            <div class="code-compare">
+              <div>
+                <div class="code-col-label mblock">🧩 mBlock</div>
+                <div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p7s1-mblock.png"></div></div>
+                <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;">Forever → read ultrasonic on A0 → save to variable <strong style="color:#fff;">Distance</strong> → wait 0.2s. Optional: print Distance to serial via broadcast.</p>
+              </div>
+              <div>
+                <div class="code-col-label cpp">💻 C++</div>
+                <div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ — Distance Reading</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">const</span> <span class="st">int</span> trigPin = <span class="nm">9</span>;
+<span class="kw">const</span> <span class="st">int</span> echoPin = <span class="nm">10</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(trigPin, OUTPUT);
+  <span class="fn">pinMode</span>(echoPin, INPUT);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">long</span> <span class="fn">readDistance</span>() {
+  <span class="fn">digitalWrite</span>(trigPin, LOW);  <span class="fn">delayMicroseconds</span>(<span class="nm">2</span>);
+  <span class="fn">digitalWrite</span>(trigPin, HIGH); <span class="fn">delayMicroseconds</span>(<span class="nm">10</span>);
+  <span class="fn">digitalWrite</span>(trigPin, LOW);
+  <span class="kw">long</span> dur = <span class="fn">pulseIn</span>(echoPin, HIGH);
+  <span class="kw">return</span> dur / <span class="nm">58</span>;
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">long</span> cm = <span class="fn">readDistance</span>();
+  Serial.<span class="fn">print</span>(<span class="st">"Distance: "</span>);
+  Serial.<span class="fn">print</span>(cm);
+  Serial.<span class="fn">println</span>(<span class="st">" cm"</span>);
+  <span class="fn">delay</span>(<span class="nm">200</span>);
+}</pre></div>
+              </div>
+            </div>
+          </div>
+          <div class="sub-panel" id="p7s2">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p7s2.png"></div></div><div class="circuit-slot-label">Piezo buzzer: positive leg → Pin 8, negative leg → GND.</div></div>
+            <div class="code-compare">
+              <div>
+                <div class="code-col-label mblock">🧩 mBlock</div>
+                <div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p7s2-mblock.png"></div></div>
+                <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;">When clicked → forever → <strong style="color:#fff;">set digital pin 8 output HIGH</strong> → wait 0.5s → <strong style="color:#fff;">set digital pin 8 output LOW</strong> → wait 0.5s.</p>
+              </div>
+              <div>
+                <div class="code-col-label cpp">💻 C++</div>
+                <div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ — Buzzer Test</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">const</span> <span class="st">int</span> buzzerPin = <span class="nm">8</span>;
+<span class="kw">void</span> <span class="fn">setup</span>() { <span class="fn">pinMode</span>(buzzerPin, OUTPUT); }
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">tone</span>(buzzerPin, <span class="nm">1000</span>); <span class="fn">delay</span>(<span class="nm">500</span>);
+  <span class="fn">noTone</span>(buzzerPin);     <span class="fn">delay</span>(<span class="nm">500</span>);
+}</pre></div>
+              </div>
+            </div>
+          </div>
+          <div class="sub-panel" id="p7s3">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p7s3.png"></div></div><div class="circuit-slot-label">Full alarm circuit — HC-SR04 (TRIG→9, ECHO→10) + buzzer (Pin 8)</div></div>
+            <div class="algo-box">
+              <div class="algo-box-header"><div class="algo-box-icon">🧠</div><div><div class="algo-box-title">Algorithm — Proximity Alarm</div><div class="algo-box-sub">Think through the logic before coding</div></div></div>
+              <ol class="algo-steps">
+                <li><div class="algo-step-num">1</div>Fire a 10 µs pulse on <span class="algo-code">TRIG</span> to send an ultrasonic ping.</li>
+                <li><div class="algo-step-num">2</div>Use <span class="algo-code">pulseIn(ECHO, HIGH)</span> to measure how long the echo takes to return.</li>
+                <li><div class="algo-step-num">3</div>Convert to centimetres: <span class="algo-code">distance = duration / 58</span>.</li>
+                <li><div class="algo-step-num">4</div><span class="algo-condition">IF</span> distance &lt; threshold (e.g. 30 cm) → sound the buzzer with <span class="algo-code">tone(pin, frequency)</span>.</li>
+                <li><div class="algo-step-num">5</div><span class="algo-condition">ELSE</span> → silence with <span class="algo-code">noTone(pin)</span>.</li>
+                <li><div class="algo-step-num">6</div>Repeat every 200 ms.</li>
+              </ol>
+            </div>
+            <div class="code-compare">
+              <div>
+                <div class="code-col-label mblock">🧩 mBlock</div>
+                <div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p7s3-mblock.png"></div></div>
+                <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;">Forever → read ultrasonic → save to <strong style="color:#fff;">Distance</strong> → <strong style="color:#fff;">if</strong> Distance &lt; 30 → tone pin 8 at 2000 Hz → wait 0.1s → tone at 1000 Hz → <strong style="color:#fff;">else</strong> → noTone → wait 0.2s.</p>
+              </div>
+              <div>
+                <div class="code-col-label cpp">💻 C++</div>
+                <div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ — Full Security Alarm</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">const</span> <span class="st">int</span> trigPin = <span class="nm">9</span>, echoPin = <span class="nm">10</span>, buzzerPin = <span class="nm">8</span>;
+<span class="kw">const</span> <span class="st">int</span> threshold = <span class="nm">30</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(trigPin, OUTPUT); <span class="fn">pinMode</span>(echoPin, INPUT);
+  <span class="fn">pinMode</span>(buzzerPin, OUTPUT); Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">long</span> <span class="fn">readDistance</span>() {
+  <span class="fn">digitalWrite</span>(trigPin, LOW);  <span class="fn">delayMicroseconds</span>(<span class="nm">2</span>);
+  <span class="fn">digitalWrite</span>(trigPin, HIGH); <span class="fn">delayMicroseconds</span>(<span class="nm">10</span>);
+  <span class="fn">digitalWrite</span>(trigPin, LOW);
+  <span class="kw">return</span> <span class="fn">pulseIn</span>(echoPin, HIGH) / <span class="nm">58</span>;
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">long</span> dist = <span class="fn">readDistance</span>();
+  Serial.<span class="fn">print</span>(<span class="st">"Distance: "</span>); Serial.<span class="fn">print</span>(dist); Serial.<span class="fn">println</span>(<span class="st">" cm"</span>);
+  <span class="kw">if</span> (dist &gt; <span class="nm">0</span> &amp;&amp; dist &lt; threshold) {
+    <span class="fn">tone</span>(buzzerPin, <span class="nm">2000</span>); <span class="fn">delay</span>(<span class="nm">100</span>);
+    <span class="fn">tone</span>(buzzerPin, <span class="nm">1000</span>); <span class="fn">delay</span>(<span class="nm">100</span>);
+  } <span class="kw">else</span> {
+    <span class="fn">noTone</span>(buzzerPin); <span class="fn">delay</span>(<span class="nm">200</span>);
+  }
+}</pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="proj-section"><div class="sect-label">Quick Quiz</div><div class="quiz-wrap"><div class="quiz-title"><span>🧠</span> Test Your Understanding</div><div class="quiz-q"><div class="quiz-question">1. The pulseIn returns 1740 microseconds. What is the distance in cm?</div><div class="quiz-options"><div class="quiz-opt" onclick="answer(this,'wrong','1740 / 58 ≈ 30. Try again with the correct formula.')"><span class="quiz-opt-letter">A</span>87 cm</div><div class="quiz-opt" onclick="answer(this,'correct','1740 ÷ 58 = 30 cm exactly. The formula divides the echo time (µs) by 58 to get centimetres.')"><span class="quiz-opt-letter">B</span>30 cm</div><div class="quiz-opt" onclick="answer(this,'wrong','That would be dividing by 2, not 58.')"><span class="quiz-opt-letter">C</span>870 cm</div></div><div class="quiz-feedback"></div></div></div></div>
+        <div class="proj-section"><div class="sect-label">Ask a Question</div><div class="message-box"><div class="message-box-title"><span>💬</span> Got a question about Project 7?</div><div class="message-box-sub">Sensor giving weird readings? Ask your coach below.</div><div class="msg-row"><textarea class="msg-input" placeholder="Type your question here…"></textarea><button class="msg-send" onclick="sendMsg(this)">Send →</button></div><div class="msg-sent">✓ Message sent!</div></div></div>
+        <div class="proj-section"><div class="sect-label">Bonus Challenges</div><div class="bonus-box"><div class="bonus-icon">🌟</div><div><div class="bonus-title">Want to go further?</div><ul class="bonus-list"><li>Make the alarm change pitch based on distance — closer = higher and faster beep.</li><li>Add an LED that turns red when alarming and green when clear.</li><li>Add a 10-second arming delay so you can walk away without triggering it yourself.</li></ul></div></div></div>
+      </div>
+    </div>
+
+    <div class="next-strip reveal">
+      <div class="next-strip-text"><div class="next-strip-label">Up Next</div><div class="next-strip-title">Project 08: Car Parking System — build a smart parking barrier with ultrasonic sensor, servo gate, and LCD display</div></div>
+      <a class="btn-next-proj" href="#projPark" onclick="openProject('projPark')">Start Project 08 →</a>
+    </div>
+
+    <!-- PROJECT 8 — CAR PARKING SYSTEM -->
+    <div class="project-card reveal" id="projPark">
+      <div class="proj-header" onclick="toggleProject(this)">
+        <div>
+          <div class="proj-num">Intermediate · Project 08</div>
+          <div class="proj-title">🅿️ Car Parking System</div>
+          <div class="proj-meta">
+            <span class="proj-tag teal">Upload Mode</span>
+            <span class="proj-tag orange">HC-SR04 · Servo · LCD</span>
+            <span class="proj-tag gray">2 Sub-Projects</span>
+            <span class="time-badge">⏱ 60–120 min</span>
+          </div>
+          <div class="difficulty-row"><span class="diff-label">Difficulty</span><div class="diff-stars"><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star"></div></div></div>
+        </div>
+        <div class="proj-chevron">▾</div>
+      </div>
+      <div class="proj-body">
+        <div class="proj-section">
+          <div class="sect-label">Introduction</div>
+          <p class="proj-overview">Build a real car parking barrier system! An ultrasonic sensor detects an approaching car, and a servo motor raises the gate to let it in. In the full version, an I2C LCD display shows the remaining parking spaces, a welcome message, and a "PARKING FULL" alert when capacity is reached — just like a real car park.</p>
+          <div class="intro-grid">
+            <div class="intro-card"><div class="intro-card-icon">🧰</div><div class="intro-card-title">What You Need (Sub 1)</div><div class="intro-card-text">Arduino Uno, HC-SR04 ultrasonic sensor, SG90 servo motor, jumper wires.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">🖥️</div><div class="intro-card-title">What You Need (Sub 2)</div><div class="intro-card-text">Everything above + I2C 16×2 LCD display, 2× LEDs (red + green), 2× 220Ω resistors. LCD wires: SDA→A4, SCL→A5.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">🌍</div><div class="intro-card-title">Real World Use</div><div class="intro-card-text">Shopping centre car parks, airport parking barriers, toll booths, office building access gates, smart city infrastructure.</div></div>
+          </div>
+          <ul class="proj-list">
+            <li>The HC-SR04 measures distance — when a car pulls up close (&lt;20 cm in our model), the Arduino detects it.</li>
+            <li>The SG90 servo acts as the barrier gate: 0° = closed, 90° = open (raised).</li>
+            <li>The I2C LCD uses only 2 wires (SDA + SCL) to show text — far fewer pins than a standard LCD.</li>
+            <li>A variable <code style="font-family:'DM Mono',monospace;color:var(--teal);">availableSpaces</code> counts down each time a car enters — when it hits 0, the gate locks.</li>
+            <li>Add a red LED for "FULL" and a green LED for "SPACES AVAILABLE" to give a visual signal visible from the road.</li>
+            <li>Library needed for LCD: <strong style="color:#fff;">LiquidCrystal_I2C</strong> (install via Arduino Library Manager — search "LiquidCrystal I2C" by Frank de Brabander).</li>
+          </ul>
+        </div>
+
+        <div class="proj-section">
+          <div class="sect-label">Sub-Projects — Circuit &amp; Code</div>
+          <div class="sub-tabs">
+            <button class="sub-tab active" onclick="switchSub(this,'pPk1')">1 · Simple Gate</button>
+            <button class="sub-tab" onclick="switchSub(this,'pPk2')">2 · Full System with Display</button>
+          </div>
+
+          <!-- ── SUB 1: SIMPLE GATE ── -->
+          <div class="sub-panel active" id="pPk1">
+            <div style="background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:18px;">
+              <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:8px;">🚗 How it works</div>
+              <p style="font-size:13px;color:var(--muted);line-height:1.7;">The ultrasonic sensor fires a ping every 200 ms. When the echo returns in under the threshold time (car detected at &lt;20 cm), the servo rotates to 90° to raise the barrier. After 3 seconds — enough time for a model car to pass — the servo returns to 0° and the gate closes.</p>
+            </div>
+
+            <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Pin Wiring</div>
+            <div class="circuit-grid" style="margin-bottom:18px;">
+              <div class="circuit-slot"><span class="circuit-slot-icon">📡</span><div class="circuit-slot-label">HC-SR04 TRIG → Pin 9<code>Sends the ultrasonic pulse</code></div></div>
+              <div class="circuit-slot"><span class="circuit-slot-icon">👂</span><div class="circuit-slot-label">HC-SR04 ECHO → Pin 10<code>Receives the reflected pulse</code></div></div>
+              <div class="circuit-slot"><span class="circuit-slot-icon">🔄</span><div class="circuit-slot-label">SG90 Signal (orange) → Pin 5<code>PWM pin — controls gate angle</code></div></div>
+              <div class="circuit-slot"><span class="circuit-slot-icon">🔋</span><div class="circuit-slot-label">HC-SR04 VCC + Servo Red → 5V<code>GND wires → Arduino GND</code></div></div>
+            </div>
+
+            <div class="circuit-grid" style="margin-bottom:20px;">
+              <div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/pPk1.png"></div></div>
+              <div class="circuit-slot-label">Simple gate circuit — HC-SR04 on pins 9 &amp; 10, SG90 servo on pin 5</div>
+            </div>
+
+            <div class="algo-box">
+              <div class="algo-box-header"><div class="algo-box-icon">🧠</div><div><div class="algo-box-title">Algorithm — Simple Parking Gate</div><div class="algo-box-sub">Detect → Open → Wait → Close → Repeat</div></div></div>
+              <ol class="algo-steps">
+                <li><div class="algo-step-num">1</div>Start with gate closed: write <span class="algo-code">0°</span> to the servo.</li>
+                <li><div class="algo-step-num">2</div>Fire a 10 µs pulse on <span class="algo-code">TRIG</span>, read the echo duration from <span class="algo-code">ECHO</span>, convert to cm: <span class="algo-code">dist = pulseIn(ECHO, HIGH) / 58</span>.</li>
+                <li><div class="algo-step-num">3</div><span class="algo-condition">IF</span> <span class="algo-code">dist &gt; 0</span> AND <span class="algo-code">dist &lt; 20</span> → car detected!</li>
+                <li><div class="algo-step-num">4</div>Open gate: write <span class="algo-code">90°</span> to servo. Wait 3 seconds for the car to pass.</li>
+                <li><div class="algo-step-num">5</div>Close gate: write <span class="algo-code">0°</span> to servo. Wait 1 second before reading again.</li>
+                <li><div class="algo-step-num">6</div>Loop forever — gate opens and closes automatically for each car.</li>
+              </ol>
+            </div>
+
+            <div class="code-compare">
+              <div>
+                <div class="code-col-label mblock">🧩 mBlock</div>
+                <div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/pPk1-mblock.png"></div></div>
+                <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;">Setup: set servo pin 5 to 0°. Forever: read ultrasonic → save to <strong style="color:#fff;">Distance</strong> → if Distance &lt; 20 → set servo to 90° → wait 3s → set servo to 0° → wait 1s.</p>
+              </div>
+              <div>
+                <div class="code-col-label cpp">💻 C++</div>
+                <div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ — Simple Parking Gate</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">#include</span> <span class="st">&lt;Servo.h&gt;</span>
+
+Servo gateServo;
+<span class="kw">const</span> <span class="st">int</span> TRIG = <span class="nm">9</span>, ECHO = <span class="nm">10</span>;
+<span class="kw">const</span> <span class="st">int</span> SERVO_PIN = <span class="nm">5</span>;
+<span class="kw">const</span> <span class="st">int</span> CAR_DIST = <span class="nm">20</span>; <span class="cm">// cm</span>
+
+<span class="kw">long</span> <span class="fn">readDistance</span>() {
+  <span class="fn">digitalWrite</span>(TRIG, LOW);  <span class="fn">delayMicroseconds</span>(<span class="nm">2</span>);
+  <span class="fn">digitalWrite</span>(TRIG, HIGH); <span class="fn">delayMicroseconds</span>(<span class="nm">10</span>);
+  <span class="fn">digitalWrite</span>(TRIG, LOW);
+  <span class="kw">long</span> dur = <span class="fn">pulseIn</span>(ECHO, HIGH, <span class="nm">25000</span>);
+  <span class="kw">return</span> dur ? dur / <span class="nm">58</span> : <span class="nm">999</span>;
+}
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  gateServo.<span class="fn">attach</span>(SERVO_PIN);
+  gateServo.<span class="fn">write</span>(<span class="nm">0</span>); <span class="cm">// Gate closed</span>
+  <span class="fn">pinMode</span>(TRIG, OUTPUT);
+  <span class="fn">pinMode</span>(ECHO, INPUT);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">long</span> dist = <span class="fn">readDistance</span>();
+  Serial.<span class="fn">print</span>(<span class="st">"Distance: "</span>); Serial.<span class="fn">print</span>(dist); Serial.<span class="fn">println</span>(<span class="st">" cm"</span>);
+
+  <span class="kw">if</span> (dist &gt; <span class="nm">0</span> &amp;&amp; dist &lt; CAR_DIST) {
+    Serial.<span class="fn">println</span>(<span class="st">"Car detected! Opening gate..."</span>);
+    gateServo.<span class="fn">write</span>(<span class="nm">90</span>);  <span class="cm">// OPEN</span>
+    <span class="fn">delay</span>(<span class="nm">3000</span>);           <span class="cm">// Hold open 3 seconds</span>
+    gateServo.<span class="fn">write</span>(<span class="nm">0</span>);   <span class="cm">// CLOSE</span>
+    Serial.<span class="fn">println</span>(<span class="st">"Gate closed."</span>);
+    <span class="fn">delay</span>(<span class="nm">1000</span>);           <span class="cm">// Pause before next scan</span>
+  }
+  <span class="fn">delay</span>(<span class="nm">200</span>);
+}</pre></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── SUB 2: FULL SYSTEM WITH DISPLAY ── -->
+          <div class="sub-panel" id="pPk2">
+            <div style="background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:18px;">
+              <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:8px;">🖥️ What's added in the Full Version</div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;">
+                <div style="background:rgba(0,151,157,0.08);border:1px solid rgba(0,151,157,0.2);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;margin-bottom:5px;">🖥️</div><div style="font-size:12px;font-weight:700;color:#fff;">I2C LCD</div><div style="font-size:11px;color:var(--muted);margin-top:3px;">Shows distance, spaces left, welcome &amp; full messages</div></div>
+                <div style="background:rgba(102,187,106,0.08);border:1px solid rgba(102,187,106,0.2);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;margin-bottom:5px;">🟢</div><div style="font-size:12px;font-weight:700;color:#a5d6a7;">Green LED</div><div style="font-size:11px;color:var(--muted);margin-top:3px;">Lit when spaces are available</div></div>
+                <div style="background:rgba(239,83,80,0.08);border:1px solid rgba(239,83,80,0.2);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;margin-bottom:5px;">🔴</div><div style="font-size:12px;font-weight:700;color:#ef9a9a;">Red LED</div><div style="font-size:11px;color:var(--muted);margin-top:3px;">Lit when parking is full</div></div>
+              </div>
+            </div>
+
+            <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Full Pin Wiring</div>
+            <div class="circuit-grid" style="margin-bottom:18px;">
+              <div class="circuit-slot"><span class="circuit-slot-icon">📡</span><div class="circuit-slot-label">HC-SR04 TRIG → Pin 9 / ECHO → Pin 10<code>Same as Sub-project 1</code></div></div>
+              <div class="circuit-slot"><span class="circuit-slot-icon">🔄</span><div class="circuit-slot-label">SG90 Signal → Pin 5<code>Same as Sub-project 1</code></div></div>
+              <div class="circuit-slot"><span class="circuit-slot-icon">🖥️</span><div class="circuit-slot-label">I2C LCD: SDA→A4, SCL→A5<code>VCC→5V, GND→GND (address 0x27)</code></div></div>
+              <div class="circuit-slot"><span class="circuit-slot-icon">🟢🔴</span><div class="circuit-slot-label">Green LED → Pin 7 / Red LED → Pin 6<code>Each with 220Ω resistor to GND</code></div></div>
+            </div>
+
+            <div class="circuit-grid" style="margin-bottom:20px;">
+              <div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/pPk2.png"></div></div>
+              <div class="circuit-slot-label">Full car park system — HC-SR04 + servo gate + I2C LCD + green/red status LEDs</div>
+            </div>
+
+            <div style="background:rgba(255,152,0,0.07);border:1px solid rgba(255,152,0,0.25);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:#ffb74d;line-height:1.65;">
+              ⚠️ <strong>Library required:</strong> Open Arduino IDE → Sketch → Include Library → Manage Libraries → search <strong>"LiquidCrystal I2C"</strong> by Frank de Brabander → Install. If your LCD shows blank squares, adjust the contrast pot on the back of the module.
+            </div>
+
+            <div class="algo-box">
+              <div class="algo-box-header"><div class="algo-box-icon">🧠</div><div><div class="algo-box-title">Algorithm — Full Parking System</div><div class="algo-box-sub">Space counter + display + LEDs + gate</div></div></div>
+              <ol class="algo-steps">
+                <li><div class="algo-step-num">1</div>Initialise LCD, servo at 0° (closed), <span class="algo-code">availableSpaces = 5</span>. Show splash screen: "Car Park Ready / Spaces: 5".</li>
+                <li><div class="algo-step-num">2</div>Every loop: read distance → print to LCD line 1 (<span class="algo-code">"Dist: Xcm"</span>).</li>
+                <li><div class="algo-step-num">3</div><span class="algo-condition">IF</span> <span class="algo-code">availableSpaces == 0</span> → show <span class="algo-code">"PARKING FULL!"</span> on LCD → turn on RED LED → gate stays closed → skip to step 6.</li>
+                <li><div class="algo-step-num">4</div>Otherwise show <span class="algo-code">"Spaces: N"</span> on LCD line 2 → GREEN LED on, RED LED off.</li>
+                <li><div class="algo-step-num">5</div><span class="algo-condition">IF</span> <span class="algo-code">dist &lt; 20 cm</span> AND <span class="algo-code">dist &gt; 0</span>:<br>→ LCD shows <span class="algo-code">"WELCOME!"</span><br>→ Servo opens to 90° → wait 3s → servo closes to 0°<br>→ <span class="algo-code">availableSpaces--</span><br>→ LCD shows updated count</li>
+                <li><div class="algo-step-num">6</div>Wait 200 ms → repeat from step 2.</li>
+              </ol>
+            </div>
+
+            <div class="code-compare">
+              <div>
+                <div class="code-col-label mblock">🧩 mBlock</div>
+                <div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/pPk2-mblock.png"></div></div>
+                <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;">Use the <strong style="color:#fff;">LCD I2C extension</strong>. Setup: set LCD, spaces=5, show splash. Forever: read distance → LCD line 1 = dist → if spaces=0 → LCD "FULL" → else LCD "Spaces:N" → if dist &lt; 20 → LCD "WELCOME!" → open gate → wait → close → spaces minus 1.</p>
+              </div>
+              <div>
+                <div class="code-col-label cpp">💻 C++</div>
+                <div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ — Full Car Parking System</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">#include</span> <span class="st">&lt;Servo.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;Wire.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;LiquidCrystal_I2C.h&gt;</span>
+
+<span class="cm">// LCD: I2C address 0x27, 16 cols, 2 rows</span>
+LiquidCrystal_I2C <span class="fn">lcd</span>(<span class="nm">0x27</span>, <span class="nm">16</span>, <span class="nm">2</span>);
+Servo gateServo;
+
+<span class="kw">const</span> <span class="st">int</span> TRIG=<span class="nm">9</span>, ECHO=<span class="nm">10</span>, SERVO_PIN=<span class="nm">5</span>;
+<span class="kw">const</span> <span class="st">int</span> GREEN_LED=<span class="nm">7</span>, RED_LED=<span class="nm">6</span>;
+<span class="kw">const</span> <span class="st">int</span> CAR_DIST=<span class="nm">20</span>;     <span class="cm">// cm — trigger distance</span>
+<span class="kw">const</span> <span class="st">int</span> TOTAL_SPACES=<span class="nm">5</span>;
+<span class="st">int</span> availableSpaces = TOTAL_SPACES;
+
+<span class="kw">long</span> <span class="fn">readDistance</span>() {
+  <span class="fn">digitalWrite</span>(TRIG,LOW);  <span class="fn">delayMicroseconds</span>(<span class="nm">2</span>);
+  <span class="fn">digitalWrite</span>(TRIG,HIGH); <span class="fn">delayMicroseconds</span>(<span class="nm">10</span>);
+  <span class="fn">digitalWrite</span>(TRIG,LOW);
+  <span class="kw">long</span> d = <span class="fn">pulseIn</span>(ECHO, HIGH, <span class="nm">25000</span>);
+  <span class="kw">return</span> d ? d/<span class="nm">58</span> : <span class="nm">999</span>;
+}
+
+<span class="kw">void</span> <span class="fn">showStatus</span>(<span class="st">long</span> dist) {
+  lcd.<span class="fn">setCursor</span>(<span class="nm">0</span>,<span class="nm">0</span>);
+  lcd.<span class="fn">print</span>(<span class="st">"Dist: "</span>); lcd.<span class="fn">print</span>(dist);
+  lcd.<span class="fn">print</span>(<span class="st">" cm   "</span>); <span class="cm">// Trailing spaces clear old chars</span>
+  lcd.<span class="fn">setCursor</span>(<span class="nm">0</span>,<span class="nm">1</span>);
+  <span class="kw">if</span> (availableSpaces &gt; <span class="nm">0</span>) {
+    lcd.<span class="fn">print</span>(<span class="st">"Spaces: "</span>); lcd.<span class="fn">print</span>(availableSpaces);
+    lcd.<span class="fn">print</span>(<span class="st">"        "</span>);
+    <span class="fn">digitalWrite</span>(GREEN_LED,HIGH); <span class="fn">digitalWrite</span>(RED_LED,LOW);
+  } <span class="kw">else</span> {
+    lcd.<span class="fn">print</span>(<span class="st">"PARKING FULL!   "</span>);
+    <span class="fn">digitalWrite</span>(GREEN_LED,LOW);  <span class="fn">digitalWrite</span>(RED_LED,HIGH);
+  }
+}
+
+<span class="kw">void</span> <span class="fn">carArrived</span>() {
+  lcd.<span class="fn">clear</span>();
+  lcd.<span class="fn">setCursor</span>(<span class="nm">0</span>,<span class="nm">0</span>); lcd.<span class="fn">print</span>(<span class="st">"  WELCOME!  :)  "</span>);
+  lcd.<span class="fn">setCursor</span>(<span class="nm">0</span>,<span class="nm">1</span>); lcd.<span class="fn">print</span>(<span class="st">"Gate opening... "</span>);
+  gateServo.<span class="fn">write</span>(<span class="nm">90</span>);   <span class="cm">// Open</span>
+  <span class="fn">delay</span>(<span class="nm">3000</span>);
+  gateServo.<span class="fn">write</span>(<span class="nm">0</span>);    <span class="cm">// Close</span>
+  availableSpaces--;
+  lcd.<span class="fn">clear</span>();
+  lcd.<span class="fn">setCursor</span>(<span class="nm">0</span>,<span class="nm">0</span>); lcd.<span class="fn">print</span>(<span class="st">"Space taken!"</span>);
+  lcd.<span class="fn">setCursor</span>(<span class="nm">0</span>,<span class="nm">1</span>); lcd.<span class="fn">print</span>(<span class="st">"Left: "</span>);
+  lcd.<span class="fn">print</span>(availableSpaces);
+  <span class="fn">delay</span>(<span class="nm">2000</span>);
+}
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  lcd.<span class="fn">init</span>(); lcd.<span class="fn">backlight</span>();
+  gateServo.<span class="fn">attach</span>(SERVO_PIN); gateServo.<span class="fn">write</span>(<span class="nm">0</span>);
+  <span class="fn">pinMode</span>(TRIG,OUTPUT); <span class="fn">pinMode</span>(ECHO,INPUT);
+  <span class="fn">pinMode</span>(GREEN_LED,OUTPUT); <span class="fn">pinMode</span>(RED_LED,OUTPUT);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  <span class="cm">// Splash screen</span>
+  lcd.<span class="fn">setCursor</span>(<span class="nm">0</span>,<span class="nm">0</span>); lcd.<span class="fn">print</span>(<span class="st">"Car Park Ready!"</span>);
+  lcd.<span class="fn">setCursor</span>(<span class="nm">0</span>,<span class="nm">1</span>); lcd.<span class="fn">print</span>(<span class="st">"Spaces: "</span>); lcd.<span class="fn">print</span>(TOTAL_SPACES);
+  <span class="fn">digitalWrite</span>(GREEN_LED,HIGH);
+  <span class="fn">delay</span>(<span class="nm">2000</span>);
+  lcd.<span class="fn">clear</span>();
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">long</span> dist = <span class="fn">readDistance</span>();
+  Serial.<span class="fn">print</span>(<span class="st">"Dist: "</span>); Serial.<span class="fn">println</span>(dist);
+
+  <span class="kw">if</span> (availableSpaces == <span class="nm">0</span>) {
+    <span class="cm">// Car park full — gate stays shut</span>
+    lcd.<span class="fn">setCursor</span>(<span class="nm">0</span>,<span class="nm">0</span>); lcd.<span class="fn">print</span>(<span class="st">"PARKING FULL!   "</span>);
+    lcd.<span class="fn">setCursor</span>(<span class="nm">0</span>,<span class="nm">1</span>); lcd.<span class="fn">print</span>(<span class="st">"No spaces left  "</span>);
+    <span class="fn">digitalWrite</span>(GREEN_LED,LOW); <span class="fn">digitalWrite</span>(RED_LED,HIGH);
+    <span class="fn">delay</span>(<span class="nm">500</span>);
+    <span class="kw">return</span>;
+  }
+
+  <span class="fn">showStatus</span>(dist);
+
+  <span class="kw">if</span> (dist &gt; <span class="nm">0</span> &amp;&amp; dist &lt; CAR_DIST) {
+    <span class="fn">carArrived</span>();
+  }
+  <span class="fn">delay</span>(<span class="nm">200</span>);
+}</pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="proj-section">
+          <div class="sect-label">Quick Quiz</div>
+          <div class="quiz-wrap">
+            <div class="quiz-title"><span>🧠</span> Test Your Understanding</div>
+            <div class="quiz-q">
+              <div class="quiz-question">1. Why does the LCD I2C module only need 2 signal wires (SDA &amp; SCL) instead of the 6+ wires a normal LCD needs?</div>
+              <div class="quiz-options">
+                <div class="quiz-opt" onclick="answer(this,'wrong','The resolution of the display has nothing to do with the number of signal wires.')"><span class="quiz-opt-letter">A</span>The I2C LCD has a lower resolution so it needs fewer pins</div>
+                <div class="quiz-opt" onclick="answer(this,'correct','I2C is a serial communication protocol — data is sent one bit at a time along the SDA wire, controlled by a clock signal on SCL. The I2C adapter chip on the back of the LCD handles the conversion, so the Arduino only needs 2 wires regardless of display size.')"><span class="quiz-opt-letter">B</span>I2C sends data serially (bit by bit), so only 2 wires (data + clock) are needed — the adapter chip does the rest</div>
+                <div class="quiz-opt" onclick="answer(this,'wrong','Both use the same 5V power — the number of wires is about the data protocol, not voltage.')"><span class="quiz-opt-letter">C</span>The I2C version runs on lower voltage so it needs fewer wires</div>
+              </div>
+              <div class="quiz-feedback"></div>
+            </div>
+            <div class="quiz-q" style="margin-top:18px;">
+              <div class="quiz-question">2. There are 3 spaces left and a car pulls up. After the gate opens and closes, what does <code style="font-family:'DM Mono',monospace;color:var(--teal);">availableSpaces</code> equal?</div>
+              <div class="quiz-options">
+                <div class="quiz-opt" onclick="answer(this,'wrong','The car entered the car park — it takes a space, so the count goes down by 1, not stays the same.')"><span class="quiz-opt-letter">A</span>Still 3</div>
+                <div class="quiz-opt" onclick="answer(this,'correct','Every time a car passes through the gate, availableSpaces-- decrements the counter by 1. 3 - 1 = 2.')"><span class="quiz-opt-letter">B</span>2 — it decrements by 1 after each car enters</div>
+                <div class="quiz-opt" onclick="answer(this,'wrong','availableSpaces only changes by 1 each time, not resets to 0 unless the car park is full.')"><span class="quiz-opt-letter">C</span>0 — it resets when the gate closes</div>
+              </div>
+              <div class="quiz-feedback"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="proj-section">
+          <div class="sect-label">Ask a Question</div>
+          <div class="message-box">
+            <div class="message-box-title"><span>💬</span> Got a question about Project 8?</div>
+            <div class="message-box-sub">Servo not moving or LCD showing blank squares? Ask your coach below.</div>
+            <div class="msg-row"><textarea class="msg-input" placeholder="Type your question here… e.g. 'My LCD shows only black squares, what should I check?'"></textarea><button class="msg-send" onclick="sendMsg(this)">Send →</button></div>
+            <div class="msg-sent">✓ Message sent! Your coach will reply soon.</div>
+          </div>
+        </div>
+
+        <div class="proj-section">
+          <div class="sect-label">Bonus Challenges</div>
+          <div class="bonus-box"><div class="bonus-icon">🌟</div><div><div class="bonus-title">Want to go further?</div><ul class="bonus-list">
+            <li>Add a second HC-SR04 at the exit to automatically increment <code style="font-family:'DM Mono',monospace;color:var(--teal);">availableSpaces</code> when a car leaves.</li>
+            <li>Add a reset button (push button on pin 4) that sets <code style="font-family:'DM Mono',monospace;color:var(--teal);">availableSpaces</code> back to 5 when pressed.</li>
+            <li>Make the gate open more slowly by using a for-loop that increments the servo from 0° to 90° one degree at a time with a 15ms delay — just like a real barrier.</li>
+            <li>Display a scrolling "SORRY — FULL" message on the LCD when capacity is reached using <code style="font-family:'DM Mono',monospace;color:var(--teal);">lcd.scrollDisplayLeft()</code>.</li>
+            <li>Add a buzzer that beeps once when the gate opens and twice when the car park is full.</li>
+          </ul></div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="next-strip reveal">
+      <div class="next-strip-text"><div class="next-strip-label">Up Next</div><div class="next-strip-title">Project 09: Spin It! — control a DC motor fan with a button, speed dial, and the L298N driver</div></div>
+      <a class="btn-next-proj" href="#proj8" onclick="openProject('proj8')">Start Project 09 →</a>
+    </div>
+
+    <!-- PROJECT 8 (now 09) -->
+    <div class="project-card reveal" id="proj8">
+      <div class="proj-header" onclick="toggleProject(this)">
+        <div>
+          <div class="proj-num">Intermediate · Project 09</div>
+          <div class="proj-title">💨 Spin It!</div>
+          <div class="proj-meta"><span class="proj-tag teal">mBlock</span><span class="proj-tag orange">DC Motor · L298N · PWM</span><span class="proj-tag gray">3 Levels</span><span class="time-badge">⏱ 75–105 min</span></div>
+          <div class="difficulty-row"><span class="diff-label">Difficulty</span><div class="diff-stars"><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star"></div></div></div>
+        </div>
+        <div class="proj-chevron">▾</div>
+      </div>
+      <div class="proj-body">
+        <div class="proj-section">
+          <div class="sect-label">Introduction</div>
+          <p class="proj-overview">Build a real electric fan you control! Starting with a basic spin, you'll add a push-button ON/OFF switch, then a potentiometer speed dial. The L298N motor driver lets the Arduino safely control the motor's speed (via PWM) and direction.</p>
+          <div class="intro-grid">
+            <div class="intro-card"><div class="intro-card-icon">🧰</div><div class="intro-card-title">What You Need</div><div class="intro-card-text">Arduino Uno, L298N motor driver, DC motor with fan blade, push button, potentiometer, 10kΩ resistor, 4×AA battery pack, jumper wires, mBlock.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">⚡</div><div class="intro-card-title">What You'll Learn</div><div class="intro-card-text">PWM speed control with analogWrite(), L298N wiring, direction reversal (IN1/IN2), button debouncing, toggle state variables, potentiometer-to-speed mapping.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">🌍</div><div class="intro-card-title">Real World Use</div><div class="intro-card-text">Cooling fans in computers, motorised blinds, conveyor belts, RC cars, drones, washing machines.</div></div>
+          </div>
+          <ul class="proj-list">
+            <li>L298N: ENA→Pin 3 (PWM speed), IN1→Pin 5, IN2→Pin 6 (direction), OUT1/OUT2 → motor terminals.</li>
+            <li>Power the motor separately! Use a 4×AA or 9V battery to the L298N — never the Arduino's 5V pin.</li>
+            <li>analogWrite(ENA, 200) sends PWM: 0=OFF, 255=full speed, 200≈78% speed.</li>
+            <li>Swap IN1 and IN2 (HIGH↔LOW) to reverse motor direction.</li>
+          </ul>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Sub-Projects — Circuit &amp; Code</div>
+          <div class="sub-tabs">
+            <button class="sub-tab active" onclick="switchSub(this,'p8s1')">Basic — Just Spin</button>
+            <button class="sub-tab" onclick="switchSub(this,'p8s2')">Intermediate — Button Switch</button>
+            <button class="sub-tab" onclick="switchSub(this,'p8s3')">Full — Speed Dial Control</button>
+          </div>
+          <div class="sub-panel active" id="p8s1">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p8s1.png"></div></div><div class="circuit-slot-label">L298N + DC Motor. ENA→D3, IN1→D5, IN2→D6, external battery to L298N power pins.</div></div>
+            <div class="code-compare">
+              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p8s1-mblock.png"></div></div></div>
+              <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="st">int</span> ENA=<span class="nm">3</span>, IN1=<span class="nm">5</span>, IN2=<span class="nm">6</span>;
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(ENA,OUTPUT); <span class="fn">pinMode</span>(IN1,OUTPUT); <span class="fn">pinMode</span>(IN2,OUTPUT);
+}
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">digitalWrite</span>(IN1, HIGH); <span class="fn">digitalWrite</span>(IN2, LOW);
+  <span class="fn">analogWrite</span>(ENA, <span class="nm">200</span>); <span class="fn">delay</span>(<span class="nm">3000</span>);
+  <span class="fn">analogWrite</span>(ENA, <span class="nm">0</span>);   <span class="fn">delay</span>(<span class="nm">2000</span>);
+}</pre></div></div>
+            </div>
+          </div>
+          <div class="sub-panel" id="p8s2">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p8s2.png"></div></div><div class="circuit-slot-label">Add push button: Pin 1 → D2 + 10kΩ pull-down to GND, Pin 2 → 5V.</div></div>
+            <div class="code-compare">
+              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p8s2-mblock.png"></div></div></div>
+              <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="st">int</span> ENA=<span class="nm">3</span>,IN1=<span class="nm">5</span>,IN2=<span class="nm">6</span>,btnPin=<span class="nm">2</span>;
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(ENA,OUTPUT);<span class="fn">pinMode</span>(IN1,OUTPUT);
+  <span class="fn">pinMode</span>(IN2,OUTPUT);<span class="fn">pinMode</span>(btnPin,INPUT);
+}
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span>(<span class="fn">digitalRead</span>(btnPin)==HIGH){
+    <span class="fn">digitalWrite</span>(IN1,HIGH);<span class="fn">digitalWrite</span>(IN2,LOW);
+    <span class="fn">analogWrite</span>(ENA,<span class="nm">200</span>);
+  }<span class="kw">else</span>{
+    <span class="fn">analogWrite</span>(ENA,<span class="nm">0</span>);
+  }
+  <span class="fn">delay</span>(<span class="nm">100</span>);
+}</pre></div></div>
+            </div>
+          </div>
+          <div class="sub-panel" id="p8s3">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p8s3.png"></div></div><div class="circuit-slot-label">Full circuit: button (D2) + potentiometer middle pin (A0) + L298N + DC motor + external battery.</div></div>
+            <div class="algo-box">
+              <div class="algo-box-header"><div class="algo-box-icon">🧠</div><div><div class="algo-box-title">Algorithm — Toggle Fan + Speed Dial</div><div class="algo-box-sub">One button press = ON, next press = OFF. Knob controls speed while ON.</div></div></div>
+              <ol class="algo-steps">
+                <li><div class="algo-step-num">1</div>Track a boolean <span class="algo-code">fanOn</span> variable and the previous button state <span class="algo-code">lastButton</span>.</li>
+                <li><div class="algo-step-num">2</div><span class="algo-condition">IF</span> the button just changed from LOW → HIGH (rising edge), flip <span class="algo-code">fanOn</span> and debounce with 50 ms delay.</li>
+                <li><div class="algo-step-num">3</div>Save the current button state to <span class="algo-code">lastButton</span> for the next loop cycle.</li>
+                <li><div class="algo-step-num">4</div><span class="algo-condition">IF</span> <span class="algo-code">fanOn</span> is true → read potentiometer (0–1023) → map to speed (0–255) → spin motor.</li>
+                <li><div class="algo-step-num">5</div><span class="algo-condition">ELSE</span> → set ENA to 0 (motor stops).</li>
+              </ol>
+            </div>
+            <div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ — Full Fan Control</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="st">int</span> ENA=<span class="nm">3</span>,IN1=<span class="nm">5</span>,IN2=<span class="nm">6</span>;
+<span class="st">int</span> btnPin=<span class="nm">2</span>, potPin=A0;
+<span class="st">bool</span> fanOn=<span class="kw">false</span>;
+<span class="st">int</span> lastButton=LOW;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(ENA,OUTPUT);<span class="fn">pinMode</span>(IN1,OUTPUT);
+  <span class="fn">pinMode</span>(IN2,OUTPUT);<span class="fn">pinMode</span>(btnPin,INPUT);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="st">int</span> btn = <span class="fn">digitalRead</span>(btnPin);
+  <span class="kw">if</span>(btn==HIGH &amp;&amp; lastButton==LOW){
+    fanOn = !fanOn;
+    <span class="fn">delay</span>(<span class="nm">50</span>);
+  }
+  lastButton = btn;
+  <span class="kw">if</span>(fanOn){
+    <span class="st">int</span> spd=<span class="fn">map</span>(<span class="fn">analogRead</span>(potPin),<span class="nm">0</span>,<span class="nm">1023</span>,<span class="nm">0</span>,<span class="nm">255</span>);
+    <span class="fn">digitalWrite</span>(IN1,HIGH);<span class="fn">digitalWrite</span>(IN2,LOW);
+    <span class="fn">analogWrite</span>(ENA,spd);
+    Serial.<span class="fn">print</span>(<span class="st">"Fan ON | Speed: "</span>);Serial.<span class="fn">println</span>(spd);
+  }<span class="kw">else</span>{
+    <span class="fn">analogWrite</span>(ENA,<span class="nm">0</span>);
+    Serial.<span class="fn">println</span>(<span class="st">"Fan OFF"</span>);
+  }
+  <span class="fn">delay</span>(<span class="nm">100</span>);
+}</pre></div>
+          </div>
+        </div>
+        <div class="proj-section"><div class="sect-label">Quick Quiz</div><div class="quiz-wrap"><div class="quiz-title"><span>🧠</span> Test Your Understanding</div><div class="quiz-q"><div class="quiz-question">1. Why must we use an external battery for the motor, not the Arduino's 5V pin?</div><div class="quiz-options"><div class="quiz-opt" onclick="answer(this,'wrong','The 5V pin can supply power — the problem is how MUCH current it can supply.')"><span class="quiz-opt-letter">A</span>The Arduino 5V pin outputs the wrong voltage</div><div class="quiz-opt" onclick="answer(this,'correct','DC motors draw far more current than the Arduino can safely supply (often 500mA+). This damages the voltage regulator and can reset or fry the board.')"><span class="quiz-opt-letter">B</span>Motors draw too much current — it would damage or reset the Arduino</div><div class="quiz-opt" onclick="answer(this,'wrong','Speed is controlled by PWM through the ENA pin, not by battery choice.')"><span class="quiz-opt-letter">C</span>The motor won\'t reach full speed without a separate battery</div></div><div class="quiz-feedback"></div></div></div></div>
+        <div class="proj-section"><div class="sect-label">Ask a Question</div><div class="message-box"><div class="message-box-title"><span>💬</span> Got a question about Project 8?</div><div class="message-box-sub">Motor not spinning? Ask your coach below.</div><div class="msg-row"><textarea class="msg-input" placeholder="Type your question here…"></textarea><button class="msg-send" onclick="sendMsg(this)">Send →</button></div><div class="msg-sent">✓ Message sent!</div></div></div>
+        <div class="proj-section"><div class="sect-label">Bonus Challenges</div><div class="bonus-box"><div class="bonus-icon">🌟</div><div><div class="bonus-title">Want to go further?</div><ul class="bonus-list"><li>Add a second button that reverses fan direction.</li><li>Make the fan auto-stop after 30 seconds and require another button press to restart.</li><li>Add a minimum speed floor: if the potentiometer reads below 100, stop the motor entirely.</li></ul></div></div></div>
+      </div>
+    </div>
+
+    <div class="next-strip reveal" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(124,58,237,0.03));border-color:rgba(124,58,237,0.2);">
+      <div class="next-strip-text"><div class="next-strip-label" style="color:#a78bfa;">Final Intermediate Project</div><div class="next-strip-title">Project 10: Arduino Car — lights, movement, surveillance, and autonomous obstacle avoidance</div></div>
+      <a class="btn-next-proj" href="#proj9" onclick="openProject('proj9')" style="background:var(--purple);">Start Project 09 →</a>
+    </div>
+
+    <!-- PROJECT 9 -->
+    <div class="project-card reveal" id="proj9">
+      <div class="proj-header" onclick="toggleProject(this)">
+        <div>
+          <div class="proj-num">Intermediate · Project 10</div>
+          <div class="proj-title">🚗 Arduino Car</div>
+          <div class="proj-meta"><span class="proj-tag teal">Upload Mode</span><span class="proj-tag orange">L298N · HC-SR04 · Servo</span><span class="proj-tag gray">4 Sub-Projects</span><span class="time-badge">⏱ 3–4 hours total</span></div>
+          <div class="difficulty-row"><span class="diff-label">Difficulty</span><div class="diff-stars"><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div><div class="diff-star on"></div></div></div>
+        </div>
+        <div class="proj-chevron">▾</div>
+      </div>
+      <div class="proj-body">
+        <div class="proj-section">
+          <div class="sect-label">Introduction</div>
+          <p class="proj-overview">This is the capstone of the Intermediate level. You'll build a fully working autonomous Arduino car in four stages — wiring up lights, making it drive, adding an ultrasonic scanner on a servo arm, and finally programming it to avoid obstacles all by itself.</p>
+          <div class="intro-grid">
+            <div class="intro-card"><div class="intro-card-icon">🧰</div><div class="intro-card-title">What You Need</div><div class="intro-card-text">Arduino Uno, L298N motor driver, 2× DC motors with wheels, SG90 servo, HC-SR04 sensor, LEDs (red×2, yellow×2, white×1), 220Ω resistors, chassis, battery pack, jumper wires.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">⚡</div><div class="intro-card-title">What You'll Learn</div><div class="intro-card-text">Automotive lighting patterns, dual-motor control, servo-mounted sensor scanning, distance-based decision making, and a complete autonomous algorithm.</div></div>
+            <div class="intro-card"><div class="intro-card-icon">🌍</div><div class="intro-card-title">Real World Use</div><div class="intro-card-text">Self-driving cars (Tesla, Waymo), robot vacuum cleaners (Roomba), autonomous forklifts, delivery drones, agricultural robots.</div></div>
+          </div>
+        </div>
+        <div class="proj-section">
+          <div class="sect-label">Sub-Projects</div>
+          <div class="sub-tabs">
+            <button class="sub-tab active" onclick="switchSub(this,'p9s1')">1 · 💡 Light Up the Car</button>
+            <button class="sub-tab" onclick="switchSub(this,'p9s2')">2 · 🏎️ Moving Car</button>
+            <button class="sub-tab" onclick="switchSub(this,'p9s3')">3 · 👁️ Surveillance</button>
+            <button class="sub-tab" onclick="switchSub(this,'p9s4')">4 · 🤖 Obstacle Avoider</button>
+            <button class="sub-tab" onclick="switchSub(this,'p9s5')">5 · 📱 Remote Control</button>
+          </div>
+
+          <!-- SUB 1 -->
+          <div class="sub-panel active" id="p9s1">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p9s1.png"></div></div><div class="circuit-slot-label">Car lighting circuit — each LED wired with a 220Ω resistor to its dedicated pin</div></div>
+            <div class="algo-box">
+              <div class="algo-box-header"><div class="algo-box-icon">🧠</div><div><div class="algo-box-title">Algorithm — Hazard &amp; Signal Blink</div><div class="algo-box-sub">Use millis() for non-blocking blinks — never delay() on a car</div></div></div>
+              <ol class="algo-steps">
+                <li><div class="algo-step-num">1</div>Define <span class="algo-code">blinkState</span> (bool) and <span class="algo-code">lastBlink</span> (unsigned long) timer variables.</li>
+                <li><div class="algo-step-num">2</div>Every loop, check: has 500 ms elapsed since <span class="algo-code">lastBlink</span>? Use <span class="algo-code">millis()</span>.</li>
+                <li><div class="algo-step-num">3</div><span class="algo-condition">IF</span> 500 ms has passed → toggle <span class="algo-code">blinkState</span> → update <span class="algo-code">lastBlink = millis()</span>.</li>
+                <li><div class="algo-step-num">4</div>For <strong style="color:#fff;">Hazard</strong>: write <span class="algo-code">blinkState</span> to BOTH left AND right signal pins simultaneously.</li>
+                <li><div class="algo-step-num">5</div>Brake and reverse lights: simple <span class="algo-code">digitalWrite(pin, HIGH/LOW)</span>.</li>
+              </ol>
+            </div>
+            <div class="code-compare">
+              <div>
+                <div class="code-col-label mblock">🧩 mBlock</div>
+                <div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p9s1-mblock.png"></div></div>
+                <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;">Setup: set all light pins as output. Forever: use a timer variable and if/else blocks to toggle left, right, brake, and reverse pins on a 500 ms cycle.</p>
+              </div>
+              <div>
+                <div class="code-col-label cpp">💻 C++</div>
+                <div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ — Car Lights (millis-based, non-blocking)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">const</span> <span class="st">int</span> PIN_BRAKE=<span class="nm">13</span>,PIN_LEFT=<span class="nm">12</span>,PIN_RIGHT=<span class="nm">11</span>,PIN_REV=<span class="nm">10</span>;
+<span class="kw">unsigned long</span> lastBlink=<span class="nm">0</span>; <span class="st">bool</span> blinkState=<span class="kw">false</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>(){
+  <span class="fn">pinMode</span>(PIN_BRAKE,OUTPUT);<span class="fn">pinMode</span>(PIN_LEFT,OUTPUT);
+  <span class="fn">pinMode</span>(PIN_RIGHT,OUTPUT);<span class="fn">pinMode</span>(PIN_REV,OUTPUT);
+}
+<span class="kw">void</span> <span class="fn">updateBlink</span>(){
+  <span class="kw">if</span>(<span class="fn">millis</span>()-lastBlink&gt;=<span class="nm">500</span>){blinkState=!blinkState;lastBlink=<span class="fn">millis</span>();}
+}
+<span class="kw">void</span> <span class="fn">hazard</span>(){
+  <span class="fn">updateBlink</span>();
+  <span class="fn">digitalWrite</span>(PIN_LEFT,blinkState);
+  <span class="fn">digitalWrite</span>(PIN_RIGHT,blinkState);
+}
+<span class="kw">void</span> <span class="fn">signalLeft</span>(){
+  <span class="fn">updateBlink</span>();
+  <span class="fn">digitalWrite</span>(PIN_LEFT,blinkState);
+  <span class="fn">digitalWrite</span>(PIN_RIGHT,LOW);
+}
+<span class="kw">void</span> <span class="fn">signalRight</span>(){
+  <span class="fn">updateBlink</span>();
+  <span class="fn">digitalWrite</span>(PIN_RIGHT,blinkState);
+  <span class="fn">digitalWrite</span>(PIN_LEFT,LOW);
+}
+<span class="kw">void</span> <span class="fn">loop</span>(){
+  <span class="kw">unsigned long</span> t=<span class="fn">millis</span>();
+  <span class="kw">if</span>(t%<span class="nm">8000</span>&lt;<span class="nm">2000</span>)      <span class="fn">digitalWrite</span>(PIN_BRAKE,HIGH);
+  <span class="kw">else if</span>(t%<span class="nm">8000</span>&lt;<span class="nm">4000</span>){<span class="fn">digitalWrite</span>(PIN_BRAKE,LOW);<span class="fn">signalLeft</span>();}
+  <span class="kw">else if</span>(t%<span class="nm">8000</span>&lt;<span class="nm">6000</span>) <span class="fn">signalRight</span>();
+  <span class="kw">else</span>                   <span class="fn">hazard</span>();
+}</pre></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB 2 -->
+          <div class="sub-panel" id="p9s2">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p9s2.png"></div></div><div class="circuit-slot-label">Dual motor wiring through L298N — external battery to +12V &amp; GND</div></div>
+            <div class="algo-box">
+              <div class="algo-box-header"><div class="algo-box-icon">🧠</div><div><div class="algo-box-title">Algorithm — Differential Steering</div><div class="algo-box-sub">How turning works without a steering wheel</div></div></div>
+              <ol class="algo-steps">
+                <li><div class="algo-step-num">1</div><strong style="color:#fff;">Forward:</strong> Both motors spin forward (IN1=H, IN2=L) AND (IN3=H, IN4=L) at the same speed.</li>
+                <li><div class="algo-step-num">2</div><strong style="color:#fff;">Backward:</strong> Reverse both motors. Activate reverse light.</li>
+                <li><div class="algo-step-num">3</div><strong style="color:#fff;">Turn Left:</strong> Stop left motor (ENA=0), right motor spins forward. Blink left signal.</li>
+                <li><div class="algo-step-num">4</div><strong style="color:#fff;">Turn Right:</strong> Stop right motor (ENB=0), left motor spins forward. Blink right signal.</li>
+                <li><div class="algo-step-num">5</div><strong style="color:#fff;">Stop:</strong> Set ENA=0 and ENB=0. Activate brake lights.</li>
+              </ol>
+            </div>
+            <div class="code-compare">
+              <div>
+                <div class="code-col-label mblock">🧩 mBlock</div>
+                <div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p9s2-mblock.png"></div></div>
+                <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;">Define custom blocks: forward, backward, turnLeft, turnRight, stopCar — each sets IN1/IN2/IN3/IN4 and uses set analog pin for ENA/ENB speed. Call them in sequence to drive a square.</p>
+              </div>
+              <div>
+                <div class="code-col-label cpp">💻 C++</div>
+                <div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ — Car Movement Functions</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">const</span> <span class="st">int</span> ENA=<span class="nm">5</span>,IN1=<span class="nm">6</span>,IN2=<span class="nm">7</span>;
+<span class="kw">const</span> <span class="st">int</span> ENB=<span class="nm">3</span>,IN3=<span class="nm">8</span>,IN4=<span class="nm">9</span>;
+<span class="kw">const</span> <span class="st">int</span> SPEED=<span class="nm">200</span>;
+
+<span class="kw">void</span> <span class="fn">moveForward</span>(){
+  <span class="fn">digitalWrite</span>(IN1,HIGH);<span class="fn">digitalWrite</span>(IN2,LOW);
+  <span class="fn">digitalWrite</span>(IN3,HIGH);<span class="fn">digitalWrite</span>(IN4,LOW);
+  <span class="fn">analogWrite</span>(ENA,SPEED);<span class="fn">analogWrite</span>(ENB,SPEED);
+}
+<span class="kw">void</span> <span class="fn">stopCar</span>(){
+  <span class="fn">analogWrite</span>(ENA,<span class="nm">0</span>);<span class="fn">analogWrite</span>(ENB,<span class="nm">0</span>);
+  <span class="fn">digitalWrite</span>(IN1,LOW);<span class="fn">digitalWrite</span>(IN2,LOW);
+  <span class="fn">digitalWrite</span>(IN3,LOW);<span class="fn">digitalWrite</span>(IN4,LOW);
+}
+<span class="cm">// Demo: drive a square</span>
+<span class="kw">void</span> <span class="fn">loop</span>(){
+  <span class="fn">moveForward</span>(); <span class="fn">delay</span>(<span class="nm">1500</span>);
+  <span class="fn">stopCar</span>();     <span class="fn">delay</span>(<span class="nm">500</span>);
+}</pre></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB 3 -->
+          <div class="sub-panel" id="p9s3">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p9s3.png"></div></div><div class="circuit-slot-label">SG90 servo signal → Pin 2; HC-SR04 TRIG → Pin 9, ECHO → Pin 10. Mount sensor on servo horn.</div></div>
+            <div class="algo-box">
+              <div class="algo-box-header"><div class="algo-box-icon">🧠</div><div><div class="algo-box-title">Algorithm — 180° Radar Sweep</div><div class="algo-box-sub">Scan the environment, build a distance map</div></div></div>
+              <ol class="algo-steps">
+                <li><div class="algo-step-num">1</div>Initialise servo at 90° (centre / facing forward).</li>
+                <li><div class="algo-step-num">2</div>Loop: move servo from <span class="algo-code">0°</span> to <span class="algo-code">180°</span> in 1° steps.</li>
+                <li><div class="algo-step-num">3</div>At each angle, wait 30 ms, fire a ping, and read the echo.</li>
+                <li><div class="algo-step-num">4</div>Convert to cm and print: <span class="algo-code">angle: Xdeg, distance: Ycm</span>.</li>
+                <li><div class="algo-step-num">5</div>Sweep back from <span class="algo-code">180°</span> to <span class="algo-code">0°</span> and repeat.</li>
+              </ol>
+            </div>
+            <div class="code-compare">
+              <div>
+                <div class="code-col-label mblock">🧩 mBlock</div>
+                <div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p9s3-mblock.png"></div></div>
+                <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;">Use a "repeat 181" loop with a counter variable (angle 0→180): set servo pin 2 to angle → wait 0.03s → read ultrasonic → print angle + distance to serial. Repeat in reverse (180→0).</p>
+              </div>
+              <div>
+                <div class="code-col-label cpp">💻 C++</div>
+                <div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ — 180° Ultrasonic Radar</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">#include</span> <span class="st">&lt;Servo.h&gt;</span>
+Servo radarServo;
+<span class="kw">const</span> <span class="st">int</span> TRIG=<span class="nm">9</span>, ECHO=<span class="nm">10</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>(){
+  radarServo.<span class="fn">attach</span>(<span class="nm">2</span>);
+  <span class="fn">pinMode</span>(TRIG,OUTPUT);<span class="fn">pinMode</span>(ECHO,INPUT);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  radarServo.<span class="fn">write</span>(<span class="nm">90</span>);<span class="fn">delay</span>(<span class="nm">500</span>);
+}
+<span class="st">int</span> <span class="fn">ping</span>(){
+  <span class="fn">digitalWrite</span>(TRIG,LOW);<span class="fn">delayMicroseconds</span>(<span class="nm">2</span>);
+  <span class="fn">digitalWrite</span>(TRIG,HIGH);<span class="fn">delayMicroseconds</span>(<span class="nm">10</span>);
+  <span class="fn">digitalWrite</span>(TRIG,LOW);
+  <span class="kw">long</span> d=<span class="fn">pulseIn</span>(ECHO,HIGH,<span class="nm">30000</span>);
+  <span class="kw">return</span> d ? d/<span class="nm">58</span> : <span class="nm">200</span>;
+}
+<span class="kw">void</span> <span class="fn">loop</span>(){
+  <span class="kw">for</span>(<span class="st">int</span> a=<span class="nm">0</span>;a&lt;=<span class="nm">180</span>;a++){
+    radarServo.<span class="fn">write</span>(a);<span class="fn">delay</span>(<span class="nm">30</span>);
+    Serial.<span class="fn">print</span>(<span class="st">"Angle:"</span>);Serial.<span class="fn">print</span>(a);
+    Serial.<span class="fn">print</span>(<span class="st">" Dist:"</span>);Serial.<span class="fn">println</span>(<span class="fn">ping</span>());
+  }
+}</pre></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB 4 -->
+          <div class="sub-panel" id="p9s4">
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p9s4.png"></div></div><div class="circuit-slot-label">Full car: L298N + HC-SR04 on SG90 servo turret + lighting LEDs — all connected to Arduino Uno</div></div>
+            <div class="algo-box">
+              <div class="algo-box-header"><div class="algo-box-icon">🧠</div><div><div class="algo-box-title">Algorithm — Autonomous Obstacle Avoidance</div><div class="algo-box-sub">The brain of every self-driving robot</div></div></div>
+              <ol class="algo-steps">
+                <li><div class="algo-step-num">1</div>Point servo forward (90°) and read the distance ahead as <span class="algo-code">frontDist</span>.</li>
+                <li><div class="algo-step-num">2</div><span class="algo-condition">IF</span> <span class="algo-code">frontDist &gt; 30 cm</span> → path is clear → call <span class="algo-code">moveForward()</span> and loop.</li>
+                <li><div class="algo-step-num">3</div><span class="algo-condition">IF</span> <span class="algo-code">frontDist ≤ 30 cm</span> → obstacle! → call <span class="algo-code">stopCar()</span> and activate hazard lights.</li>
+                <li><div class="algo-step-num">4</div>Scan left (150°) → read <span class="algo-code">leftDist</span>. Scan right (30°) → read <span class="algo-code">rightDist</span>. Return servo to 90°.</li>
+                <li><div class="algo-step-num">5</div><span class="algo-condition">IF</span> <span class="algo-code">leftDist &gt; rightDist</span> → turn left for 500 ms.</li>
+                <li><div class="algo-step-num">6</div><span class="algo-condition">ELSE IF</span> <span class="algo-code">rightDist &gt; leftDist</span> → turn right for 500 ms.</li>
+                <li><div class="algo-step-num">7</div><span class="algo-condition">ELSE</span> both blocked → reverse 600 ms, turn 180°, try again.</li>
+                <li><div class="algo-step-num">8</div>Turn off hazard lights → repeat from step 1.</li>
+              </ol>
+            </div>
+            <div class="code-compare">
+              <div>
+                <div class="code-col-label mblock">🧩 mBlock</div>
+                <div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p9s4-mblock.png"></div></div>
+                <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;">Forever: set servo to 90° → read ultrasonic → if distance &gt; 30 call forward block → else call stopCar, hazard on, lookAt(150°) for leftDist, lookAt(30°) for rightDist → if/else to pivot or reverse.</p>
+              </div>
+              <div>
+                <div class="code-col-label cpp">💻 C++</div>
+                <div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ — Full Autonomous Obstacle Avoiding Car</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">#include</span> <span class="st">&lt;Servo.h&gt;</span>
+
+<span class="cm">// Motors</span>
+<span class="kw">const</span> <span class="st">int</span> ENA=<span class="nm">5</span>,IN1=<span class="nm">6</span>,IN2=<span class="nm">7</span>,ENB=<span class="nm">3</span>,IN3=<span class="nm">8</span>,IN4=<span class="nm">9</span>;
+<span class="kw">const</span> <span class="st">int</span> SPEED=<span class="nm">190</span>;
+<span class="cm">// Sensor</span>
+Servo radarServo;
+<span class="kw">const</span> <span class="st">int</span> TRIG=<span class="nm">9</span>,ECHO=<span class="nm">10</span>,STOP_DIST=<span class="nm">30</span>;
+<span class="cm">// Lights</span>
+<span class="kw">const</span> <span class="st">int</span> PIN_LEFT=<span class="nm">12</span>,PIN_RIGHT=<span class="nm">11</span>,PIN_BRAKE=<span class="nm">13</span>;
+<span class="kw">unsigned long</span> lastBlink=<span class="nm">0</span>;<span class="st">bool</span> blinkState=<span class="kw">false</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>(){
+  <span class="st">int</span> pins[]={ENA,IN1,IN2,ENB,IN3,IN4,PIN_LEFT,PIN_RIGHT,PIN_BRAKE};
+  <span class="kw">for</span>(<span class="st">int</span> p:pins)<span class="fn">pinMode</span>(p,OUTPUT);
+  <span class="fn">pinMode</span>(TRIG,OUTPUT);<span class="fn">pinMode</span>(ECHO,INPUT);
+  radarServo.<span class="fn">attach</span>(<span class="nm">2</span>);radarServo.<span class="fn">write</span>(<span class="nm">90</span>);<span class="fn">delay</span>(<span class="nm">500</span>);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+<span class="st">int</span> <span class="fn">ping</span>(){
+  <span class="fn">digitalWrite</span>(TRIG,LOW);<span class="fn">delayMicroseconds</span>(<span class="nm">2</span>);
+  <span class="fn">digitalWrite</span>(TRIG,HIGH);<span class="fn">delayMicroseconds</span>(<span class="nm">10</span>);
+  <span class="fn">digitalWrite</span>(TRIG,LOW);
+  <span class="kw">long</span> d=<span class="fn">pulseIn</span>(ECHO,HIGH,<span class="nm">25000</span>);
+  <span class="kw">return</span> d?d/<span class="nm">58</span>:<span class="nm">200</span>;
+}
+<span class="st">int</span> <span class="fn">lookAt</span>(<span class="st">int</span> a){radarServo.<span class="fn">write</span>(a);<span class="fn">delay</span>(<span class="nm">300</span>);<span class="kw">return</span> <span class="fn">ping</span>();}
+<span class="kw">void</span> <span class="fn">forward</span>(){
+  <span class="fn">digitalWrite</span>(IN1,HIGH);<span class="fn">digitalWrite</span>(IN2,LOW);
+  <span class="fn">digitalWrite</span>(IN3,HIGH);<span class="fn">digitalWrite</span>(IN4,LOW);
+  <span class="fn">analogWrite</span>(ENA,SPEED);<span class="fn">analogWrite</span>(ENB,SPEED);
+}
+<span class="kw">void</span> <span class="fn">stopCar</span>(){
+  <span class="fn">analogWrite</span>(ENA,<span class="nm">0</span>);<span class="fn">analogWrite</span>(ENB,<span class="nm">0</span>);
+  <span class="fn">digitalWrite</span>(PIN_BRAKE,HIGH);
+}
+<span class="kw">void</span> <span class="fn">updateBlink</span>(){
+  <span class="kw">if</span>(<span class="fn">millis</span>()-lastBlink&gt;=<span class="nm">500</span>){blinkState=!blinkState;lastBlink=<span class="fn">millis</span>();}
+}
+<span class="kw">void</span> <span class="fn">loop</span>(){
+  radarServo.<span class="fn">write</span>(<span class="nm">90</span>);<span class="fn">delay</span>(<span class="nm">100</span>);
+  <span class="st">int</span> front=<span class="fn">ping</span>();
+  <span class="kw">if</span>(front&gt;STOP_DIST){
+    <span class="fn">digitalWrite</span>(PIN_BRAKE,LOW);
+    <span class="fn">forward</span>();
+  }<span class="kw">else</span>{
+    <span class="fn">stopCar</span>();
+    <span class="fn">digitalWrite</span>(PIN_LEFT,HIGH);<span class="fn">digitalWrite</span>(PIN_RIGHT,HIGH);<span class="fn">delay</span>(<span class="nm">300</span>);
+    <span class="st">int</span> L=<span class="fn">lookAt</span>(<span class="nm">150</span>), R=<span class="fn">lookAt</span>(<span class="nm">30</span>);
+    radarServo.<span class="fn">write</span>(<span class="nm">90</span>);
+    <span class="fn">digitalWrite</span>(PIN_LEFT,LOW);<span class="fn">digitalWrite</span>(PIN_RIGHT,LOW);
+    <span class="kw">if</span>(L&gt;R&amp;&amp;L&gt;<span class="nm">20</span>){
+      <span class="fn">analogWrite</span>(ENB,SPEED);<span class="fn">digitalWrite</span>(IN3,HIGH);<span class="fn">digitalWrite</span>(IN4,LOW);
+      <span class="fn">analogWrite</span>(ENA,<span class="nm">0</span>);<span class="fn">delay</span>(<span class="nm">500</span>);<span class="fn">stopCar</span>();
+    }<span class="kw">else if</span>(R&gt;L&amp;&amp;R&gt;<span class="nm">20</span>){
+      <span class="fn">analogWrite</span>(ENA,SPEED);<span class="fn">digitalWrite</span>(IN1,HIGH);<span class="fn">digitalWrite</span>(IN2,LOW);
+      <span class="fn">analogWrite</span>(ENB,<span class="nm">0</span>);<span class="fn">delay</span>(<span class="nm">500</span>);<span class="fn">stopCar</span>();
+    }<span class="kw">else</span>{
+      <span class="fn">digitalWrite</span>(IN1,LOW);<span class="fn">digitalWrite</span>(IN2,HIGH);
+      <span class="fn">digitalWrite</span>(IN3,LOW);<span class="fn">digitalWrite</span>(IN4,HIGH);
+      <span class="fn">analogWrite</span>(ENA,SPEED);<span class="fn">analogWrite</span>(ENB,SPEED);
+      <span class="fn">delay</span>(<span class="nm">600</span>);<span class="fn">stopCar</span>();
+    }
+  }
+}</pre></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB 5 -->
+          <div class="sub-panel" id="p9s5">
+            <div style="background:linear-gradient(135deg,rgba(0,188,212,0.1),rgba(0,151,157,0.04));border:1px solid rgba(0,188,212,0.3);border-radius:12px;padding:18px 20px;margin-bottom:20px;">
+              <div style="font-size:13px;font-weight:700;color:#4dd0e1;margin-bottom:8px;display:flex;align-items:center;gap:10px;"><span>📱</span> Sub-Project 5 — Remote Controlled Car via Bluetooth</div>
+              <p style="font-size:13px;color:var(--muted);line-height:1.7;">Add an HC-05 or HC-06 Bluetooth module and drive the car from your Android phone! A free app (like <strong style="color:#fff;">Serial Bluetooth Terminal</strong> or one built in MIT App Inventor) sends single-character commands — F, B, L, R, S — over Bluetooth. The Arduino reads them and calls the matching movement function.</p>
+            </div>
+
+            <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">HC-05 / HC-06 Wiring</div>
+            <div class="circuit-grid" style="margin-bottom:18px;">
+              <div class="circuit-slot"><span class="circuit-slot-icon">🔴</span><div class="circuit-slot-label">VCC → Arduino 5V<code>Powers the Bluetooth module</code></div></div>
+              <div class="circuit-slot"><span class="circuit-slot-icon">⚫</span><div class="circuit-slot-label">GND → Arduino GND<code>Common ground</code></div></div>
+              <div class="circuit-slot"><span class="circuit-slot-icon">📥</span><div class="circuit-slot-label">HC-05 TX → Arduino Pin 2 (SoftSerial RX)<code>Module sends data to Arduino</code></div></div>
+              <div class="circuit-slot"><span class="circuit-slot-icon">📤</span><div class="circuit-slot-label">HC-05 RX → Arduino Pin 4 (SoftSerial TX) via 1kΩ+2kΩ divider<code>⚠️ Voltage divider required — HC-05 RX is 3.3V max!</code></div></div>
+            </div>
+            <div style="background:rgba(255,152,0,0.08);border:1px solid rgba(255,152,0,0.25);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:#ffb74d;line-height:1.65;">
+              ⚠️ <strong>HC-06 vs HC-05:</strong> HC-06 is simpler (slave only, no AT commands needed). HC-05 can be master or slave. Both work identically for this project. Default pairing code is <strong>1234</strong> or <strong>0000</strong>.
+            </div>
+
+            <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Command Table — Android App sends these characters</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">
+              <div style="background:rgba(102,187,106,0.1);border:1px solid rgba(102,187,106,0.3);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;margin-bottom:6px;">⬆️</div><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:#a5d6a7;">F</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Forward</div></div>
+              <div style="background:rgba(239,83,80,0.1);border:1px solid rgba(239,83,80,0.3);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;margin-bottom:6px;">⬇️</div><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:#ef9a9a;">B</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Backward</div></div>
+              <div style="background:rgba(255,193,7,0.1);border:1px solid rgba(255,193,7,0.3);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;margin-bottom:6px;">⬅️</div><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:#ffd54f;">L</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Turn Left</div></div>
+              <div style="background:rgba(255,193,7,0.1);border:1px solid rgba(255,193,7,0.3);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;margin-bottom:6px;">➡️</div><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:#ffd54f;">R</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Turn Right</div></div>
+              <div style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;margin-bottom:6px;">🛑</div><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:#fff;">S</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Stop</div></div>
+              <div style="background:rgba(232,80,10,0.08);border:1px solid rgba(232,80,10,0.3);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;margin-bottom:6px;">⚠️</div><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:#ff8a65;">H</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Hazard Lights</div></div>
+            </div>
+            <div style="margin-bottom:20px;font-size:12px;color:var(--muted);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:12px 14px;">
+              💡 <strong style="color:#fff;">Speed control:</strong> Also send digits <strong style="color:var(--teal);">0–9</strong> to set speed. 0 = 50/255, 9 = 255/255. The app can have a slider that sends the digit as the user drags.
+            </div>
+
+            <div class="circuit-grid" style="margin-bottom:20px;"><div class="circuit-slot full"><div class="circuit-slot-icon"><img src="images/p9s5.png"></div></div><div class="circuit-slot-label">RC Car: L298N motors + HC-05/06 Bluetooth module (SoftwareSerial on pins 2 &amp; 4) + lighting LEDs</div></div>
+
+            <div class="algo-box">
+              <div class="algo-box-header"><div class="algo-box-icon">🧠</div><div><div class="algo-box-title">Algorithm — Bluetooth Remote Control</div><div class="algo-box-sub">Phone sends a character → Arduino reads it → calls the right function</div></div></div>
+              <ol class="algo-steps">
+                <li><div class="algo-step-num">1</div>Initialise <span class="algo-code">SoftwareSerial BT(2, 4)</span> at 9600 baud — same speed the HC-05/06 uses by default.</li>
+                <li><div class="algo-step-num">2</div>Every loop, check <span class="algo-code">BT.available()</span> — returns true when a character has arrived from the phone.</li>
+                <li><div class="algo-step-num">3</div>Read the character: <span class="algo-code">char cmd = BT.read()</span>.</li>
+                <li><div class="algo-step-num">4</div>Use a <span class="algo-code">switch/case</span> to match <span class="algo-code">'F'</span>, <span class="algo-code">'B'</span>, <span class="algo-code">'L'</span>, <span class="algo-code">'R'</span>, <span class="algo-code">'S'</span>, <span class="algo-code">'H'</span> to the matching movement or light function.</li>
+                <li><div class="algo-step-num">5</div><span class="algo-condition">IF</span> cmd is a digit <span class="algo-code">'0'–'9'</span> → map it to a speed value: <span class="algo-code">carSpeed = map(cmd - '0', 0, 9, 50, 255)</span>.</li>
+                <li><div class="algo-step-num">6</div>The movement functions use <span class="algo-code">carSpeed</span> instead of a fixed value, so the phone controls both direction and throttle.</li>
+                <li><div class="algo-step-num">7</div>Echo the command back via USB Serial (<span class="algo-code">Serial.println(cmd)</span>) for debugging — visible in Arduino's Serial Monitor.</li>
+              </ol>
+            </div>
+
+            <div class="code-compare">
+              <div>
+                <div class="code-col-label mblock">🧩 mBlock</div>
+                <div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p9s5-mblock.png"></div></div>
+                <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;">Use the <strong style="color:#fff;">Bluetooth Serial</strong> extension. Forever: <strong style="color:#fff;">if Bluetooth received = "F"</strong> → call forward block. If "B" → backward. If "L" → turnLeft. If "R" → turnRight. If "S" → stopCar. Chain all cases with if/else if blocks.</p>
+              </div>
+              <div>
+                <div class="code-col-label cpp">💻 C++</div>
+                <div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++ — Bluetooth Remote Control</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">#include</span> <span class="st">&lt;SoftwareSerial.h&gt;</span>
+
+<span class="cm">// HC-05/06: TX→Pin2 (Arduino RX), RX→Pin4 via voltage divider</span>
+SoftwareSerial BT(<span class="nm">2</span>, <span class="nm">4</span>);
+
+<span class="cm">// ── L298N Motor Pins ─────────────────────────────────────</span>
+<span class="kw">const</span> <span class="st">int</span> ENA=<span class="nm">5</span>,IN1=<span class="nm">6</span>,IN2=<span class="nm">7</span>;
+<span class="kw">const</span> <span class="st">int</span> ENB=<span class="nm">3</span>,IN3=<span class="nm">8</span>,IN4=<span class="nm">9</span>;
+
+<span class="cm">// ── Lights ───────────────────────────────────────────────</span>
+<span class="kw">const</span> <span class="st">int</span> PIN_BRAKE=<span class="nm">13</span>,PIN_LEFT=<span class="nm">12</span>,PIN_RIGHT=<span class="nm">11</span>,PIN_REV=<span class="nm">10</span>;
+<span class="kw">unsigned long</span> lastBlink=<span class="nm">0</span>; <span class="st">bool</span> blinkState=<span class="kw">false</span>;
+
+<span class="st">int</span> carSpeed = <span class="nm">200</span>; <span class="cm">// Default speed (0–255)</span>
+
+<span class="kw">void</span> <span class="fn">updateBlink</span>(){
+  <span class="kw">if</span>(<span class="fn">millis</span>()-lastBlink&gt;=<span class="nm">500</span>){blinkState=!blinkState;lastBlink=<span class="fn">millis</span>();}
+}
+<span class="kw">void</span> <span class="fn">allLightsOff</span>(){
+  <span class="fn">digitalWrite</span>(PIN_BRAKE,LOW);<span class="fn">digitalWrite</span>(PIN_LEFT,LOW);
+  <span class="fn">digitalWrite</span>(PIN_RIGHT,LOW);<span class="fn">digitalWrite</span>(PIN_REV,LOW);
+}
+
+<span class="kw">void</span> <span class="fn">forward</span>(){
+  <span class="fn">allLightsOff</span>();
+  <span class="fn">digitalWrite</span>(IN1,HIGH);<span class="fn">digitalWrite</span>(IN2,LOW);
+  <span class="fn">digitalWrite</span>(IN3,HIGH);<span class="fn">digitalWrite</span>(IN4,LOW);
+  <span class="fn">analogWrite</span>(ENA,carSpeed);<span class="fn">analogWrite</span>(ENB,carSpeed);
+}
+<span class="kw">void</span> <span class="fn">backward</span>(){
+  <span class="fn">allLightsOff</span>(); <span class="fn">digitalWrite</span>(PIN_REV,HIGH);
+  <span class="fn">digitalWrite</span>(IN1,LOW);<span class="fn">digitalWrite</span>(IN2,HIGH);
+  <span class="fn">digitalWrite</span>(IN3,LOW);<span class="fn">digitalWrite</span>(IN4,HIGH);
+  <span class="fn">analogWrite</span>(ENA,carSpeed);<span class="fn">analogWrite</span>(ENB,carSpeed);
+}
+<span class="kw">void</span> <span class="fn">turnLeft</span>(){
+  <span class="fn">updateBlink</span>(); <span class="fn">digitalWrite</span>(PIN_LEFT,blinkState);
+  <span class="fn">analogWrite</span>(ENA,<span class="nm">0</span>);
+  <span class="fn">digitalWrite</span>(IN3,HIGH);<span class="fn">digitalWrite</span>(IN4,LOW);
+  <span class="fn">analogWrite</span>(ENB,carSpeed);
+}
+<span class="kw">void</span> <span class="fn">turnRight</span>(){
+  <span class="fn">updateBlink</span>(); <span class="fn">digitalWrite</span>(PIN_RIGHT,blinkState);
+  <span class="fn">analogWrite</span>(ENB,<span class="nm">0</span>);
+  <span class="fn">digitalWrite</span>(IN1,HIGH);<span class="fn">digitalWrite</span>(IN2,LOW);
+  <span class="fn">analogWrite</span>(ENA,carSpeed);
+}
+<span class="kw">void</span> <span class="fn">stopCar</span>(){
+  <span class="fn">analogWrite</span>(ENA,<span class="nm">0</span>);<span class="fn">analogWrite</span>(ENB,<span class="nm">0</span>);
+  <span class="fn">digitalWrite</span>(IN1,LOW);<span class="fn">digitalWrite</span>(IN2,LOW);
+  <span class="fn">digitalWrite</span>(IN3,LOW);<span class="fn">digitalWrite</span>(IN4,LOW);
+  <span class="fn">allLightsOff</span>(); <span class="fn">digitalWrite</span>(PIN_BRAKE,HIGH);
+}
+
+<span class="kw">void</span> <span class="fn">setup</span>(){
+  BT.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  <span class="st">int</span> pins[]={ENA,IN1,IN2,ENB,IN3,IN4,PIN_BRAKE,PIN_LEFT,PIN_RIGHT,PIN_REV};
+  <span class="kw">for</span>(<span class="st">int</span> p:pins)<span class="fn">pinMode</span>(p,OUTPUT);
+  <span class="fn">stopCar</span>();
+  Serial.<span class="fn">println</span>(<span class="st">"RC Car Ready — waiting for Bluetooth..."</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>(){
+  <span class="kw">if</span>(BT.<span class="fn">available</span>()){
+    <span class="st">char</span> cmd = BT.<span class="fn">read</span>();
+    Serial.<span class="fn">print</span>(<span class="st">"CMD: "</span>); Serial.<span class="fn">println</span>(cmd);
+    <span class="kw">switch</span>(cmd){
+      <span class="kw">case</span> <span class="st">'F'</span>: <span class="fn">forward</span>();   <span class="kw">break</span>;
+      <span class="kw">case</span> <span class="st">'B'</span>: <span class="fn">backward</span>();  <span class="kw">break</span>;
+      <span class="kw">case</span> <span class="st">'L'</span>: <span class="fn">turnLeft</span>();  <span class="kw">break</span>;
+      <span class="kw">case</span> <span class="st">'R'</span>: <span class="fn">turnRight</span>(); <span class="kw">break</span>;
+      <span class="kw">case</span> <span class="st">'S'</span>: <span class="fn">stopCar</span>();   <span class="kw">break</span>;
+      <span class="kw">case</span> <span class="st">'H'</span>:
+        <span class="fn">updateBlink</span>();
+        <span class="fn">digitalWrite</span>(PIN_LEFT,blinkState);
+        <span class="fn">digitalWrite</span>(PIN_RIGHT,blinkState);
+        <span class="kw">break</span>;
+      <span class="kw">default</span>:
+        <span class="cm">// Digits 0–9 set speed</span>
+        <span class="kw">if</span>(cmd&gt;=<span class="st">'0'</span> &amp;&amp; cmd&lt;=<span class="st">'9'</span>)
+          carSpeed = <span class="fn">map</span>(cmd-<span class="st">'0'</span>,<span class="nm">0</span>,<span class="nm">9</span>,<span class="nm">50</span>,<span class="nm">255</span>);
+        <span class="kw">break</span>;
+    }
+  }
+}</pre></div>
+              </div>
+            </div>
+
+            <div style="margin-top:20px;background:rgba(0,188,212,0.06);border:1px solid rgba(0,188,212,0.2);border-radius:12px;padding:16px 20px;">
+              <div style="font-size:13px;font-weight:700;color:#4dd0e1;margin-bottom:10px;">📱 Android App Options</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div style="background:var(--faint);border:1px solid var(--border);border-radius:10px;padding:14px;"><div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:5px;">Serial Bluetooth Terminal</div><div style="font-size:12px;color:var(--muted);line-height:1.6;">Free Play Store app. Connect to HC-05, then tap buttons you configure to send F, B, L, R, S. Zero coding needed.</div></div>
+                <div style="background:var(--faint);border:1px solid var(--border);border-radius:10px;padding:14px;"><div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:5px;">MIT App Inventor</div><div style="font-size:12px;color:var(--muted);line-height:1.6;">Build a custom controller with joystick, speed slider, and hazard button. Free drag-and-drop app builder — no coding required.</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="proj-section"><div class="sect-label">Quick Quiz</div><div class="quiz-wrap"><div class="quiz-title"><span>🧠</span> Test Your Understanding</div><div class="quiz-q"><div class="quiz-question">1. The car detects an obstacle. Left scan = 15 cm, Right scan = 45 cm. What does the car do?</div><div class="quiz-options"><div class="quiz-opt" onclick="answer(this,'wrong','Left side is only 15 cm clear — right side has 45 cm of space.')"><span class="quiz-opt-letter">A</span>Turn left because it scans left first</div><div class="quiz-opt" onclick="answer(this,'correct','Right side has more space (45 cm > 15 cm), so rightDist > leftDist → the car pivots right.')"><span class="quiz-opt-letter">B</span>Turn right — right has more space (45 cm vs 15 cm)</div><div class="quiz-opt" onclick="answer(this,'wrong','Reversing is only triggered when BOTH sides are blocked. 45 cm is plenty of room.')"><span class="quiz-opt-letter">C</span>Reverse, because both scans are below 50 cm</div></div><div class="quiz-feedback"></div></div><div class="quiz-q" style="margin-top:18px;"><div class="quiz-question">2. Why do we use millis() for the blink function instead of delay()?</div><div class="quiz-options"><div class="quiz-opt" onclick="answer(this,'wrong','Both measure time — the difference is whether they block other code from running.')"><span class="quiz-opt-letter">A</span>millis() is more accurate</div><div class="quiz-opt" onclick="answer(this,'correct','delay() freezes ALL code — the car would stop checking sensors. millis() is non-blocking: the blink updates without pausing the rest of the program.')"><span class="quiz-opt-letter">B</span>delay() freezes the whole program — millis() lets other code keep running</div><div class="quiz-opt" onclick="answer(this,'wrong','Blink speed depends on the interval value, not millis vs delay.')"><span class="quiz-opt-letter">C</span>millis() makes the LEDs blink faster</div></div><div class="quiz-feedback"></div></div></div></div>
+        <div class="proj-section"><div class="sect-label">Ask a Question</div><div class="message-box"><div class="message-box-title"><span>💬</span> Got a question about the Arduino Car?</div><div class="message-box-sub">Motors not responding? Sensor giving bad readings? Ask below.</div><div class="msg-row"><textarea class="msg-input" placeholder="Type your question here…"></textarea><button class="msg-send" onclick="sendMsg(this)">Send →</button></div><div class="msg-sent">✓ Message sent! Your coach will reply soon.</div></div></div>
+        <div class="proj-section"><div class="sect-label">Bonus Challenges</div><div class="bonus-box"><div class="bonus-icon">🌟</div><div><div class="bonus-title">Ready for the next level?</div><ul class="bonus-list"><li>Speed Trap: make the car slow down gradually as it approaches an obstacle.</li><li>Full Sweep: do a full 180° scan on every stop, find the clearest angle, and drive that direction.</li><li>Memory Map: store the last 5 distances and only trigger avoidance if ALL five were below threshold.</li><li>Bluetooth Control: add an HC-05 module to override autonomous mode from your phone.</li></ul></div></div></div>
+      </div>
+    </div>
+
+    <div class="next-strip reveal" style="background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(232,80,10,0.06));border-color:rgba(124,58,237,0.25);">
+      <div class="next-strip-text"><div class="next-strip-label" style="color:#a78bfa;">🎉 Intermediate Complete!</div><div class="next-strip-title">You've built a sunflower, an alarm, a fan, and a self-driving car. You're ready for the Advanced level.</div></div>
+      <a class="btn-next-proj" href="#advanced" style="background:var(--purple);">Go to Advanced 🚀</a>
+    </div>
+    </div><!-- /intermediate -->
 
     <!-- ═══ ADVANCED ═══ -->
     <div id="advanced">
@@ -910,9 +2063,9 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
       <p class="tier-desc">For students who've mastered the basics and intermediate level. These projects push your skills to the limit.</p>
     </div>
     <div class="coming-grid">
-      <div class="coming-card reveal"><div class="coming-icon">📡</div><div class="coming-title">Bluetooth Control</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">HC-05 Bluetooth module + custom Android app. Control LEDs, motors, and sensors wirelessly from your phone.</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 09</div></div>
-      <div class="coming-card reveal"><div class="coming-icon">🌈</div><div class="coming-title">LED Matrix Display</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">8×8 LED matrix + MAX7219 driver. Scroll text, show animations, and create pixel art with addressable LEDs.</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 10</div></div>
-      <div class="coming-card reveal"><div class="coming-icon">🏠</div><div class="coming-title">Smart Home</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">PIR motion sensor + relay + DHT22 + LCD. Automatic lights, temperature control, and intruder detection — all in one system.</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 11</div></div>
+      <div class="coming-card reveal"><div class="coming-icon">📡</div><div class="coming-title">Bluetooth Control</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">HC-05 Bluetooth module + custom Android app. Control LEDs, motors, and sensors wirelessly from your phone.</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 10</div></div>
+      <div class="coming-card reveal"><div class="coming-icon">🌈</div><div class="coming-title">LED Matrix Display</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">8×8 LED matrix + MAX7219 driver. Scroll text, show animations, and create pixel art with addressable LEDs.</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 11</div></div>
+      <div class="coming-card reveal"><div class="coming-icon">🏠</div><div class="coming-title">Smart Home</div><div style="font-size:13px;color:var(--muted);line-height:1.6;">PIR motion sensor + relay + DHT22 + LCD. Automatic lights, temperature control, and intruder detection — all in one system.</div><div class="coming-label">Coming Soon</div><div class="coming-badge">Project 12</div></div>
     </div>
     <div style="height:80px;"></div>
     </div>
@@ -930,8 +2083,7 @@ window.addEventListener('scroll', () => {
   const el = document.documentElement;
   const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
   document.getElementById('readProgress').style.width = pct + '%';
-  // Active sidebar link
-  ['proj1','proj2','proj3','proj4','proj5','intermediate','advanced'].forEach(id => {
+  ['proj1','proj2','proj3','proj4','proj5','proj6','proj7','projPark','proj8','proj9','intermediate','advanced'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     const r = el.getBoundingClientRect();
@@ -955,145 +2107,74 @@ window.addEventListener('scroll', () => {
   addEventListener('resize',resize);resize();loop();
 })();
 
-/* HERO 3D — workshop/circuit lab scene */
+/* HERO 3D */
 (function(){
   const canvas = document.getElementById('hero-canvas');
   const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(48, innerWidth/innerHeight, 0.1, 100);
   camera.position.set(0, 0, 18);
-
   scene.add(new THREE.AmbientLight(0xffffff, 0.4));
   const l1 = new THREE.PointLight(0x00979d, 3, 30); l1.position.set(8, 6, 5); scene.add(l1);
   const l2 = new THREE.PointLight(0xe8500a, 2, 25); l2.position.set(-8, -4, 4); scene.add(l2);
-  const l3 = new THREE.PointLight(0xffdd00, 1.5, 20); l3.position.set(0, 8, 3); scene.add(l3);
-
-  // 5 floating project icons (boxes with emissive glow)
   const projData = [
-    {color:0xffdd00, emit:0xffaa00, emoji:'💡', x:-7, y:2.5, z:0},
-    {color:0x00bfff, emit:0x0088cc, emoji:'✨', x:-4, y:-2, z:1},
-    {color:0x66bb6a, emit:0x338844, emoji:'🔘', x:0, y:3.5, z:-1},
-    {color:0xff8a65, emit:0xcc5500, emoji:'🎹', x:4, y:-1.5, z:0.5},
-    {color:0xf44336, emit:0xaa2222, emoji:'🏁', x:7, y:2, z:-0.5},
+    {color:0xffdd00,emit:0xffaa00,x:-7,y:2.5,z:0},
+    {color:0x00bfff,emit:0x0088cc,x:-4,y:-2,z:1},
+    {color:0x66bb6a,emit:0x338844,x:0,y:3.5,z:-1},
+    {color:0xff8a65,emit:0xcc5500,x:4,y:-1.5,z:0.5},
+    {color:0xf44336,emit:0xaa2222,x:7,y:2,z:-0.5},
   ];
-
   const projMeshes = projData.map((p, i) => {
     const group = new THREE.Group();
-    // Rounded-ish box
     const geo = new THREE.BoxGeometry(1.6, 1.6, 0.4);
-    const mat = new THREE.MeshPhongMaterial({color:p.color, emissive:p.emit, emissiveIntensity:.45, shininess:70});
+    const mat = new THREE.MeshPhongMaterial({color:p.color,emissive:p.emit,emissiveIntensity:.45,shininess:70});
     group.add(new THREE.Mesh(geo, mat));
-    // Glow sphere
     const sg = new THREE.SphereGeometry(1.0, 14, 14);
-    const sm = new THREE.MeshPhongMaterial({color:p.color, opacity:.1, transparent:true});
+    const sm = new THREE.MeshPhongMaterial({color:p.color,opacity:.1,transparent:true});
     group.add(new THREE.Mesh(sg, sm));
-    // Number plate on front
-    const ng = new THREE.BoxGeometry(0.5, 0.3, 0.08);
-    const nm = new THREE.MeshPhongMaterial({color:0x111111});
-    const np = new THREE.Mesh(ng, nm);
-    np.position.set(0, -0.5, 0.25);
-    group.add(np);
-
-    group.position.set(p.x, p.y, p.z);
-    group.rotation.set((Math.random()-.5)*.2, (Math.random()-.5)*.3, (Math.random()-.5)*.15);
+    group.position.set(p.x+4, p.y, p.z);
+    group.rotation.set((Math.random()-.5)*.2,(Math.random()-.5)*.3,(Math.random()-.5)*.15);
     scene.add(group);
-    return {group, base:[p.x, p.y, p.z], speed:.25+Math.random()*.35, off:(i/5)*Math.PI*2};
+    return {group,base:[p.x,p.y,p.z],speed:.25+Math.random()*.35,off:(i/5)*Math.PI*2};
   });
-
-  // Connecting circuit traces between projects
-  const traceMat = new THREE.LineBasicMaterial({color:0x00979d, opacity:.2, transparent:true});
-  for(let i=0;i<projData.length-1;i++){
-    const pts = [
-      new THREE.Vector3(projData[i].x +4, projData[i].y, projData[i].z),
-      new THREE.Vector3(projData[i+1].x +4, projData[i+1].y, projData[i+1].z)
-    ];
-    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), traceMat));
-  }
-
-  // Floating resistor cylinders
-  for(let i=0;i<8;i++){
-    const geo = new THREE.CylinderGeometry(.06, .06, .5, 8);
-    const mat = new THREE.MeshPhongMaterial({color:Math.random()>.5?0xc8a86c:0x88cc66, shininess:40});
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set((Math.random()-.5)*18 + 4, (Math.random()-.5)*10, (Math.random()-.5)*3-2);
-    mesh.rotation.z = Math.PI/2;
-    scene.add(mesh);
-  }
-
-  // Floating LED spheres
-  const ledColors = [0xff2222, 0x22ff22, 0xffff22, 0x2222ff, 0xff8822];
-  ledColors.forEach((col,i) => {
-    const geo = new THREE.SphereGeometry(.14, 10, 10);
-    const mat = new THREE.MeshPhongMaterial({color:col, emissive:col, emissiveIntensity:.9});
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set(-5+i*4.5, -4+Math.sin(i)*2, -1);
+  const ledColors = [0xff2222,0x22ff22,0xffff22,0x2222ff,0xff8822];
+  ledColors.forEach((col,i)=>{
+    const geo=new THREE.SphereGeometry(.14,10,10);
+    const mat=new THREE.MeshPhongMaterial({color:col,emissive:col,emissiveIntensity:.9});
+    const mesh=new THREE.Mesh(geo,mat);
+    mesh.position.set(-5+i*4.5,-4+Math.sin(i)*2,-1);
     scene.add(mesh);
   });
-
-  // Central circuit board
-  const boardGeo = new THREE.BoxGeometry(5, 3.5, .08);
-  const boardMat = new THREE.MeshPhongMaterial({color:0x0a4f3a, shininess:40});
-  const board = new THREE.Mesh(boardGeo, boardMat);
-  board.position.set(4, 0, -2.5);
-  scene.add(board);
-  // Board traces
-  const traceColors = [0x00979d, 0xffaa00, 0xff4400];
-  traceColors.forEach((col,i) => {
-    const tg = new THREE.BoxGeometry(4, .04, .05);
-    const tm = new THREE.MeshPhongMaterial({color:col, emissive:col, emissiveIntensity:.5});
-    const t = new THREE.Mesh(tg, tm);
-    t.position.set(4, -0.8+i*.8, -2.44);
-    scene.add(t);
-  });
-
-  let mx=0, my=0;
-  document.addEventListener('mousemove', e => {
-    mx=(e.clientX/innerWidth-.5)*2;
-    my=-(e.clientY/innerHeight-.5)*2;
-  });
-
-  function resize(){
-    renderer.setSize(innerWidth, innerHeight);
-    camera.aspect = innerWidth/innerHeight;
-    camera.updateProjectionMatrix();
-  }
-
+  let mx=0,my=0;
+  document.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*2;my=-(e.clientY/innerHeight-.5)*2;});
+  function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
   let t=0;
   function animate(){
-    requestAnimationFrame(animate);
-    t+=.011;
+    requestAnimationFrame(animate);t+=.011;
     projMeshes.forEach(p=>{
-      p.group.position.y = p.base[1] + Math.sin(t*p.speed+p.off)*.45;
-      p.group.position.x = p.base[0] + 4 + Math.cos(t*p.speed*.6+p.off)*.12;
-      p.group.rotation.y += .008;
-      p.group.rotation.z = Math.sin(t*p.speed*.4+p.off)*.07;
+      p.group.position.y=p.base[1]+Math.sin(t*p.speed+p.off)*.45;
+      p.group.rotation.y+=.008;
     });
-    board.rotation.y += (mx*.06 - board.rotation.y)*.04;
-    board.rotation.x += (-my*.04 - board.rotation.x)*.04;
-    camera.position.x += (mx*1.2-camera.position.x)*.03;
-    camera.position.y += (my*.8-camera.position.y)*.03;
-    camera.lookAt(0,0,0);
-    renderer.render(scene,camera);
+    camera.position.x+=(mx*1.2-camera.position.x)*.03;
+    camera.position.y+=(my*.8-camera.position.y)*.03;
+    camera.lookAt(0,0,0);renderer.render(scene,camera);
   }
-  resize(); addEventListener('resize',resize); animate();
+  resize();addEventListener('resize',resize);animate();
 })();
 
 /* TOGGLE PROJECT */
 function toggleProject(header){
   const body=header.nextElementSibling;
-  const chevron=header.querySelector('.proj-chevron');
   const open=body.classList.contains('open');
   body.classList.toggle('open',!open);
   header.classList.toggle('open',!open);
-  chevron.classList.toggle('open',!open);
 }
 function openProject(id){
   const card=document.getElementById(id);
   if(!card)return;
-  const h=card.querySelector('.proj-header'),b=card.querySelector('.proj-body'),c=h.querySelector('.proj-chevron');
-  if(!b.classList.contains('open')){b.classList.add('open');h.classList.add('open');c.classList.add('open');}
+  const h=card.querySelector('.proj-header'),b=card.querySelector('.proj-body');
+  if(!b.classList.contains('open')){b.classList.add('open');h.classList.add('open');}
   setTimeout(()=>card.scrollIntoView({behavior:'smooth',block:'start'}),50);
 }
 
@@ -1134,37 +2215,33 @@ function copyCode(btn){
   navigator.clipboard.writeText(pre.innerText).then(()=>{btn.textContent='✓ Copied!';setTimeout(()=>{btn.textContent='Copy';},1800);});
 }
 
-/* SCROLL REVEAL */
-function navSearch(q) {
-  q = q.toLowerCase().trim();
-  if (!q) return;
-  // Map keywords to pages
-  const routes = [
-    { keywords: ['led','resistor','buzzer','sensor','servo','motor','lcd','oled','rfid','bluetooth','relay','ultrasonic','component'], page: 'components.html' },
-    { keywords: ['mblock','block','scratch','drag','beginner'], page: 'mblock.html' },
-    { keywords: ['c++','cpp','code','variable','loop','function','serial'], page: 'cpp.html' },
-    { keywords: ['project','light','piano','switch','reaction','blink'], page: 'projects.html' },
+/* NAV SEARCH */
+function navSearch(q){
+  q=q.toLowerCase().trim();
+  if(!q)return;
+  const routes=[
+    {keywords:['led','resistor','buzzer','sensor','servo','motor'],page:'components.html'},
+    {keywords:['mblock','block','scratch'],page:'mblock.html'},
+    {keywords:['project','light','piano','switch','reaction'],page:'projects.html'},
   ];
-  for (const route of routes) {
-    if (route.keywords.some(k => q.includes(k))) {
-      window.location.href = route.page + '?search=' + encodeURIComponent(q);
-      return;
-    }
+  for(const route of routes){
+    if(route.keywords.some(k=>q.includes(k))){window.location.href=route.page+'?search='+encodeURIComponent(q);return;}
   }
 }
 
+/* ACCOUNT DROPDOWN */
+document.querySelector('[data-acc-toggle]').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('accountDropdown').classList.toggle('open');
+});
+document.addEventListener('click',()=>document.getElementById('accountDropdown').classList.remove('open'));
 
-document.addEventListener('click',()=>document.getElementById('accountDropdown')?.classList.remove('open'));
-
-
+/* SCROLL REVEAL */
 const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.08});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
-
 </script>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<!-- ✅ Firebase Auth — SDK loaded at top of <head>, so this now works correctly -->
 <script>
 if(!firebase.apps.length){
   firebase.initializeApp({
@@ -1184,8 +2261,6 @@ auth.onAuthStateChanged(async(user)=>{
   const snap=await db.collection('users').doc(user.uid).get();
   if(!snap.exists){window.location.replace('index.html');return;}
   const p=snap.data();
-
-  // Populate nav
   const l=(p.displayName||p.username||'?').charAt(0).toUpperCase();
   document.getElementById('navAccAv').textContent=l;
   document.getElementById('navAccBigAv').textContent=l;
@@ -1196,15 +2271,6 @@ auth.onAuthStateChanged(async(user)=>{
   document.getElementById('navProgressPct').textContent=pct+'%';
   document.getElementById('navProgressFill').style.width=pct+'%';
   document.getElementById('navProgressCount').textContent=cnt+' / 50 lessons';
-});
-
-// Dropdown toggle
-document.querySelector('[data-acc-toggle]').addEventListener('click',e=>{
-  e.stopPropagation();
-  document.getElementById('accountDropdown').classList.toggle('open');
-});
-document.addEventListener('click',()=>{
-  document.getElementById('accountDropdown').classList.remove('open');
 });
 
 async function handleLogout(){
