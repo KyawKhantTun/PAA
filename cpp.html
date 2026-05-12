@@ -244,6 +244,13 @@ auth.onAuthStateChanged(async (user) => {
   const snap = await db.collection('users').doc(user.uid).get();
   if (!snap.exists) { window.location.replace('index.html'); return; }
   const p = snap.data();
+
+  // admin and chosen get the real C++ module; coach and student see coming soon
+  if (p.role === 'admin' || p.role === 'chosen') {
+    window.location.replace('cpp-real.html');
+    return;
+  }
+
   const l = (p.displayName || p.username || '?').charAt(0).toUpperCase();
   document.getElementById('navAccAv').textContent = l;
   document.getElementById('navAccBigAv').textContent = l;

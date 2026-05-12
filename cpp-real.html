@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arduino C++ — Learn with Ace</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="responsive.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --teal:#307fff;--teal-dark:#0123ac;--teal-light:rgba(0,47,157,0.12);
+  --orange:#e8500a;--purple:#ab47bc;--purple-light:rgba(171,71,188,0.15);
+  --green:#4caf7d;--green-light:rgba(76,175,125,0.12);
+  --dark:#050708;--dark2:#0c0f10;--dark3:#141819;--dark4:#1b2023;
+  --border:rgba(255,255,255,0.08);--muted:rgba(255,255,255,0.45);--faint:rgba(255,255,255,0.05);
+  --sidebar-w:260px;
+  --nav-h:60px;
+}
+
+/* FIX: Use a full-page flex column so nav is in normal document flow.
+   No position:fixed = no z-index battles, no stacking context bugs,
+   no browser quirks. Nav is simply the first row, .app fills the rest. */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--dark);
+  color: #fff;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── NAV ── */
+nav.top-nav {
+  flex-shrink: 0;
+  height: 64px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 40px;
+  gap: 24px;
+  background: rgba(5,7,8,0.82);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+}
+.nav-logo{font-family:'Fraunces',serif;font-size:24px;font-weight:900;font-style:italic;color:var(--teal);letter-spacing:-1px;text-decoration:none;text-shadow:0 0 30px rgba(0,151,157,0.35);}
+.nav-logo .orange{color:var(--orange);}
+.nav-links{display:flex;gap:4px;list-style:none;}
+.nav-links a{font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;padding:6px 13px;border-radius:8px;transition:all .2s;}
+.nav-links a:hover,.nav-links a.active{background:var(--teal-light);color:var(--teal);}
+.nav-right{display:flex;align-items:center;justify-content:flex-end;gap:10px;}
+.nav-search{display:flex;align-items:center;background:var(--faint);border:1.5px solid var(--border);border-radius:100px;padding:0 14px;height:34px;gap:8px;width:180px;}
+.nav-search svg{width:13px;color:var(--muted);}
+.nav-search input{background:none;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:12.5px;color:#fff;width:100%;}
+.nav-search input::placeholder{color:rgba(255,255,255,0.2);}
+
+/* Account dropdown */
+.account-wrap{position:relative;}
+.nav-account{display:flex;align-items:center;gap:8px;background:var(--teal);color:#fff;border:none;padding:7px 16px 7px 9px;border-radius:100px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+.nav-account:hover{background:var(--teal-dark);}
+.acc-av{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+.account-dropdown{position:absolute;top:calc(100% + 10px);right:0;width:270px;background:#181c1e;border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .22s,transform .22s;z-index:10000;}
+.account-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0);}
+.acc-header{background:linear-gradient(135deg,var(--teal),var(--teal-dark));padding:18px;display:flex;align-items:center;gap:12px;}
+.acc-big-avatar{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;border:2px solid rgba(255,255,255,0.3);flex-shrink:0;}
+.acc-name{font-size:13px;font-weight:700;color:#fff;}
+.acc-email{font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;}
+.acc-progress-wrap{padding:12px 16px;border-bottom:1px solid var(--border);}
+.acc-progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:6px;}
+.acc-progress-bar{height:4px;background:rgba(255,255,255,0.08);border-radius:100px;overflow:hidden;}
+.acc-progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-dark));border-radius:100px;}
+.acc-menu{padding:6px;}
+.acc-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;text-decoration:none;color:rgba(255,255,255,0.8);font-size:13px;font-weight:500;transition:background .15s;}
+.acc-item:hover{background:rgba(48,127,255,0.1);color:var(--teal);}
+.acc-item-icon{width:28px;height:28px;border-radius:7px;background:var(--faint);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.acc-divider{height:1px;background:var(--border);margin:4px 12px;}
+.acc-logout{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:#f28b82;transition:background .15s;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:4px;}
+.acc-logout:hover{background:rgba(242,139,130,0.08);}
+
+/* ── APP LAYOUT ── */
+.app{
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);background:var(--dark2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+.sidebar-header{padding:20px 18px 14px;border-bottom:1px solid var(--border);}
+.sidebar-title{font-family:'Fraunces',serif;font-size:15px;font-weight:900;letter-spacing:-.3px;color:#fff;margin-bottom:2px;}
+.sidebar-sub{font-size:11px;color:var(--muted);}
+.progress-section{padding:12px 18px;border-bottom:1px solid var(--border);}
+.progress-label{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-bottom:6px;}
+.progress-bar{height:4px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-dark));border-radius:100px;transition:width .5s ease;}
+
+.sidebar-nav{flex:1;overflow-y:auto;padding:8px;}
+.chapter-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:all .18s;border:1px solid transparent;user-select:none;line-height:1;}
+.chapter-item:hover{background:var(--faint);color:#fff;}
+.chapter-item.active{background:var(--teal-light);color:var(--teal);border-color:rgba(48,127,255,0.2);}
+.chapter-item.done{color:var(--green);}
+.chapter-item.done .ch-num-badge{background:var(--green-light);color:var(--green);}
+.chapter-item.active .ch-num-badge{background:rgba(48,127,255,0.25);color:var(--teal);}
+.ch-num-badge{
+  width:26px;height:26px;border-radius:7px;
+  background:var(--faint);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;font-family:'DM Mono',monospace;
+  flex-shrink:0;transition:background .18s;
+}
+.ch-label{flex:1;font-size:12.5px;}
+.ch-check{font-size:10px;opacity:.6;margin-left:auto;flex-shrink:0;}
+.sidebar-divider{height:1px;background:var(--border);margin:3px 4px;}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:48px;border-bottom:1px solid var(--border);background:var(--dark2);display:flex;align-items:center;padding:0 28px;gap:12px;flex-shrink:0;}
+.breadcrumb{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.breadcrumb span{color:#fff;font-weight:600;}
+.topbar-spacer{flex:1;}
+.lesson-nav-btns{display:flex;gap:8px;}
+.ln-btn{background:var(--faint);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;color:var(--muted);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:6px;}
+.ln-btn:hover{color:#fff;border-color:rgba(255,255,255,0.2);}
+.ln-btn.primary{background:var(--teal);color:#fff;border-color:transparent;}
+.ln-btn.primary:hover{background:var(--teal-dark);}
+.ln-btn:disabled{opacity:.35;pointer-events:none;}
+
+.content{flex:1;overflow-y:auto;padding:36px 48px;max-width:900px;margin:0 auto;width:100%;}
+
+/* ── CHAPTER PAGES ── */
+.chapter-page{display:none;}
+.chapter-page.active{display:block;}
+
+/* Typography */
+.ch-title{font-family:'Fraunces',serif;font-size:clamp(30px,4vw,46px);font-weight:900;letter-spacing:-1.5px;line-height:.95;margin-bottom:10px;}
+.ch-title .accent{color:var(--teal);font-style:italic;}
+.ch-badge{display:inline-flex;align-items:center;gap:7px;background:var(--teal-light);border:1px solid rgba(48,127,255,0.25);color:var(--teal);padding:4px 14px;border-radius:100px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:18px;}
+.ch-intro{font-size:14.5px;color:rgba(255,255,255,0.7);line-height:1.85;margin-bottom:36px;max-width:680px;border-left:3px solid var(--teal);padding-left:18px;background:var(--teal-light);border-radius:0 10px 10px 0;padding:14px 18px;}
+
+/* Section titles */
+.section-title{font-family:'Fraunces',serif;font-size:22px;font-weight:900;letter-spacing:-.4px;margin:36px 0 16px;color:#fff;}
+.section-title::before{content:'';display:inline-block;width:4px;height:20px;background:var(--teal);border-radius:2px;margin-right:12px;vertical-align:middle;}
+p.body{font-size:14px;color:rgba(255,255,255,0.7);line-height:1.85;margin-bottom:16px;}
+code.inline{font-family:'DM Mono',monospace;font-size:12.5px;background:rgba(48,127,255,0.12);color:#90caf9;padding:2px 7px;border-radius:5px;}
+
+/* ── CODE BLOCKS ── */
+.code-block{background:#0d1117;border:1px solid rgba(255,255,255,0.1);border-radius:14px;overflow:hidden;margin:20px 0;font-family:'DM Mono',monospace;font-size:13px;line-height:1.8;}
+.code-header{background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.07);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;}
+.code-lang{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;gap:7px;}
+.lang-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);}
+.copy-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s;}
+.copy-btn:hover{border-color:var(--teal);color:var(--teal);}
+.code-body{padding:20px 22px;overflow-x:auto;}
+.code-body pre{margin:0;white-space:pre;}
+
+/* Syntax colors */
+.kw{color:#ff79c6;}
+.dt{color:#8be9fd;}
+.fn{color:#50fa7b;}
+.cm{color:#6272a4;}
+.st{color:#f1fa8c;}
+.nm{color:#bd93f9;}
+.pp{color:#ffb86c;}
+.op{color:#ff79c6;}
+
+/* ── CONCEPT CARDS ── */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:20px 0;}
+.concept-card{background:var(--dark3);border:1px solid var(--border);border-radius:14px;padding:18px;transition:border-color .2s;}
+.concept-card:hover{border-color:rgba(48,127,255,0.3);}
+.cc-icon{font-size:24px;margin-bottom:10px;}
+.cc-title{font-size:13px;font-weight:700;margin-bottom:6px;}
+.cc-desc{font-size:12px;color:var(--muted);line-height:1.65;}
+.cc-type{font-family:'DM Mono',monospace;font-size:11px;color:var(--teal);background:var(--teal-light);padding:2px 8px;border-radius:5px;display:inline-block;margin-top:8px;}
+
+/* ── INFO BOXES ── */
+.info-box{border-radius:12px;padding:16px 18px;margin:20px 0;display:flex;gap:13px;}
+.info-box.tip{background:rgba(76,175,125,0.08);border:1px solid rgba(76,175,125,0.25);}
+.info-box.warn{background:rgba(232,80,10,0.08);border:1px solid rgba(232,80,10,0.25);}
+.info-box.note{background:var(--teal-light);border:1px solid rgba(48,127,255,0.25);}
+.info-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.info-box .info-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+.info-box.tip .info-title{color:var(--green);}
+.info-box.warn .info-title{color:var(--orange);}
+.info-box.note .info-title{color:var(--teal);}
+.info-box .info-text{font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7;}
+
+/* ── DATA TYPE TABLE ── */
+.data-table{width:100%;border-collapse:collapse;margin:20px 0;}
+.data-table th{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
+.data-table td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(255,255,255,0.02);}
+.data-table .mono{font-family:'DM Mono',monospace;color:#90caf9;font-size:12px;}
+.data-table .range{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+
+/* ── QUIZ / CHECK ── */
+.quiz-section{background:var(--dark3);border:1px solid var(--border);border-radius:16px;padding:24px;margin:32px 0;}
+.quiz-title{font-family:'Fraunces',serif;font-size:16px;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:9px;}
+.quiz-sub{font-size:12.5px;color:var(--muted);margin-bottom:18px;}
+.quiz-q{font-size:14px;font-weight:600;margin-bottom:12px;line-height:1.6;}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;transition:all .18s;font-size:13.5px;}
+.quiz-opt:hover{border-color:rgba(48,127,255,0.4);background:var(--teal-light);}
+.quiz-opt.correct{border-color:var(--green);background:var(--green-light);color:var(--green);}
+.quiz-opt.wrong{border-color:#ef5350;background:rgba(239,83,80,0.1);color:#ef9a9a;}
+.quiz-opt-letter{width:26px;height:26px;border-radius:7px;background:var(--faint);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0;}
+.quiz-feedback{margin-top:14px;padding:12px 16px;border-radius:10px;font-size:13px;display:none;}
+.quiz-feedback.show{display:block;}
+.quiz-feedback.ok{background:var(--green-light);border:1px solid rgba(76,175,125,0.3);color:var(--green);}
+.quiz-feedback.bad{background:rgba(239,83,80,0.08);border:1px solid rgba(239,83,80,0.25);color:#ef9a9a;}
+
+/* ── CHAPTER COMPLETE ── */
+.ch-complete{text-align:center;padding:48px 24px;border-top:1px solid var(--border);margin-top:48px;}
+.ch-complete-icon{font-size:56px;margin-bottom:16px;}
+.ch-complete-title{font-family:'Fraunces',serif;font-size:26px;font-weight:900;margin-bottom:8px;}
+.ch-complete-desc{font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.7;}
+.ch-complete-btn{display:inline-flex;align-items:center;gap:9px;background:var(--teal);color:#fff;border:none;padding:13px 30px;border-radius:100px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .22s;box-shadow:0 6px 24px rgba(48,127,255,0.3);}
+.ch-complete-btn:hover{background:var(--teal-dark);transform:translateY(-2px);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:#181c1e;border:1px solid rgba(48,127,255,0.35);border-radius:12px;padding:11px 22px;font-size:13px;font-weight:600;color:#fff;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.5);transition:transform .3s cubic-bezier(.34,1.1,.64,1),opacity .3s;opacity:0;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top-nav">
+  <div><a class="nav-logo" href="arduino.html">L<span class="orange">A</span></a></div>
+  <div><ul class="nav-links">
+    <li><a href="arduino.html">Home</a></li>
+    <li><a href="components.html">Components</a></li>
+    <li><a href="cpp.html" class="active">Learn</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="arduino.html#contact">Contact</a></li>
+  </ul></div>
+  <div class="nav-right">
+    <div class="nav-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input placeholder="Search…">
+    </div>
+    <div class="account-wrap">
+      <button class="nav-account" data-acc-toggle>
+        <div class="acc-av" id="navAccAv">?</div>
+        <span id="navAccName">Account</span>
+      </button>
+      <div class="account-dropdown" id="accountDropdown">
+        <div class="acc-header">
+          <div class="acc-big-avatar" id="navAccBigAv">?</div>
+          <div>
+            <div class="acc-name" id="navAccNameFull">Loading…</div>
+            <div class="acc-email" id="navAccEmail"></div>
+          </div>
+        </div>
+        <div class="acc-progress-wrap">
+          <div class="acc-progress-label"><span>Lessons Completed</span><span id="navProgressPct">0%</span></div>
+          <div class="acc-progress-bar"><div class="acc-progress-fill" id="navProgressFill" style="width:0%"></div></div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;" id="navProgressCount">0 / 50 lessons</div>
+        </div>
+        <div class="acc-menu">
+          <a class="acc-item" href="profile.html"><div class="acc-item-icon">👤</div>View Profile</a>
+          <a class="acc-item" href="projects.html"><div class="acc-item-icon">🔧</div>Your Projects</a>
+          <div class="acc-divider"></div>
+          <a class="acc-item" href="settings.html"><div class="acc-item-icon">⚙️</div>Settings</a>
+          <div class="acc-divider"></div>
+          <button class="acc-logout" onclick="handleLogout()">🚪 Log Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="app">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Arduino C++</div>
+      <div class="sidebar-sub">8 chapters · 40+ examples</div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-label"><span>Your progress</span><span id="sidebarPct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="sidebarFill" style="width:0%"></div></div>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <!-- rendered by JS -->
+    </nav>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+    <div class="topbar">
+      <div class="breadcrumb">C++ <span id="bcChapter">Chapter 1</span></div>
+      <div class="topbar-spacer"></div>
+      <div class="lesson-nav-btns">
+        <button class="ln-btn" id="btnPrev" onclick="navigate(-1)" disabled>← Prev</button>
+        <button class="ln-btn primary" id="btnNext" onclick="navigate(1)">Next →</button>
+      </div>
+    </div>
+
+    <div class="content" id="mainContent">
+      <!-- Chapter pages rendered here -->
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CURRICULUM DATA ───────────────────────────────────────────
+const chapters = [
+  {
+    id: 'intro',
+    icon: '⚡',
+    title: 'Introduction to Arduino C++',
+    short: 'Getting Started',
+    content: `
+      <div class="ch-badge">Chapter 1</div>
+      <h1 class="ch-title">Getting Started with<br><span class="accent">Arduino C++</span></h1>
+      <div class="ch-intro">Arduino programs are written in a simplified version of C++. If you've used mBlock, think of C++ as giving you direct control over every detail — no blocks, just pure logic written as text.</div>
+
+      <h2 class="section-title">The Two Core Functions</h2>
+      <p class="body">Every Arduino sketch <em>must</em> have exactly two functions: <code class="inline">setup()</code> and <code class="inline">loop()</code>. These are the skeleton of every program you'll ever write.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang"><div class="lang-dot"></div>Arduino C++</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <div class="code-body"><pre><span class="cm">// setup() runs ONCE when the Arduino powers on</span>
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(<span class="nm">13</span>, OUTPUT);  <span class="cm">// set pin 13 as output</span>
+}
+
+<span class="cm">// loop() runs FOREVER, over and over</span>
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, HIGH);  <span class="cm">// turn LED on</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);              <span class="cm">// wait 1 second</span>
+  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, LOW);   <span class="cm">// turn LED off</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);              <span class="cm">// wait 1 second</span>
+}</pre></div>
+      </div>
+
+      <div class="info-box tip"><div class="info-icon">💡</div><div><div class="info-title">Why two functions?</div><div class="info-text"><code class="inline">setup()</code> is for one-time configuration (pin modes, Serial begin, etc.). <code class="inline">loop()</code> is your program's heartbeat — it runs continuously while the Arduino has power.</div></div></div>
+
+      <h2 class="section-title">Comments</h2>
+      <p class="body">Comments are notes for humans — the Arduino ignores them completely. Use them generously to explain your code.</p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="cm">// This is a single-line comment</span>
+
+<span class="cm">/*
+  This is a multi-line comment.
+  Great for longer explanations.
+  The Arduino ignores all of this.
+*/</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="cm">// Comments can go anywhere</span>
+  <span class="fn">Serial</span>.<span class="fn">begin</span>(<span class="nm">9600</span>);  <span class="cm">// 9600 is the baud rate</span>
+}</pre></div>
+      </div>
+
+      <h2 class="section-title">The Serial Monitor</h2>
+      <p class="body">The Serial Monitor lets your Arduino talk to your computer. It's your most powerful debugging tool — like a print statement in Python or JavaScript.</p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">Serial</span>.<span class="fn">begin</span>(<span class="nm">9600</span>);       <span class="cm">// start Serial at 9600 baud</span>
+  <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"Hello!"</span>);  <span class="cm">// print with newline</span>
+  <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="st">"Value: "</span>);   <span class="cm">// print without newline</span>
+  <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="nm">42</span>);        <span class="cm">// print a number</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() { }</pre></div>
+      </div>
+
+      <div class="quiz-section">
+        <div class="quiz-title">🎯 Quick Check</div>
+        <div class="quiz-sub">Test what you just learned</div>
+        <div class="quiz-q">Which function runs continuously while the Arduino has power?</div>
+        <div class="quiz-opts">
+          <div class="quiz-opt" onclick="checkQuiz(this,false,'ch1')"><div class="quiz-opt-letter">A</div>setup()</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,true,'ch1')"><div class="quiz-opt-letter">B</div>loop()</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,false,'ch1')"><div class="quiz-opt-letter">C</div>main()</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,false,'ch1')"><div class="quiz-opt-letter">D</div>run()</div>
+        </div>
+        <div class="quiz-feedback" id="qfb-ch1"></div>
+      </div>
+
+      <div class="ch-complete">
+        <div class="ch-complete-icon">🎉</div>
+        <div class="ch-complete-title">Chapter 1 Complete!</div>
+        <div class="ch-complete-desc">You know the skeleton of every Arduino program. On to variables!</div>
+        <button class="ch-complete-btn" onclick="navigate(1)">Next Chapter →</button>
+      </div>
+    `
+  },
+  {
+    id: 'variables',
+    icon: '📦',
+    title: 'Variables & Data Types',
+    short: 'Variables',
+    content: `
+      <div class="ch-badge">Chapter 2</div>
+      <h1 class="ch-title">Variables &<br><span class="accent">Data Types</span></h1>
+      <div class="ch-intro">Variables are named storage containers in memory. In C++, you must declare the <em>type</em> of data a variable holds before you use it — this is called <strong>static typing</strong>.</div>
+
+      <h2 class="section-title">Common Data Types</h2>
+      <table class="data-table">
+        <thead><tr><th>Type</th><th>What it stores</th><th>Size</th><th>Range</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">int</td><td>Whole numbers</td><td>2 bytes</td><td class="range">-32,768 to 32,767</td></tr>
+          <tr><td class="mono">long</td><td>Big whole numbers</td><td>4 bytes</td><td class="range">-2.1B to 2.1B</td></tr>
+          <tr><td class="mono">float</td><td>Decimal numbers</td><td>4 bytes</td><td class="range">±3.4 × 10³⁸</td></tr>
+          <tr><td class="mono">bool</td><td>true or false</td><td>1 byte</td><td class="range">true / false</td></tr>
+          <tr><td class="mono">char</td><td>A single character</td><td>1 byte</td><td class="range">'A', 'z', '3'</td></tr>
+          <tr><td class="mono">String</td><td>Text (Arduino class)</td><td>varies</td><td class="range">"Hello World"</td></tr>
+          <tr><td class="mono">byte</td><td>Small unsigned int</td><td>1 byte</td><td class="range">0 to 255</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="cm">// Declare and assign variables</span>
+<span class="dt">int</span>    ledPin   = <span class="nm">13</span>;        <span class="cm">// whole number</span>
+<span class="dt">float</span>  voltage  = <span class="nm">3.14</span>;      <span class="cm">// decimal</span>
+<span class="dt">bool</span>   isOn     = <span class="kw">true</span>;      <span class="cm">// true or false</span>
+<span class="dt">char</span>   grade    = <span class="st">'A'</span>;       <span class="cm">// single character</span>
+<span class="dt">String</span> name     = <span class="st">"Ace"</span>;     <span class="cm">// text</span>
+<span class="dt">byte</span>   speed    = <span class="nm">200</span>;       <span class="cm">// 0–255 (PWM range)</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">Serial</span>.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  <span class="fn">Serial</span>.<span class="fn">println</span>(ledPin);    <span class="cm">// prints: 13</span>
+  <span class="fn">Serial</span>.<span class="fn">println</span>(voltage);   <span class="cm">// prints: 3.14</span>
+  <span class="fn">Serial</span>.<span class="fn">println</span>(name);      <span class="cm">// prints: Ace</span>
+}</pre></div>
+      </div>
+
+      <h2 class="section-title">Constants</h2>
+      <p class="body">Use <code class="inline">const</code> when a value should never change. It prevents bugs and makes your code self-documenting. Always use uppercase names for constants by convention.</p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="kw">const</span> <span class="dt">int</span>   BUTTON_PIN = <span class="nm">7</span>;
+<span class="kw">const</span> <span class="dt">int</span>   LED_PIN    = <span class="nm">13</span>;
+<span class="kw">const</span> <span class="dt">float</span> PI_VAL     = <span class="nm">3.14159</span>;
+
+<span class="cm">// #define is another way (no type, just text replacement)</span>
+<span class="pp">#define BUZZER 9</span>
+<span class="pp">#define MAX_TEMP 60</span></pre></div>
+      </div>
+
+      <div class="info-box note"><div class="info-icon">📌</div><div><div class="info-title">Prefer const over #define</div><div class="info-text"><code class="inline">const</code> is type-safe and respects scope. <code class="inline">#define</code> is a simple text replacement with no type checking. Use <code class="inline">const</code> unless you have a specific reason for <code class="inline">#define</code>.</div></div></div>
+
+      <h2 class="section-title">Arithmetic & Assignment</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="dt">int</span> x = <span class="nm">10</span>;
+<span class="dt">int</span> y = <span class="nm">3</span>;
+
+<span class="dt">int</span> sum     = x <span class="op">+</span> y;    <span class="cm">// 13</span>
+<span class="dt">int</span> diff    = x <span class="op">-</span> y;    <span class="cm">// 7</span>
+<span class="dt">int</span> product = x <span class="op">*</span> y;    <span class="cm">// 30</span>
+<span class="dt">int</span> quotient= x <span class="op">/</span> y;    <span class="cm">// 3  (integer division!)</span>
+<span class="dt">int</span> remain  = x <span class="op">%</span> y;    <span class="cm">// 1  (modulo / remainder)</span>
+
+<span class="cm">// Shorthand operators</span>
+x<span class="op">++</span>;        <span class="cm">// same as x = x + 1</span>
+x<span class="op">--</span>;        <span class="cm">// same as x = x - 1</span>
+x <span class="op">+=</span> <span class="nm">5</span>;     <span class="cm">// same as x = x + 5</span>
+x <span class="op">*=</span> <span class="nm">2</span>;     <span class="cm">// same as x = x * 2</span></pre></div>
+      </div>
+
+      <div class="info-box warn"><div class="info-icon">⚠️</div><div><div class="info-title">Integer Division Trap</div><div class="info-text"><code class="inline">10 / 3</code> gives <code class="inline">3</code>, not <code class="inline">3.33</code>. To get decimals, use a <code class="inline">float</code>: <code class="inline">10.0 / 3</code> gives <code class="inline">3.33</code>. This is a very common bug.</div></div></div>
+
+      <div class="quiz-section">
+        <div class="quiz-title">🎯 Quick Check</div>
+        <div class="quiz-sub">What is the value of <code class="inline">int result = 7 % 3;</code>?</div>
+        <div class="quiz-q">What does the <code class="inline">%</code> operator return?</div>
+        <div class="quiz-opts">
+          <div class="quiz-opt" onclick="checkQuiz(this,false,'ch2')"><div class="quiz-opt-letter">A</div>2.33</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,false,'ch2')"><div class="quiz-opt-letter">B</div>2</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,true,'ch2')"><div class="quiz-opt-letter">C</div>1</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,false,'ch2')"><div class="quiz-opt-letter">D</div>0</div>
+        </div>
+        <div class="quiz-feedback" id="qfb-ch2"></div>
+      </div>
+
+      <div class="ch-complete">
+        <div class="ch-complete-icon">🎉</div>
+        <div class="ch-complete-title">Chapter 2 Complete!</div>
+        <div class="ch-complete-desc">You can now store and manipulate data. Next up: making decisions with control flow!</div>
+        <button class="ch-complete-btn" onclick="navigate(1)">Next Chapter →</button>
+      </div>
+    `
+  },
+  {
+    id: 'control',
+    icon: '🔀',
+    title: 'Control Flow',
+    short: 'Control Flow',
+    content: `
+      <div class="ch-badge">Chapter 3</div>
+      <h1 class="ch-title">Control<br><span class="accent">Flow</span></h1>
+      <div class="ch-intro">Control flow lets your program make decisions and repeat actions. Without it, your code runs top to bottom, once. With it, you can react to sensors, count events, and build real behaviours.</div>
+
+      <h2 class="section-title">if / else if / else</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="dt">int</span> temperature = <span class="nm">35</span>;
+
+<span class="kw">if</span> (temperature <span class="op">></span> <span class="nm">40</span>) {
+  <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"CRITICAL - too hot!"</span>);
+} <span class="kw">else if</span> (temperature <span class="op">></span> <span class="nm">30</span>) {
+  <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"Warning - warm"</span>);
+} <span class="kw">else</span> {
+  <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"OK - temperature normal"</span>);
+}</pre></div>
+      </div>
+
+      <h2 class="section-title">Comparison & Logical Operators</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="cm">// Comparison operators (return true or false)</span>
+x <span class="op">==</span> y   <span class="cm">// equal to</span>
+x <span class="op">!=</span> y   <span class="cm">// NOT equal to</span>
+x <span class="op">></span>  y   <span class="cm">// greater than</span>
+x <span class="op">&lt;</span>  y   <span class="cm">// less than</span>
+x <span class="op">>=</span> y   <span class="cm">// greater than or equal</span>
+x <span class="op">&lt;=</span> y   <span class="cm">// less than or equal</span>
+
+<span class="cm">// Logical operators</span>
+(x <span class="op">></span> <span class="nm">0</span>) <span class="op">&amp;&amp;</span> (x <span class="op">&lt;</span> <span class="nm">100</span>)   <span class="cm">// AND — both must be true</span>
+(x <span class="op">&lt;</span> <span class="nm">0</span>) <span class="op">||</span> (x <span class="op">></span> <span class="nm">100</span>)   <span class="cm">// OR  — at least one true</span>
+<span class="op">!</span>(x <span class="op">==</span> <span class="nm">5</span>)               <span class="cm">// NOT — flips the result</span></pre></div>
+      </div>
+
+      <h2 class="section-title">for Loop</h2>
+      <p class="body">Use a <code class="inline">for</code> loop when you know exactly how many times to repeat something.</p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="cm">// Blink an LED 5 times</span>
+<span class="kw">for</span> (<span class="dt">int</span> i = <span class="nm">0</span>; i <span class="op">&lt;</span> <span class="nm">5</span>; i<span class="op">++</span>) {
+  <span class="fn">digitalWrite</span>(LED_PIN, HIGH);
+  <span class="fn">delay</span>(<span class="nm">200</span>);
+  <span class="fn">digitalWrite</span>(LED_PIN, LOW);
+  <span class="fn">delay</span>(<span class="nm">200</span>);
+  <span class="cm">// i goes: 0, 1, 2, 3, 4  → 5 iterations</span>
+}
+
+<span class="cm">// Fade LED brightness using PWM (0–255)</span>
+<span class="kw">for</span> (<span class="dt">int</span> brightness = <span class="nm">0</span>; brightness <span class="op">&lt;=</span> <span class="nm">255</span>; brightness<span class="op">++</span>) {
+  <span class="fn">analogWrite</span>(LED_PIN, brightness);
+  <span class="fn">delay</span>(<span class="nm">8</span>);
+}</pre></div>
+      </div>
+
+      <h2 class="section-title">while Loop</h2>
+      <p class="body">Use <code class="inline">while</code> when you want to keep looping until a condition changes — often based on sensor readings.</p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="cm">// Wait until button is pressed</span>
+<span class="kw">while</span> (<span class="fn">digitalRead</span>(BUTTON_PIN) <span class="op">==</span> HIGH) {
+  <span class="cm">// do nothing — just wait</span>
+  <span class="fn">delay</span>(<span class="nm">10</span>);
+}
+<span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"Button pressed!"</span>);
+
+<span class="cm">// Countdown</span>
+<span class="dt">int</span> count = <span class="nm">10</span>;
+<span class="kw">while</span> (count <span class="op">></span> <span class="nm">0</span>) {
+  <span class="fn">Serial</span>.<span class="fn">println</span>(count);
+  count<span class="op">--</span>;
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+}</pre></div>
+      </div>
+
+      <h2 class="section-title">switch / case</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="dt">int</span> mode = <span class="nm">2</span>;
+
+<span class="kw">switch</span> (mode) {
+  <span class="kw">case</span> <span class="nm">1</span>:
+    <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"Mode: Slow blink"</span>);
+    <span class="kw">break</span>;
+  <span class="kw">case</span> <span class="nm">2</span>:
+    <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"Mode: Fast blink"</span>);
+    <span class="kw">break</span>;
+  <span class="kw">case</span> <span class="nm">3</span>:
+    <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"Mode: Always on"</span>);
+    <span class="kw">break</span>;
+  <span class="kw">default</span>:
+    <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"Unknown mode"</span>);
+}</pre></div>
+      </div>
+
+      <div class="info-box warn"><div class="info-icon">⚠️</div><div><div class="info-title">Don't forget break!</div><div class="info-text">Without <code class="inline">break</code>, the code falls through to the next case. This is almost always a bug. Always add <code class="inline">break</code> unless you intentionally want fall-through behaviour.</div></div></div>
+
+      <div class="quiz-section">
+        <div class="quiz-title">🎯 Quick Check</div>
+        <div class="quiz-sub">Choose the correct answer</div>
+        <div class="quiz-q">What does <code class="inline">&amp;&amp;</code> mean in C++?</div>
+        <div class="quiz-opts">
+          <div class="quiz-opt" onclick="checkQuiz(this,false,'ch3')"><div class="quiz-opt-letter">A</div>OR — at least one must be true</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,true,'ch3')"><div class="quiz-opt-letter">B</div>AND — both must be true</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,false,'ch3')"><div class="quiz-opt-letter">C</div>NOT — flip the result</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,false,'ch3')"><div class="quiz-opt-letter">D</div>Bitwise AND (different)</div>
+        </div>
+        <div class="quiz-feedback" id="qfb-ch3"></div>
+      </div>
+
+      <div class="ch-complete">
+        <div class="ch-complete-icon">🎉</div>
+        <div class="ch-complete-title">Chapter 3 Complete!</div>
+        <div class="ch-complete-desc">You can now write programs that make decisions and repeat actions. Next: functions!</div>
+        <button class="ch-complete-btn" onclick="navigate(1)">Next Chapter →</button>
+      </div>
+    `
+  },
+  {
+    id: 'functions',
+    icon: '🧩',
+    title: 'Functions',
+    short: 'Functions',
+    content: `
+      <div class="ch-badge">Chapter 4</div>
+      <h1 class="ch-title">Writing Your Own<br><span class="accent">Functions</span></h1>
+      <div class="ch-intro">Functions let you name and reuse a block of code. Instead of copy-pasting the same code in 10 places, write a function once and call it wherever you need it.</div>
+
+      <h2 class="section-title">Function Anatomy</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="cm">// return_type  functionName ( parameters ) { body }</span>
+<span class="kw">void</span> <span class="fn">blinkLED</span>(<span class="dt">int</span> times, <span class="dt">int</span> speed) {
+  <span class="kw">for</span> (<span class="dt">int</span> i = <span class="nm">0</span>; i <span class="op">&lt;</span> times; i<span class="op">++</span>) {
+    <span class="fn">digitalWrite</span>(LED_PIN, HIGH);
+    <span class="fn">delay</span>(speed);
+    <span class="fn">digitalWrite</span>(LED_PIN, LOW);
+    <span class="fn">delay</span>(speed);
+  }
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">blinkLED</span>(<span class="nm">3</span>, <span class="nm">200</span>);   <span class="cm">// blink 3 times, 200ms each</span>
+  <span class="fn">blinkLED</span>(<span class="nm">5</span>, <span class="nm">80</span>);    <span class="cm">// blink 5 times, 80ms each</span>
+  <span class="fn">delay</span>(<span class="nm">2000</span>);
+}</pre></div>
+      </div>
+
+      <h2 class="section-title">Returning Values</h2>
+      <p class="body">Functions can calculate something and hand the result back. Instead of <code class="inline">void</code>, declare the return type.</p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="cm">// Returns the voltage from an analog pin</span>
+<span class="dt">float</span> <span class="fn">readVoltage</span>(<span class="dt">int</span> pin) {
+  <span class="dt">int</span> raw = <span class="fn">analogRead</span>(pin);       <span class="cm">// 0–1023</span>
+  <span class="dt">float</span> volts = raw <span class="op">*</span> (<span class="nm">5.0</span> <span class="op">/</span> <span class="nm">1023.0</span>);
+  <span class="kw">return</span> volts;
+}
+
+<span class="cm">// Returns true if button is pressed</span>
+<span class="dt">bool</span> <span class="fn">isButtonPressed</span>(<span class="dt">int</span> pin) {
+  <span class="kw">return</span> <span class="fn">digitalRead</span>(pin) <span class="op">==</span> LOW;  <span class="cm">// LOW = pressed (pull-up)</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="dt">float</span> v = <span class="fn">readVoltage</span>(A0);
+  <span class="fn">Serial</span>.<span class="fn">println</span>(v);
+
+  <span class="kw">if</span> (<span class="fn">isButtonPressed</span>(<span class="nm">7</span>)) {
+    <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"Pressed!"</span>);
+  }
+}</pre></div>
+      </div>
+
+      <div class="info-box tip"><div class="info-icon">💡</div><div><div class="info-title">One function, one job</div><div class="info-text">The best functions do exactly one thing and do it well. If you find yourself writing a function that does three different things, split it into three functions. This makes debugging 10× easier.</div></div></div>
+
+      <div class="ch-complete">
+        <div class="ch-complete-icon">🎉</div>
+        <div class="ch-complete-title">Chapter 4 Complete!</div>
+        <div class="ch-complete-desc">Functions are one of the most powerful tools in programming. Next: storing lists of data with arrays.</div>
+        <button class="ch-complete-btn" onclick="navigate(1)">Next Chapter →</button>
+      </div>
+    `
+  },
+  {
+    id: 'arrays',
+    icon: '📋',
+    title: 'Arrays & Strings',
+    short: 'Arrays',
+    content: `
+      <div class="ch-badge">Chapter 5</div>
+      <h1 class="ch-title">Arrays &<br><span class="accent">Strings</span></h1>
+      <div class="ch-intro">An array stores multiple values of the same type under one name, accessed by an index. Think of it as a numbered list starting at zero.</div>
+
+      <h2 class="section-title">Creating Arrays</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="cm">// type  name[size] = { values };</span>
+<span class="dt">int</span>  pins[<span class="nm">4</span>] = { <span class="nm">9</span>, <span class="nm">10</span>, <span class="nm">11</span>, <span class="nm">12</span> };  <span class="cm">// 4 LED pins</span>
+<span class="dt">int</span>  notes[<span class="nm">7</span>] = { <span class="nm">262</span>, <span class="nm">294</span>, <span class="nm">330</span>, <span class="nm">349</span>, <span class="nm">392</span>, <span class="nm">440</span>, <span class="nm">494</span> };
+
+<span class="cm">// Access by index (starts at 0!)</span>
+<span class="dt">int</span> first = pins[<span class="nm">0</span>];   <span class="cm">// 9</span>
+<span class="dt">int</span> last  = pins[<span class="nm">3</span>];   <span class="cm">// 12</span>
+
+<span class="cm">// Modify a value</span>
+pins[<span class="nm">2</span>] = <span class="nm">6</span>;   <span class="cm">// now: {9, 10, 6, 12}</span>
+
+<span class="cm">// Get array length</span>
+<span class="dt">int</span> len = <span class="kw">sizeof</span>(pins) <span class="op">/</span> <span class="kw">sizeof</span>(pins[<span class="nm">0</span>]);  <span class="cm">// = 4</span></pre></div>
+      </div>
+
+      <h2 class="section-title">Looping Through Arrays</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="dt">int</span> ledPins[] = { <span class="nm">3</span>, <span class="nm">5</span>, <span class="nm">6</span>, <span class="nm">9</span>, <span class="nm">11</span> };
+<span class="dt">int</span> numLeds   = <span class="kw">sizeof</span>(ledPins) <span class="op">/</span> <span class="kw">sizeof</span>(ledPins[<span class="nm">0</span>]);
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="kw">for</span> (<span class="dt">int</span> i = <span class="nm">0</span>; i <span class="op">&lt;</span> numLeds; i<span class="op">++</span>) {
+    <span class="fn">pinMode</span>(ledPins[i], OUTPUT);  <span class="cm">// set each as output</span>
+  }
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="cm">// Knight Rider / Scanner effect</span>
+  <span class="kw">for</span> (<span class="dt">int</span> i = <span class="nm">0</span>; i <span class="op">&lt;</span> numLeds; i<span class="op">++</span>) {
+    <span class="fn">digitalWrite</span>(ledPins[i], HIGH);
+    <span class="fn">delay</span>(<span class="nm">80</span>);
+    <span class="fn">digitalWrite</span>(ledPins[i], LOW);
+  }
+}</pre></div>
+      </div>
+
+      <h2 class="section-title">Strings in Arduino</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="dt">String</span> name    = <span class="st">"Ace"</span>;
+<span class="dt">String</span> subject = <span class="st">"Arduino"</span>;
+<span class="dt">String</span> joined  = name <span class="op">+</span> <span class="st">" loves "</span> <span class="op">+</span> subject;
+
+<span class="fn">Serial</span>.<span class="fn">println</span>(joined);          <span class="cm">// Ace loves Arduino</span>
+<span class="fn">Serial</span>.<span class="fn">println</span>(name.<span class="fn">length</span>());   <span class="cm">// 3</span>
+<span class="fn">Serial</span>.<span class="fn">println</span>(name.<span class="fn">toUpperCase</span>());  <span class="cm">// ACE</span>
+
+<span class="cm">// Compare strings</span>
+<span class="kw">if</span> (name <span class="op">==</span> <span class="st">"Ace"</span>) {
+  <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"Found it!"</span>);
+}</pre></div>
+      </div>
+
+      <div class="ch-complete">
+        <div class="ch-complete-icon">🎉</div>
+        <div class="ch-complete-title">Chapter 5 Complete!</div>
+        <div class="ch-complete-desc">Arrays and strings are essential for real projects. Next: reading and writing to pins!</div>
+        <button class="ch-complete-btn" onclick="navigate(1)">Next Chapter →</button>
+      </div>
+    `
+  },
+  {
+    id: 'io',
+    icon: '🔌',
+    title: 'Digital & Analog I/O',
+    short: 'Pins & I/O',
+    content: `
+      <div class="ch-badge">Chapter 6</div>
+      <h1 class="ch-title">Digital &<br><span class="accent">Analog I/O</span></h1>
+      <div class="ch-intro">Pins are how your Arduino talks to the real world — LEDs, buttons, sensors, motors. Understanding digital vs. analog is the bridge between code and hardware.</div>
+
+      <h2 class="section-title">Digital I/O</h2>
+      <p class="body">Digital pins are strictly HIGH (5V) or LOW (0V). Use them for LEDs, buttons, relays, and anything on/off.</p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="kw">const</span> <span class="dt">int</span> LED_PIN    = <span class="nm">13</span>;
+<span class="kw">const</span> <span class="dt">int</span> BUTTON_PIN = <span class="nm">2</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(LED_PIN, OUTPUT);              <span class="cm">// set pin 13 as output</span>
+  <span class="fn">pinMode</span>(BUTTON_PIN, INPUT_PULLUP);    <span class="cm">// built-in pull-up resistor</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="dt">int</span> btn = <span class="fn">digitalRead</span>(BUTTON_PIN);  <span class="cm">// HIGH or LOW</span>
+
+  <span class="kw">if</span> (btn <span class="op">==</span> LOW) {                   <span class="cm">// LOW = pressed (pull-up)</span>
+    <span class="fn">digitalWrite</span>(LED_PIN, HIGH);       <span class="cm">// LED on</span>
+  } <span class="kw">else</span> {
+    <span class="fn">digitalWrite</span>(LED_PIN, LOW);        <span class="cm">// LED off</span>
+  }
+}</pre></div>
+      </div>
+
+      <div class="info-box tip"><div class="info-icon">💡</div><div><div class="info-title">INPUT_PULLUP explained</div><div class="info-text">Using <code class="inline">INPUT_PULLUP</code> activates an internal resistor that holds the pin HIGH when nothing is connected. When you press a button connecting the pin to GND, it reads LOW. This avoids floating pins and external resistors.</div></div></div>
+
+      <h2 class="section-title">Analog Input — analogRead()</h2>
+      <p class="body">Analog pins (A0–A5) read varying voltages 0–5V and convert them to numbers 0–1023. Perfect for potentiometers, LDRs, temperature sensors.</p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="dt">int</span>   raw   = <span class="fn">analogRead</span>(A0);           <span class="cm">// 0–1023</span>
+  <span class="dt">float</span> volts = raw <span class="op">*</span> (<span class="nm">5.0</span> <span class="op">/</span> <span class="nm">1023.0</span>);    <span class="cm">// 0.0–5.0V</span>
+
+  <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="st">"Raw: "</span>);   <span class="fn">Serial</span>.<span class="fn">print</span>(raw);
+  <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="st">"  V: "</span>);   <span class="fn">Serial</span>.<span class="fn">println</span>(volts);
+  <span class="fn">delay</span>(<span class="nm">100</span>);
+}</pre></div>
+      </div>
+
+      <h2 class="section-title">PWM Output — analogWrite()</h2>
+      <p class="body">PWM (Pulse Width Modulation) simulates analog output on pins marked ~. Value 0–255 controls "how much" power: LED brightness, motor speed, buzzer tone.</p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="cm">// Potentiometer controls LED brightness</span>
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="dt">int</span> pot        = <span class="fn">analogRead</span>(A0);       <span class="cm">// 0–1023</span>
+  <span class="dt">int</span> brightness = pot <span class="op">/</span> <span class="nm">4</span>;              <span class="cm">// map to 0–255</span>
+
+  <span class="fn">analogWrite</span>(<span class="nm">9</span>, brightness);           <span class="cm">// pin 9 is PWM (~)</span>
+}
+
+<span class="cm">// Using map() for cleaner scaling</span>
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="dt">int</span> raw  = <span class="fn">analogRead</span>(A0);
+  <span class="dt">int</span> pwm  = <span class="fn">map</span>(raw, <span class="nm">0</span>, <span class="nm">1023</span>, <span class="nm">0</span>, <span class="nm">255</span>);
+  <span class="fn">analogWrite</span>(<span class="nm">9</span>, pwm);
+}</pre></div>
+      </div>
+
+      <h2 class="section-title">The map() Function</h2>
+      <p class="body"><code class="inline">map()</code> is one of Arduino's most useful built-in functions. It re-scales a number from one range to another — no maths needed.</p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="cm">// map(value, fromLow, fromHigh, toLow, toHigh)</span>
+<span class="dt">int</span> angle = <span class="fn">map</span>(raw, <span class="nm">0</span>, <span class="nm">1023</span>, <span class="nm">0</span>, <span class="nm">180</span>);  <span class="cm">// servo angle</span>
+<span class="dt">int</span> speed = <span class="fn">map</span>(pot, <span class="nm">0</span>, <span class="nm">1023</span>, <span class="nm">50</span>, <span class="nm">255</span>); <span class="cm">// motor speed (min 50)</span>
+<span class="dt">int</span> freq  = <span class="fn">map</span>(ldr, <span class="nm">0</span>, <span class="nm">1023</span>, <span class="nm">100</span>, <span class="nm">2000</span>);<span class="cm">// light → tone frequency</span></pre></div>
+      </div>
+
+      <div class="ch-complete">
+        <div class="ch-complete-icon">🎉</div>
+        <div class="ch-complete-title">Chapter 6 Complete!</div>
+        <div class="ch-complete-desc">You can now read sensors and control outputs. Next: Serial communication for debugging and input.</div>
+        <button class="ch-complete-btn" onclick="navigate(1)">Next Chapter →</button>
+      </div>
+    `
+  },
+  {
+    id: 'serial',
+    icon: '📡',
+    title: 'Serial Communication',
+    short: 'Serial',
+    content: `
+      <div class="ch-badge">Chapter 7</div>
+      <h1 class="ch-title">Serial<br><span class="accent">Communication</span></h1>
+      <div class="ch-intro">Serial lets your Arduino and computer talk to each other in real-time. It's your debugging window, data logger, and remote control all in one.</div>
+
+      <h2 class="section-title">Sending Data to the Computer</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">Serial</span>.<span class="fn">begin</span>(<span class="nm">9600</span>);   <span class="cm">// must match Monitor's baud rate</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="dt">int</span> sensorVal = <span class="fn">analogRead</span>(A0);
+
+  <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="st">"Sensor: "</span>);   <span class="cm">// no newline</span>
+  <span class="fn">Serial</span>.<span class="fn">println</span>(sensorVal);  <span class="cm">// with newline</span>
+  <span class="fn">Serial</span>.<span class="fn">println</span>();           <span class="cm">// blank line</span>
+
+  <span class="cm">// Print multiple values for Serial Plotter (CSV format)</span>
+  <span class="fn">Serial</span>.<span class="fn">print</span>(sensorVal);
+  <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="st">","</span>);
+  <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="fn">analogRead</span>(A1));
+
+  <span class="fn">delay</span>(<span class="nm">100</span>);
+}</pre></div>
+      </div>
+
+      <h2 class="section-title">Receiving Input from Computer</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span> (<span class="fn">Serial</span>.<span class="fn">available</span>() <span class="op">></span> <span class="nm">0</span>) {  <span class="cm">// data waiting?</span>
+    <span class="dt">String</span> cmd = <span class="fn">Serial</span>.<span class="fn">readStringUntil</span>(<span class="st">'\n'</span>);
+    cmd.<span class="fn">trim</span>();  <span class="cm">// remove trailing whitespace</span>
+
+    <span class="kw">if</span> (cmd <span class="op">==</span> <span class="st">"ON"</span>) {
+      <span class="fn">digitalWrite</span>(LED_PIN, HIGH);
+      <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"LED is ON"</span>);
+    } <span class="kw">else if</span> (cmd <span class="op">==</span> <span class="st">"OFF"</span>) {
+      <span class="fn">digitalWrite</span>(LED_PIN, LOW);
+      <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"LED is OFF"</span>);
+    } <span class="kw">else</span> {
+      <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">"Unknown command"</span>);
+    }
+  }
+}</pre></div>
+      </div>
+
+      <div class="info-box tip"><div class="info-icon">💡</div><div><div class="info-title">Serial Plotter</div><div class="info-text">In the Arduino IDE, open <strong>Tools → Serial Plotter</strong>. If your sketch prints comma-separated numbers, they become live graph lines. Perfect for visualising sensor data in real-time.</div></div></div>
+
+      <div class="ch-complete">
+        <div class="ch-complete-icon">🎉</div>
+        <div class="ch-complete-title">Chapter 7 Complete!</div>
+        <div class="ch-complete-desc">Serial is your superpower for debugging. Final chapter: Libraries & Sensors!</div>
+        <button class="ch-complete-btn" onclick="navigate(1)">Next Chapter →</button>
+      </div>
+    `
+  },
+  {
+    id: 'libraries',
+    icon: '📚',
+    title: 'Libraries & Sensors',
+    short: 'Libraries',
+    content: `
+      <div class="ch-badge">Chapter 8</div>
+      <h1 class="ch-title">Libraries &<br><span class="accent">Sensors</span></h1>
+      <div class="ch-intro">Libraries are pre-written code you can import to use complex hardware without writing everything from scratch. Servo control, OLED displays, temperature sensors — all one import away.</div>
+
+      <h2 class="section-title">Using a Library</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="pp">#include &lt;Servo.h&gt;</span>    <span class="cm">// import the Servo library</span>
+
+<span class="dt">Servo</span> myServo;       <span class="cm">// create a Servo object</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  myServo.<span class="fn">attach</span>(<span class="nm">9</span>);  <span class="cm">// connect servo to pin 9</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  myServo.<span class="fn">write</span>(<span class="nm">0</span>);    <span class="cm">// turn to 0°</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+  myServo.<span class="fn">write</span>(<span class="nm">90</span>);   <span class="cm">// turn to 90°</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+  myServo.<span class="fn">write</span>(<span class="nm">180</span>);  <span class="cm">// turn to 180°</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+}</pre></div>
+      </div>
+
+      <h2 class="section-title">Ultrasonic Distance Sensor (HC-SR04)</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-lang"><div class="lang-dot"></div>Arduino C++</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div class="code-body"><pre><span class="kw">const</span> <span class="dt">int</span> TRIG = <span class="nm">7</span>;
+<span class="kw">const</span> <span class="dt">int</span> ECHO = <span class="nm">6</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">Serial</span>.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  <span class="fn">pinMode</span>(TRIG, OUTPUT);
+  <span class="fn">pinMode</span>(ECHO, INPUT);
+}
+
+<span class="dt">long</span> <span class="fn">getDistance</span>() {
+  <span class="fn">digitalWrite</span>(TRIG, LOW);   <span class="fn">delayMicroseconds</span>(<span class="nm">2</span>);
+  <span class="fn">digitalWrite</span>(TRIG, HIGH);  <span class="fn">delayMicroseconds</span>(<span class="nm">10</span>);
+  <span class="fn">digitalWrite</span>(TRIG, LOW);
+
+  <span class="dt">long</span> dur = <span class="fn">pulseIn</span>(ECHO, HIGH);
+  <span class="kw">return</span> dur <span class="op">*</span> <span class="nm">0.034</span> <span class="op">/</span> <span class="nm">2</span>;  <span class="cm">// distance in cm</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="dt">long</span> dist = <span class="fn">getDistance</span>();
+  <span class="fn">Serial</span>.<span class="fn">print</span>(<span class="st">"Distance: "</span>);
+  <span class="fn">Serial</span>.<span class="fn">print</span>(dist);
+  <span class="fn">Serial</span>.<span class="fn">println</span>(<span class="st">" cm"</span>);
+  <span class="fn">delay</span>(<span class="nm">200</span>);
+}</pre></div>
+      </div>
+
+      <h2 class="section-title">Popular Libraries to Explore</h2>
+      <div class="concept-grid">
+        <div class="concept-card"><div class="cc-icon">🌡️</div><div class="cc-title">DHT.h</div><div class="cc-desc">Read temperature and humidity from DHT11 / DHT22 sensors.</div><div class="cc-type">DHT sensor(pin, DHT11)</div></div>
+        <div class="concept-card"><div class="cc-icon">📟</div><div class="cc-title">LiquidCrystal.h</div><div class="cc-desc">Drive 16×2 LCD displays with simple text commands.</div><div class="cc-type">lcd.print("Hello")</div></div>
+        <div class="concept-card"><div class="cc-icon">🎛️</div><div class="cc-title">Servo.h</div><div class="cc-desc">Control servo motors 0–180° with one line of code.</div><div class="cc-type">servo.write(angle)</div></div>
+        <div class="concept-card"><div class="cc-icon">🔊</div><div class="cc-title">tone()</div><div class="cc-desc">Built-in! Play musical notes and sounds on a buzzer pin.</div><div class="cc-type">tone(pin, freq, ms)</div></div>
+        <div class="concept-card"><div class="cc-icon">💡</div><div class="cc-title">FastLED.h</div><div class="cc-desc">Drive WS2812B addressable RGB LEDs with stunning effects.</div><div class="cc-type">CRGB leds[NUM_LEDS]</div></div>
+        <div class="concept-card"><div class="cc-icon">📡</div><div class="cc-title">SoftwareSerial.h</div><div class="cc-desc">Create extra serial ports on any digital pins.</div><div class="cc-type">SoftwareSerial(rx,tx)</div></div>
+      </div>
+
+      <div class="info-box note"><div class="info-icon">📌</div><div><div class="info-title">Install Libraries</div><div class="info-text">In the Arduino IDE: <strong>Sketch → Include Library → Manage Libraries</strong>. Search by name and click Install. The library is then available with <code class="inline">#include</code>.</div></div></div>
+
+      <div class="quiz-section">
+        <div class="quiz-title">🎯 Final Quiz</div>
+        <div class="quiz-sub">You've reached the end of the module!</div>
+        <div class="quiz-q">What does the <code class="inline">#include</code> directive do?</div>
+        <div class="quiz-opts">
+          <div class="quiz-opt" onclick="checkQuiz(this,false,'ch8')"><div class="quiz-opt-letter">A</div>Runs external code on another Arduino</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,false,'ch8')"><div class="quiz-opt-letter">B</div>Downloads a library from the internet</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,true,'ch8')"><div class="quiz-opt-letter">C</div>Imports a library file so you can use its functions</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,false,'ch8')"><div class="quiz-opt-letter">D</div>Declares a constant variable</div>
+        </div>
+        <div class="quiz-feedback" id="qfb-ch8"></div>
+      </div>
+
+      <div class="ch-complete" style="border-top:1px solid var(--border);margin-top:48px;background:linear-gradient(135deg,rgba(48,127,255,0.06),rgba(76,175,125,0.06));border-radius:20px;padding:48px 24px;">
+        <div class="ch-complete-icon">🏆</div>
+        <div class="ch-complete-title">Module Complete!</div>
+        <div class="ch-complete-desc">You've worked through all 8 chapters of Arduino C++. You now have the foundation to read sensors, control hardware, write clean functions, and use libraries. Time to build something real!</div>
+        <a href="projects.html" class="ch-complete-btn">See Projects →</a>
+      </div>
+    `
+  }
+];
+
+// ─── STATE ────────────────────────────────────────────────────
+let currentChapter = 0;
+const COMPLETED_KEY = 'cpp_completed';
+const completed = new Set(JSON.parse(localStorage.getItem(COMPLETED_KEY) || '[]'));
+
+// ─── RENDER SIDEBAR ───────────────────────────────────────────
+function renderSidebar() {
+  const nav = document.getElementById('sidebarNav');
+  nav.innerHTML = chapters.map((ch, i) => `
+    <div class="chapter-item${i === currentChapter ? ' active' : ''}${completed.has(ch.id) ? ' done' : ''}"
+         onclick="goToChapter(${i})">
+      <div class="ch-num-badge">${i + 1}</div>
+      <span class="ch-label">${ch.short}</span>
+      ${completed.has(ch.id) ? '<span class="ch-check">✓</span>' : ''}
+    </div>
+  `).join('<div class="sidebar-divider"></div>');
+  updateProgressBar();
+}
+
+function updateProgressBar() {
+  const pct = Math.round((completed.size / chapters.length) * 100);
+  document.getElementById('sidebarPct').textContent = pct + '%';
+  document.getElementById('sidebarFill').style.width = pct + '%';
+}
+
+// ─── RENDER CHAPTERS ─────────────────────────────────────────
+function renderChapters() {
+  const container = document.getElementById('mainContent');
+  container.innerHTML = chapters.map((ch, i) => `
+    <div class="chapter-page${i === 0 ? ' active' : ''}" id="page-${i}">
+      ${ch.content}
+    </div>
+  `).join('');
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────
+function goToChapter(idx) {
+  if (idx < 0 || idx >= chapters.length) return;
+  completed.add(chapters[currentChapter].id);
+  localStorage.setItem(COMPLETED_KEY, JSON.stringify([...completed]));
+
+  document.querySelectorAll('.chapter-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + idx).classList.add('active');
+  currentChapter = idx;
+
+  const contentEl = document.querySelector('.content');
+  if (contentEl) contentEl.scrollTop = 0;
+
+  document.getElementById('bcChapter').textContent = 'Chapter ' + (idx + 1);
+  document.getElementById('btnPrev').disabled = idx === 0;
+  document.getElementById('btnNext').disabled = idx === chapters.length - 1;
+  document.getElementById('btnNext').textContent = idx === chapters.length - 1 ? 'Done ✓' : 'Next →';
+  renderSidebar();
+}
+
+function navigate(dir) {
+  goToChapter(currentChapter + dir);
+}
+
+// ─── QUIZ ────────────────────────────────────────────────────
+function checkQuiz(el, correct, qid) {
+  const opts = el.closest('.quiz-opts').querySelectorAll('.quiz-opt');
+  opts.forEach(o => { o.classList.remove('correct','wrong'); o.style.pointerEvents='none'; });
+  el.classList.add(correct ? 'correct' : 'wrong');
+  const fb = document.getElementById('qfb-' + qid);
+  fb.className = 'quiz-feedback show ' + (correct ? 'ok' : 'bad');
+  fb.textContent = correct ? '✓ Correct! Well done.' : '✗ Not quite — review the section above and try again.';
+}
+
+// ─── COPY CODE ───────────────────────────────────────────────
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ Copied';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+
+// ─── TOAST ───────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ─── INIT ────────────────────────────────────────────────────
+renderChapters();
+renderSidebar();
+document.getElementById('btnPrev').disabled = true;
+
+const contentEl = document.querySelector('.content');
+if (contentEl) contentEl.style.overflowY = 'auto';
+</script>
+
+<!-- ── FIREBASE ── -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+if(!firebase.apps.length){
+  firebase.initializeApp({
+    apiKey:'AIzaSyD6kfvr-6qVSWMwWgp9PfKnGNT3u5K-4zk',
+    authDomain:'learn-arduino-with-ace.firebaseapp.com',
+    projectId:'learn-arduino-with-ace',
+    storageBucket:'learn-arduino-with-ace.firebasestorage.app',
+    messagingSenderId:'100033192953',
+    appId:'1:100033192953:web:c331698eea56c1a34c5328'
+  });
+}
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+auth.onAuthStateChanged(async(user)=>{
+  if(!user){ window.location.replace('index.html'); return; }
+  const snap = await db.collection('users').doc(user.uid).get();
+  if(!snap.exists){ window.location.replace('index.html'); return; }
+  const p = snap.data();
+
+  if(p.role !== 'admin' && p.role !== 'chosen'){
+    window.location.replace('cpp.html');
+    return;
+  }
+
+  const l = (p.displayName||p.username||'?').charAt(0).toUpperCase();
+  document.getElementById('navAccAv').textContent     = l;
+  document.getElementById('navAccBigAv').textContent  = l;
+  document.getElementById('navAccName').textContent   = p.displayName||p.username||'Account';
+  document.getElementById('navAccNameFull').textContent = p.displayName||p.username||'';
+  document.getElementById('navAccEmail').textContent  = p.email||'';
+  const pct = p.avg_progress||0, cnt = p.lessons_completed||0;
+  document.getElementById('navProgressPct').textContent   = pct+'%';
+  document.getElementById('navProgressFill').style.width  = pct+'%';
+  document.getElementById('navProgressCount').textContent = cnt+' / 50 lessons';
+});
+
+document.querySelector('[data-acc-toggle]').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('accountDropdown').classList.toggle('open');
+});
+document.addEventListener('click',()=>{
+  document.getElementById('accountDropdown').classList.remove('open');
+});
+
+async function handleLogout(){
+  if(!confirm('Log out?'))return;
+  await auth.signOut();
+  window.location.replace('index.html');
+}
+</script>
+</body>
+</html>

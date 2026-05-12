@@ -2261,6 +2261,31 @@ auth.onAuthStateChanged(async(user)=>{
   const snap=await db.collection('users').doc(user.uid).get();
   if(!snap.exists){window.location.replace('index.html');return;}
   const p=snap.data();
+
+  // ── ROLE GATE ──────────────────────────────────────────────
+  // Students cannot see C++ code or mBlock images in intermediate projects.
+  // admin, chosen, coach see everything.
+  if(p.role==='student'){
+    const intermediateProjIds=['proj6','proj7','projPark','proj8','proj9'];
+    intermediateProjIds.forEach(function(id){
+      const card=document.getElementById(id);
+      if(!card)return;
+
+      // Hide every mBlock screenshot image column
+      card.querySelectorAll('.mblock-screenshot').forEach(function(el){
+        el.closest('.code-compare')
+          ? el.parentElement.style.display='none'   // hide the whole mBlock column div
+          : el.style.display='none';
+      });
+
+      // Hide every C++ code block column (the sibling div with code-col-label.cpp + .code-block)
+      card.querySelectorAll('.code-col-label.cpp').forEach(function(el){
+        el.parentElement.style.display='none';       // hide the whole C++ column div
+      });
+    });
+  }
+  // ──────────────────────────────────────────────────────────
+
   const l=(p.displayName||p.username||'?').charAt(0).toUpperCase();
   document.getElementById('navAccAv').textContent=l;
   document.getElementById('navAccBigAv').textContent=l;
