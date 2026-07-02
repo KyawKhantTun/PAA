@@ -349,9 +349,9 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
     <div class="toc-section-hd">🔥 Intermediate</div>
     <a class="toc-proj-btn" href="#proj6">06 · 🌻 Setting It Up</a>
     <a class="toc-proj-btn" href="#proj7">07 · 🚨 Intruder!</a>
-    <a class="toc-proj-btn" href="#projPark">08 · 🅿️ Car Parking</a>
-    <a class="toc-proj-btn" href="#proj8">09 · 💨 Spin It!</a>
-    <a class="toc-proj-btn" href="#proj9">10 · 🚗 Arduino Car</a>
+    <a class="toc-proj-btn" href="#proj8">08 · 🅿️ Car Parking</a>
+    <a class="toc-proj-btn" href="#proj9">09 · 💨 Spin It!</a>
+    <a class="toc-proj-btn" href="#proj10">10 · 🚗 Arduino Car</a>
     <div class="toc-section-hd">🚀 Advanced</div>
     <a class="toc-proj-btn" href="#advanced">10 · 📡 Bluetooth Control</a>
     <a class="toc-proj-btn" href="#advanced">11 · 🌈 LED Matrix</a>
@@ -951,7 +951,7 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
               </ol>
             </div>
             <div class="code-compare">
-              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p6s1-mblock.png"></div></div></div>
+              <div><div class="code-col-label mblock">🧩 mBlock</div><div class="mblock-screenshot"><div class="mblock-screenshot-icon"><img src="images/p6s1_mblock.png"></div></div></div>
               <div><div class="code-col-label cpp">💻 C++</div><div class="code-block"><div class="code-header"><span class="code-lang cpp">Arduino C++</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre class="code-pre"><span class="kw">#include</span> <span class="st">&lt;Servo.h&gt;</span>
 
 Servo myServo;
@@ -1174,11 +1174,11 @@ Servo myServo;
 
     <div class="next-strip reveal">
       <div class="next-strip-text"><div class="next-strip-label">Up Next</div><div class="next-strip-title">Project 08: Car Parking System — build a smart parking barrier with ultrasonic sensor, servo gate, and LCD display</div></div>
-      <a class="btn-next-proj" href="#projPark" onclick="openProject('projPark')">Start Project 08 →</a>
+      <a class="btn-next-proj" href="#proj8" onclick="openProject('proj8')">Start Project 08 →</a>
     </div>
 
     <!-- PROJECT 8 — CAR PARKING SYSTEM -->
-    <div class="project-card reveal" id="projPark">
+    <div class="project-card reveal" id="proj8">
       <div class="proj-header" onclick="toggleProject(this)">
         <div>
           <div class="proj-num">Intermediate · Project 08</div>
@@ -1490,11 +1490,11 @@ Servo gateServo;
 
     <div class="next-strip reveal">
       <div class="next-strip-text"><div class="next-strip-label">Up Next</div><div class="next-strip-title">Project 09: Spin It! — control a DC motor fan with a button, speed dial, and the L298N driver</div></div>
-      <a class="btn-next-proj" href="#proj8" onclick="openProject('proj8')">Start Project 09 →</a>
+      <a class="btn-next-proj" href="#proj9" onclick="openProject('proj9')">Start Project 09 →</a>
     </div>
 
     <!-- PROJECT 8 (now 09) -->
-    <div class="project-card reveal" id="proj8">
+    <div class="project-card reveal" id="proj9">
       <div class="proj-header" onclick="toggleProject(this)">
         <div>
           <div class="proj-num">Intermediate · Project 09</div>
@@ -2083,7 +2083,7 @@ window.addEventListener('scroll', () => {
   const el = document.documentElement;
   const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
   document.getElementById('readProgress').style.width = pct + '%';
-  ['proj1','proj2','proj3','proj4','proj5','proj6','proj7','projPark','proj8','proj9','intermediate','advanced'].forEach(id => {
+  ['proj1','proj2','proj3','proj4','proj5','proj6','proj7','proj8','proj9','proj10','intermediate','advanced'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     const r = el.getBoundingClientRect();
@@ -2266,7 +2266,7 @@ auth.onAuthStateChanged(async(user)=>{
   // Students cannot see C++ code or mBlock images in intermediate projects.
   // admin, chosen, coach see everything.
   if(p.role==='student'){
-    const intermediateProjIds=['proj6','proj7','projPark','proj8','proj9'];
+    const intermediateProjIds=['proj6','proj7','proj8','proj9','proj10'];
     intermediateProjIds.forEach(function(id){
       const card=document.getElementById(id);
       if(!card)return;
