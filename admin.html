@@ -10,6 +10,7 @@
 :root{
   --teal:#307fff;--teal-dark:#0123ac;--teal-light:rgba(48,127,255,0.12);--teal-glow:rgba(48,127,255,0.25);
   --orange:#e8500a;--orange-light:rgba(232,80,10,0.12);
+  --purple:#ab47bc;--purple-light:rgba(171,71,188,0.12);
   --green:#4caf7d;--green-light:rgba(76,175,125,0.12);
   --red:#ef5350;--red-light:rgba(239,83,80,0.12);
   --dark:#060809;--dark2:#0d1012;--dark3:#161b1d;--dark4:#1e2326;
@@ -92,6 +93,8 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .badge-active{background:var(--green-light);color:var(--green);border:1px solid rgba(76,175,125,0.25);}
 .badge-suspended{background:var(--red-light);color:var(--red);border:1px solid rgba(239,83,80,0.25);}
 .badge-admin{background:var(--orange-light);color:var(--orange);border:1px solid rgba(232,80,10,0.25);}
+.badge-chosen{background:var(--purple-light);color:var(--purple);border:1px solid rgba(171,71,188,0.25);}
+.badge-student{background:var(--faint);color:var(--muted);border:1px solid var(--border);}
 .tbl-actions{display:flex;gap:6px;align-items:center;}
 .tbl-btn{background:var(--faint);border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:13px;cursor:pointer;transition:all .18s;color:#fff;}
 .tbl-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.18);}
@@ -376,16 +379,23 @@ tr:hover td{background:rgba(255,255,255,0.02);}
               <div class="panel-title">All Students</div>
               <span style="font-size:12px;color:var(--muted);" id="userCount"></span>
             </div>
-            <div class="filter-tabs">
-              <button class="filter-tab active" onclick="filterUsers('all',this)">All</button>
-              <button class="filter-tab" onclick="filterUsers('active',this)">Active</button>
-              <button class="filter-tab" onclick="filterUsers('suspended',this)">Suspended</button>
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+              <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterUsers('all',this)">All</button>
+                <button class="filter-tab" onclick="filterUsers('active',this)">Active</button>
+                <button class="filter-tab" onclick="filterUsers('suspended',this)">Suspended</button>
+              </div>
+              <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterRole('all',this)">All Roles</button>
+                <button class="filter-tab" onclick="filterRole('student',this)">Student</button>
+                <button class="filter-tab" onclick="filterRole('chosen',this)">Chosen</button>
+              </div>
             </div>
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Student</th><th>Email</th><th>Grade</th><th>Progress</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="usersTable"><tr class="empty-row"><td colspan="6">Loading…</td></tr></tbody>
+              <thead><tr><th>Student</th><th>Email</th><th>Grade</th><th>Role</th><th>Progress</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="usersTable"><tr class="empty-row"><td colspan="7">Loading…</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -422,6 +432,45 @@ tr:hover td{background:rgba(255,255,255,0.02);}
   </div>
 </div>
 
+<!-- ── EDIT STUDENT MODAL ── -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box">
+    <div class="modal-icon">✏️</div>
+    <div class="modal-title">Edit Student</div>
+    <div class="modal-desc">Update this account's details, including its role.</div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label>Display Name</label>
+      <div class="field-wrap" style="position:relative;">
+        <input type="text" id="e_name" style="padding-left:13px;">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label>Grade / Class</label>
+      <div class="field-wrap" style="position:relative;">
+        <select id="e_grade" style="padding-left:13px;">
+          <option value="">Select grade…</option>
+          <option>Grade 7</option><option>Grade 8</option><option>Grade 9</option>
+          <option>Grade 10</option><option>Grade 11</option><option>Grade 12</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:20px;">
+      <label>Role</label>
+      <div class="field-wrap" style="position:relative;">
+        <select id="e_role" style="padding-left:13px;">
+          <option value="student">Student</option>
+          <option value="chosen">Chosen</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeEdit()">Cancel</button>
+      <button class="btn-modal-primary" id="confirmEditBtn" onclick="confirmEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- ── FIREBASE ── -->
@@ -445,7 +494,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.firestore();
 
-let allUsers = [], currentFilter = 'all', deleteTargetId = null, resetTargetId = null;
+let allUsers = [], currentFilter = 'all', currentRoleFilter = 'all', deleteTargetId = null, resetTargetId = null, editTargetId = null;
 
 // ── ADMIN GUARD ──────────────────────────────────────────────
 (async function init(){
@@ -485,8 +534,8 @@ function showSection(id, link){
 // ── DASHBOARD ────────────────────────────────────────────────
 async function loadDashboard(){
   try {
-    const snap = await db.collection('users').where('role','==','student').get();
-    allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const snap = await db.collection('users').get();
+    allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(u => u.role !== 'admin');
 
     const total     = allUsers.length;
     const active    = allUsers.filter(u => !u.suspended).length;
@@ -514,23 +563,26 @@ async function loadDashboard(){
 // ── USERS TABLE ──────────────────────────────────────────────
 async function loadUsers(){
   try {
-    const snap = await db.collection('users').where('role','==','student').get();
-    allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const snap = await db.collection('users').get();
+    allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(u => u.role !== 'admin');
     renderUsers(currentFilter);
   } catch(e){ showToast('⚠ ' + e.message); }
 }
 
-function renderUsers(filter){
-  let list = allUsers;
-  if (filter === 'active')    list = allUsers.filter(u => !u.suspended);
-  if (filter === 'suspended') list = allUsers.filter(u => !!u.suspended);
-  document.getElementById('userCount').textContent = `${list.length} student${list.length!==1?'s':''}`;
-  document.getElementById('usersTable').innerHTML = list.length
-    ? list.map(u => `
+function applyFilters(list){
+  if (currentFilter === 'active')    list = list.filter(u => !u.suspended);
+  if (currentFilter === 'suspended') list = list.filter(u => !!u.suspended);
+  if (currentRoleFilter !== 'all')   list = list.filter(u => (u.role||'student') === currentRoleFilter);
+  return list;
+}
+
+function rowHtml(u){
+  return `
         <tr>
           <td>${userCell(u)}</td>
           <td class="mono" style="font-size:12.5px;">${u.email||'—'}</td>
           <td style="font-size:13px;">${u.grade||'—'}</td>
+          <td>${roleBadge(u)}</td>
           <td>
             <div style="display:flex;align-items:center;">
               <div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${u.avg_progress||0}%"></div></div>
@@ -539,41 +591,42 @@ function renderUsers(filter){
           </td>
           <td>${u.suspended ? '<span class="badge badge-suspended">Suspended</span>' : '<span class="badge badge-active">Active</span>'}</td>
           <td>${actionBtns(u)}</td>
-        </tr>`).join('')
-    : '<tr class="empty-row"><td colspan="6">No students found.</td></tr>';
+        </tr>`;
+}
+
+function renderUsers(filter){
+  const list = applyFilters(allUsers);
+  document.getElementById('userCount').textContent = `${list.length} student${list.length!==1?'s':''}`;
+  document.getElementById('usersTable').innerHTML = list.length
+    ? list.map(rowHtml).join('')
+    : '<tr class="empty-row"><td colspan="7">No students found.</td></tr>';
 }
 
 function filterUsers(f, btn){
   currentFilter = f;
-  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+  btn.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderUsers(f);
+}
+
+function filterRole(r, btn){
+  currentRoleFilter = r;
+  btn.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderUsers(currentFilter);
 }
 
 function searchUsers(q){
   if (!q.trim()) { renderUsers(currentFilter); return; }
   const ql = q.toLowerCase();
-  const filtered = allUsers.filter(u =>
+  const filtered = applyFilters(allUsers).filter(u =>
     u.displayName?.toLowerCase().includes(ql) ||
     u.username?.toLowerCase().includes(ql) ||
     u.email?.toLowerCase().includes(ql)
   );
   document.getElementById('usersTable').innerHTML = filtered.length
-    ? filtered.map(u => `
-        <tr>
-          <td>${userCell(u)}</td>
-          <td class="mono" style="font-size:12.5px;">${u.email||'—'}</td>
-          <td style="font-size:13px;">${u.grade||'—'}</td>
-          <td>
-            <div style="display:flex;align-items:center;">
-              <div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${u.avg_progress||0}%"></div></div>
-              <span style="font-size:12px;color:var(--muted);">${u.avg_progress||0}%</span>
-            </div>
-          </td>
-          <td>${u.suspended ? '<span class="badge badge-suspended">Suspended</span>' : '<span class="badge badge-active">Active</span>'}</td>
-          <td>${actionBtns(u)}</td>
-        </tr>`).join('')
-    : '<tr class="empty-row"><td colspan="6">No results for "' + q + '"</td></tr>';
+    ? filtered.map(rowHtml).join('')
+    : '<tr class="empty-row"><td colspan="7">No results for "' + q + '"</td></tr>';
 }
 
 // ── ROW HELPERS ──────────────────────────────────────────────
@@ -587,10 +640,17 @@ function userCell(u){
     </div>
   </div>`;
 }
+function roleBadge(u){
+  const role = u.role || 'student';
+  if (role === 'chosen') return '<span class="badge badge-chosen">Chosen</span>';
+  if (role === 'admin')  return '<span class="badge badge-admin">Admin</span>';
+  return '<span class="badge badge-student">Student</span>';
+}
 function actionBtns(u){
   const suspendIcon = u.suspended ? '🔓' : '🔒';
   const suspendTip  = u.suspended ? 'Reactivate' : 'Suspend';
   return `<div class="tbl-actions">
+    <button class="tbl-btn" title="Edit" onclick="openEdit('${u.id}')">✏️</button>
     <button class="tbl-btn" title="Reset password" onclick="openReset('${u.id}')">🔑</button>
     <button class="tbl-btn" title="${suspendTip}" onclick="toggleSuspend('${u.id}')">${suspendIcon}</button>
     <button class="tbl-btn del" title="Delete" onclick="openDelete('${u.id}')">🗑️</button>
@@ -714,6 +774,36 @@ async function confirmReset(){
   } catch(e){ showToast('⚠ ' + e.message); }
 }
 
+// ── EDIT ─────────────────────────────────────────────────────
+function openEdit(id){
+  editTargetId = id;
+  const u = allUsers.find(x => x.id === id);
+  if (!u) return;
+  document.getElementById('e_name').value  = u.displayName || '';
+  document.getElementById('e_grade').value = u.grade || '';
+  document.getElementById('e_role').value  = u.role === 'chosen' ? 'chosen' : 'student';
+  document.getElementById('editModal').classList.add('open');
+}
+function closeEdit(){ document.getElementById('editModal').classList.remove('open'); editTargetId = null; }
+async function confirmEdit(){
+  if (!editTargetId) return;
+  const btn = document.getElementById('confirmEditBtn');
+  const name  = document.getElementById('e_name').value.trim();
+  const grade = document.getElementById('e_grade').value;
+  const role  = document.getElementById('e_role').value;
+  if (!name) { showToast('⚠ Display name can\'t be empty.'); return; }
+
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await db.collection('users').doc(editTargetId).update({ displayName: name, grade, role });
+    closeEdit();
+    showToast('✅ Changes saved.');
+    await loadDashboard();
+    if (document.getElementById('section-users').classList.contains('active')) loadUsers();
+  } catch(e){ showToast('⚠ ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = 'Save Changes'; }
+}
+
 // ── DELETE ────────────────────────────────────────────────────
 function openDelete(id){
   deleteTargetId = id;
@@ -752,6 +842,7 @@ function showToast(msg){ const t=document.getElementById('toast');t.textContent=
 // Close modals on overlay click
 document.getElementById('deleteModal').addEventListener('click',e=>{ if(e.target===document.getElementById('deleteModal'))closeDelete(); });
 document.getElementById('resetModal').addEventListener('click',e=>{ if(e.target===document.getElementById('resetModal'))closeReset(); });
+document.getElementById('editModal').addEventListener('click',e=>{ if(e.target===document.getElementById('editModal'))closeEdit(); });
 </script>
 </body>
 </html>
