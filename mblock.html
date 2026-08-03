@@ -203,7 +203,7 @@ main{position:relative;z-index:10}
         <div class="acc-progress-wrap">
           <div class="acc-progress-label"><span>Lessons Completed</span><span id="navProgressPct">0%</span></div>
           <div class="acc-progress-bar"><div class="acc-progress-fill" id="navProgressFill" style="width:0%"></div></div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;" id="navProgressCount">0 / 50 lessons</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;" id="navProgressCount">0 / 18 lessons</div>
         </div>
         <div class="acc-menu">
           <a class="acc-item" href="profile.html"><div class="acc-item-icon">👤</div>View Profile</a>
@@ -543,7 +543,7 @@ auth.onAuthStateChanged(async(user)=>{
   const pct=p.avg_progress||0, cnt=p.lessons_completed||0;
   document.getElementById('navProgressPct').textContent=pct+'%';
   document.getElementById('navProgressFill').style.width=pct+'%';
-  document.getElementById('navProgressCount').textContent=cnt+' / 50 lessons';
+  document.getElementById('navProgressCount').textContent=cnt+' / 18 lessons';
 });
 
 // Dropdown toggle

@@ -136,7 +136,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:grid;gri
         <div class="acc-progress-wrap">
           <div class="acc-progress-label"><span>Lessons Completed</span><span id="navProgressPct">0%</span></div>
           <div class="acc-progress-bar"><div class="acc-progress-fill" id="navProgressFill" style="width:0%"></div></div>
-          <div class="acc-progress-count" id="navProgressCount">0 / 50 lessons</div>
+          <div class="acc-progress-count" id="navProgressCount">0 / 18 lessons</div>
         </div>
         <div class="acc-menu">
           <a class="acc-item" href="profile.html"><div class="acc-item-icon">👤</div>View Profile</a>
@@ -429,7 +429,7 @@ function initNavAccount(p){
   const pct=p.avg_progress||0,cnt=p.lessons_completed||0;
   document.getElementById('navProgressPct').textContent=pct+'%';
   document.getElementById('navProgressFill').style.width=pct+'%';
-  document.getElementById('navProgressCount').textContent=cnt+' / 50 lessons';
+  document.getElementById('navProgressCount').textContent=cnt+' / 18 lessons';
 }
 async function handleLogout(){
   if(!confirm('Log out?'))return;

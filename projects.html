@@ -298,7 +298,7 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
         <div class="acc-progress-wrap">
           <div class="acc-progress-label"><span>Lessons Completed</span><span id="navProgressPct">0%</span></div>
           <div class="acc-progress-bar"><div class="acc-progress-fill" id="navProgressFill" style="width:0%"></div></div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;" id="navProgressCount">0 / 50 lessons</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;" id="navProgressCount">0 / 18 lessons</div>
         </div>
         <div class="acc-menu">
           <a class="acc-item" href="profile.html"><div class="acc-item-icon">👤</div>View Profile</a>
@@ -1617,7 +1617,7 @@ Servo gateServo;
     </div>
 
     <!-- PROJECT 9 -->
-    <div class="project-card reveal" id="proj9">
+    <div class="project-card reveal" id="proj10">
       <div class="proj-header" onclick="toggleProject(this)">
         <div>
           <div class="proj-num">Intermediate · Project 10</div>
@@ -2193,11 +2193,25 @@ function answer(opt,result,explanation){
   const q=opt.closest('.quiz-q');
   if(q.dataset.answered)return;
   q.dataset.answered='1';
+  q.dataset.correct=(result==='correct')?'1':'0';
   q.querySelectorAll('.quiz-opt').forEach(o=>o.style.pointerEvents='none');
   opt.classList.add(result);
   const fb=q.querySelector('.quiz-feedback');
   fb.textContent=(result==='correct'?'✓ Correct! ':'✗ Not quite. ')+explanation;
   fb.className='quiz-feedback show '+(result==='correct'?'ok':'no');
+
+  // Once every quiz question in this project has been answered, sync progress to the account.
+  const project=opt.closest('.project-card');
+  if(project){
+    const allQs=project.querySelectorAll('.quiz-q');
+    const answeredQs=project.querySelectorAll('.quiz-q[data-answered]');
+    if(allQs.length && answeredQs.length===allQs.length){
+      const correctCount=project.querySelectorAll('.quiz-q[data-correct="1"]').length;
+      const pct=Math.round((correctCount/allQs.length)*100);
+      const title=project.querySelector('.proj-title')?.textContent?.trim()||project.id;
+      saveProjectProgress(project.id, title, pct);
+    }
+  }
 }
 
 /* SEND MESSAGE */
@@ -2295,8 +2309,32 @@ auth.onAuthStateChanged(async(user)=>{
   const pct=p.avg_progress||0, cnt=p.lessons_completed||0;
   document.getElementById('navProgressPct').textContent=pct+'%';
   document.getElementById('navProgressFill').style.width=pct+'%';
-  document.getElementById('navProgressCount').textContent=cnt+' / 50 lessons';
+  document.getElementById('navProgressCount').textContent=cnt+' / '+TOTAL_LESSONS+' lessons';
 });
+
+const TOTAL_LESSONS = 18; // 10 hands-on projects + 8 C++ chapters
+
+async function saveProjectProgress(lessonId, title, pct){
+  try {
+    if (!auth.currentUser) return;
+    const uid = auth.currentUser.uid;
+    await db.collection('progress').doc(uid+'_'+lessonId).set({
+      uid, lesson_id: lessonId, lesson_title: title,
+      category: 'project', completed: true, progress_pct: pct,
+      updated_at: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    await updateUserRollup(uid);
+  } catch(e) { console.warn('saveProjectProgress failed', e); }
+}
+
+async function updateUserRollup(uid){
+  const snap = await db.collection('progress').where('uid','==',uid).get();
+  const docs = snap.docs.map(d => d.data());
+  const total = docs.length;
+  const avg = total ? Math.round(docs.reduce((s,d)=>s+(d.progress_pct||0),0)/total) : 0;
+  const done = docs.filter(d => d.completed).length;
+  await db.collection('users').doc(uid).update({ avg_progress: avg, lessons_completed: done });
+}
 
 async function handleLogout(){
   if(!confirm('Log out?'))return;

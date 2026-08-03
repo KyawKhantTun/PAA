@@ -262,7 +262,7 @@ code.inline{font-family:'DM Mono',monospace;font-size:12.5px;background:rgba(48,
         <div class="acc-progress-wrap">
           <div class="acc-progress-label"><span>Lessons Completed</span><span id="navProgressPct">0%</span></div>
           <div class="acc-progress-bar"><div class="acc-progress-fill" id="navProgressFill" style="width:0%"></div></div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;" id="navProgressCount">0 / 50 lessons</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px;font-family:'DM Mono',monospace;" id="navProgressCount">0 / 18 lessons</div>
         </div>
         <div class="acc-menu">
           <a class="acc-item" href="profile.html"><div class="acc-item-icon">👤</div>View Profile</a>
@@ -1052,8 +1052,10 @@ function renderChapters() {
 // ─── NAVIGATION ──────────────────────────────────────────────
 function goToChapter(idx) {
   if (idx < 0 || idx >= chapters.length) return;
-  completed.add(chapters[currentChapter].id);
+  const finishedChapter = chapters[currentChapter];
+  completed.add(finishedChapter.id);
   localStorage.setItem(COMPLETED_KEY, JSON.stringify([...completed]));
+  saveChapterProgress(finishedChapter.id, finishedChapter.short); // fire-and-forget sync to the account
 
   document.querySelectorAll('.chapter-page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + idx).classList.add('active');
@@ -1148,8 +1150,50 @@ auth.onAuthStateChanged(async(user)=>{
   const pct = p.avg_progress||0, cnt = p.lessons_completed||0;
   document.getElementById('navProgressPct').textContent   = pct+'%';
   document.getElementById('navProgressFill').style.width  = pct+'%';
-  document.getElementById('navProgressCount').textContent = cnt+' / 50 lessons';
+  document.getElementById('navProgressCount').textContent = cnt+' / '+TOTAL_LESSONS+' lessons';
+
+  // Pull this account's real chapter completions from Firestore (works across devices),
+  // merge with whatever's cached locally, then push any local-only ones back up.
+  try {
+    const progSnap = await db.collection('progress').where('uid','==',user.uid).where('category','==','cpp').get();
+    progSnap.docs.forEach(d => {
+      const data = d.data();
+      if (data.completed && data.lesson_id) completed.add(data.lesson_id.replace(/^cpp_/, ''));
+    });
+    renderSidebar();
+    // Self-heal: anything completed locally but missing from Firestore gets synced up.
+    const known = new Set(progSnap.docs.map(d => d.data().lesson_id));
+    for (const ch of chapters) {
+      if (completed.has(ch.id) && !known.has('cpp_'+ch.id)) {
+        saveChapterProgress(ch.id, ch.short);
+      }
+    }
+  } catch(e) { console.warn('progress sync failed', e); }
 });
+
+const TOTAL_LESSONS = 18; // 8 C++ chapters + 10 hands-on projects
+
+async function saveChapterProgress(chapterId, title){
+  try {
+    if (!auth.currentUser) return;
+    const uid = auth.currentUser.uid;
+    await db.collection('progress').doc(uid+'_cpp_'+chapterId).set({
+      uid, lesson_id: 'cpp_'+chapterId, lesson_title: title,
+      category: 'cpp', completed: true, progress_pct: 100,
+      updated_at: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    await updateUserRollup(uid);
+  } catch(e) { console.warn('saveChapterProgress failed', e); }
+}
+
+async function updateUserRollup(uid){
+  const snap = await db.collection('progress').where('uid','==',uid).get();
+  const docs = snap.docs.map(d => d.data());
+  const total = docs.length;
+  const avg = total ? Math.round(docs.reduce((s,d)=>s+(d.progress_pct||0),0)/total) : 0;
+  const done = docs.filter(d => d.completed).length;
+  await db.collection('users').doc(uid).update({ avg_progress: avg, lessons_completed: done });
+}
 
 document.querySelector('[data-acc-toggle]').addEventListener('click',e=>{
   e.stopPropagation();

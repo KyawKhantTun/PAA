@@ -162,7 +162,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:grid;gri
         <div class="acc-progress-wrap">
           <div class="acc-progress-label"><span>Lessons Completed</span><span id="navProgressPct">0%</span></div>
           <div class="acc-progress-bar"><div class="acc-progress-fill" id="navProgressFill" style="width:0%"></div></div>
-          <div class="acc-progress-count" id="navProgressCount">0 / 50 lessons</div>
+          <div class="acc-progress-count" id="navProgressCount">0 / 18 lessons</div>
         </div>
         <div class="acc-menu">
           <a class="acc-item" href="profile.html"><div class="acc-item-icon">👤</div>View Profile</a>
@@ -202,7 +202,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:grid;gri
 
   <!-- STAT CARDS -->
   <div class="profile-grid reveal" style="margin-bottom:24px;">
-    <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-val" id="statLessons">—</div><div class="stat-label">Lessons Completed</div><div class="stat-sub" id="statLessonsSub">out of 50 total</div></div>
+    <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-val" id="statLessons">—</div><div class="stat-label">Lessons Completed</div><div class="stat-sub" id="statLessonsSub">out of 18 total</div></div>
     <div class="stat-card"><div class="stat-icon">🔧</div><div class="stat-val" id="statProjs">—</div><div class="stat-label">Projects Finished</div><div class="stat-sub" id="statProjsSub"></div></div>
     <div class="stat-card"><div class="stat-icon">🧠</div><div class="stat-val" id="statQuizzes">—</div><div class="stat-label">Quizzes Taken</div><div class="stat-sub" id="statQuizSub"></div></div>
   </div>
@@ -251,14 +251,24 @@ const auth=firebase.auth(); const db=firebase.firestore();
 </script>
 <script>
 const LESSONS = [
-  {id:'proj1', name:'Light It Up',     icon:'💡'},
-  {id:'proj2', name:'Light Coding',    icon:'✨'},
-  {id:'proj3', name:'Switch It Up',    icon:'🔘'},
-  {id:'proj4', name:'Electric Piano',  icon:'🎹'},
-  {id:'proj5', name:'Reaction Race',   icon:'🏁'},
-  {id:'cpp_vars',    name:'C++ Variables',   icon:'💻'},
-  {id:'cpp_loops',   name:'C++ Loops',       icon:'💻'},
-  {id:'cpp_funcs',   name:'C++ Functions',   icon:'💻'},
+  {id:'proj1',  name:'Light It Up',            icon:'💡'},
+  {id:'proj2',  name:'Light Coding',           icon:'✨'},
+  {id:'proj3',  name:'Switch It Up',           icon:'🔘'},
+  {id:'proj4',  name:'Electric Piano',         icon:'🎹'},
+  {id:'proj5',  name:'Reaction Race',          icon:'🏁'},
+  {id:'proj6',  name:'Setting It Up',          icon:'🌻'},
+  {id:'proj7',  name:'Intruder! Intruder!',    icon:'🚨'},
+  {id:'proj8',  name:'Car Parking System',     icon:'🅿️'},
+  {id:'proj9',  name:'Spin It!',               icon:'💨'},
+  {id:'proj10', name:'Arduino Car',            icon:'🚗'},
+  {id:'cpp_intro',     name:'C++ Getting Started', icon:'💻'},
+  {id:'cpp_variables', name:'C++ Variables',       icon:'💻'},
+  {id:'cpp_control',   name:'C++ Control Flow',    icon:'💻'},
+  {id:'cpp_functions', name:'C++ Functions',       icon:'💻'},
+  {id:'cpp_arrays',    name:'C++ Arrays',          icon:'💻'},
+  {id:'cpp_io',        name:'C++ Pins & I/O',      icon:'💻'},
+  {id:'cpp_serial',    name:'C++ Serial',          icon:'💻'},
+  {id:'cpp_libraries', name:'C++ Libraries',       icon:'💻'},
 ];
 
 const ACHIEVEMENTS = [
@@ -266,10 +276,10 @@ const ACHIEVEMENTS = [
   {icon:'🔥', name:'5-Day Streak',   desc:'Logged in 5 days in a row',       key:'streak_5'},
   {icon:'🏆', name:'Quiz Master',    desc:'Scored 100% on a quiz',           key:'quiz_100'},
   {icon:'🎹', name:'Music Maker',    desc:'Built the Electric Piano',        key:'piano_done'},
-  {icon:'🤖', name:'Robot Builder',  desc:'Complete the Robot Car project',  key:'robot_done'},
+  {icon:'🤖', name:'Robot Builder',  desc:'Complete the Arduino Car project',key:'robot_done'},
   {icon:'📡', name:'Wireless Wizard',desc:'Use Bluetooth in a project',      key:'bt_done'},
   {icon:'🚀', name:'C++ Pro',        desc:'Complete all C++ lessons',        key:'cpp_done'},
-  {icon:'🎓', name:'Graduate',       desc:'Finish all 50 lessons',           key:'graduate'},
+  {icon:'🎓', name:'Graduate',       desc:'Finish all '+LESSONS.length+' lessons',  key:'graduate'},
 ];
 
 function timeAgo(ts){
@@ -313,7 +323,7 @@ async function loadProfile(uid, profile){
   document.getElementById('miniPct').textContent        = totalPct+'%';
   document.getElementById('miniProj').textContent       = projsDone;
   document.getElementById('statLessons').textContent    = completed;
-  document.getElementById('statLessonsSub').textContent = 'out of 50 total lessons';
+  document.getElementById('statLessonsSub').textContent = 'out of '+LESSONS.length+' total lessons';
   document.getElementById('statProjs').textContent      = projsDone;
   document.getElementById('statProjsSub').textContent   = (LESSONS.filter(l=>l.id.startsWith('proj')).length-projsDone)+' in progress';
   document.getElementById('statQuizzes').textContent    = quizScores.length;
@@ -335,7 +345,7 @@ async function loadProfile(uid, profile){
   }).join('');
 
   // Projects
-  const projDefs=[{id:'proj1',icon:'💡',name:'Light It Up'},{id:'proj2',icon:'✨',name:'Light Coding'},{id:'proj3',icon:'🔘',name:'Switch It Up'},{id:'proj4',icon:'🎹',name:'Electric Piano'},{id:'proj5',icon:'🏁',name:'Reaction Race'},{id:'proj6',icon:'🌡️',name:'Weather Station'}];
+  const projDefs=LESSONS.filter(l=>l.id.startsWith('proj'));
   document.getElementById('projectsGrid').innerHTML=projDefs.map(p=>{
     const row=progressMap[p.id];const pct=row?.progress_pct||0;
     let cls='locked',lbl='🔒 Locked';
@@ -377,7 +387,7 @@ function initNavAccount(p){
   const pct=p.avg_progress||0,cnt=p.lessons_completed||0;
   document.getElementById('navProgressPct').textContent=pct+'%';
   document.getElementById('navProgressFill').style.width=pct+'%';
-  document.getElementById('navProgressCount').textContent=cnt+' / 50 lessons';
+  document.getElementById('navProgressCount').textContent=cnt+' / '+LESSONS.length+' lessons';
 }
 async function handleLogout(){
   if(!confirm('Log out?'))return;
