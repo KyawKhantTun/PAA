@@ -189,6 +189,15 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
 .tip-text{font-size:15.5px;color:var(--muted);line-height:1.7;}
 .tip-text strong{color:#fff;}
 
+/* Video section */
+.video-section{grid-column:1/-1;border-top:1px solid var(--border);padding-top:28px;}
+.video-wrap{background:#000;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.video-wrap video{width:100%;max-height:480px;display:block;background:#000;}
+.video-placeholder{background:rgba(0,151,157,0.04);border:1.5px dashed rgba(0,151,157,0.2);border-radius:12px;padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;}
+.video-placeholder-icon{font-size:32px;}
+.video-placeholder-text{font-size:12px;color:var(--muted);line-height:1.6;}
+.video-placeholder-text code{display:block;font-family:'DM Mono',monospace;font-size:10px;color:rgba(0,151,157,0.7);margin-top:6px;word-break:break-all;}
+
 /* Circuit section */
 .circuit-section{grid-column:1/-1;border-top:1px solid var(--border);padding-top:28px;}
 .circuit-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;}
@@ -525,6 +534,11 @@ function jumpTo(idx){
   current=idx; updateTrackPosition(true); updatePanel(current);
 }
 
+/* ════════ SLUGIFY (used to auto-derive video filenames) ════════ */
+function slugify(str){
+  return str.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-+|-+$)/g,'');
+}
+
 /* ════════ DETAIL PANEL ════════ */
 function openDetail(){
   const c=filtered[current]; if(!c)return;
@@ -552,6 +566,23 @@ function renderDetail(c){
 
   const pinRows=c.pinout.map(p=>`<tr><td>${p.pin}</td><td><span class="pin-badge ${p.type}">${p.arduino}</span></td><td>${p.notes}</td></tr>`).join('');
   const useRows=c.uses.map(u=>`<div class="use-row"><div class="use-dot"></div><span>${u}</span></div>`).join('');
+
+  /* Video Walkthrough — filename is auto-derived from the component name
+     (e.g. "Arduino Uno" -> videos/arduino-uno.mp4) unless the component
+     object sets its own `video` field. Drop matching .mp4 files into a
+     /videos folder next to this page and they'll show up automatically.
+     If a file is missing, a placeholder is shown instead. */
+  const videoSlug=c.videoSlug||slugify(c.name);
+  const videoSrc=c.video||`videos/${videoSlug}.mp4`;
+  const placeholderHtml=`<div class="video-placeholder"><div class="video-placeholder-icon">🎬</div><div class="video-placeholder-text">No video yet for ${c.name}.<br>Add one at <code>${videoSrc}</code></div></div>`;
+  const videoHtml=`<div class="video-section">
+    <div class="detail-section-title">Video Walkthrough</div>
+    <div class="video-wrap" id="videoWrap">
+      <video controls preload="none" playsinline onerror="this.closest('.video-wrap').innerHTML=this.closest('.video-wrap').dataset.fallback">
+        <source src="${videoSrc}" type="video/mp4">
+      </video>
+    </div>
+  </div>`;
 
   let circuitHtml='';
   if(c.circuits&&c.circuits.length>0){
@@ -595,9 +626,13 @@ function renderDetail(c){
       </div>
       <div class="tip-box"><div class="tip-icon">💡</div><div class="tip-text"><strong>Pro Tip:</strong> ${c.tip}</div></div>
     </div>
+    ${videoHtml}
     ${circuitHtml}
     ${bottomNav}
   `;
+
+  const vw=document.getElementById('videoWrap');
+  if(vw) vw.dataset.fallback=placeholderHtml;
 }
 
 function detailNav(dir){
