@@ -221,6 +221,17 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
 .btn-detail-prev svg,.btn-detail-next svg{width:14px;}
 
 .cursor-glow{position:fixed;pointer-events:none;z-index:5;width:400px;height:400px;background:radial-gradient(circle,rgba(0,151,157,0.05) 0%,transparent 70%);border-radius:50%;transform:translate(-50%,-50%);}
+
+/* INTRO VIDEO BUTTON + MODAL */
+.intro-video-btn{position:absolute;top:50px;right:52px;z-index:11;display:flex;align-items:center;gap:8px;background:var(--teal);color:#fff;border:none;padding:8px 18px 8px 14px;border-radius:100px;font-size:12.5px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .22s;box-shadow:0 6px 20px rgba(0,151,157,0.35);}
+.intro-video-btn:hover{background:var(--teal-dark);transform:translateY(-2px);}
+.intro-video-btn svg{width:13px;}
+.intro-video-modal{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;background:rgba(5,6,7,0.86);backdrop-filter:blur(6px);padding:40px;}
+.intro-video-modal.open{display:flex;}
+.intro-video-modal-inner{width:100%;max-width:960px;background:var(--dark3);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,0.6);}
+.intro-video-modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);}
+.intro-video-modal-title{font-family:'Fraunces',serif;font-weight:900;font-size:16px;color:#fff;}
+.intro-video-modal video{width:100%;max-height:70vh;display:block;background:#000;}
 </style>
 </head>
 <body>
@@ -291,6 +302,12 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
       <div class="filter-pill" onclick="filterComps('board',this)">Boards</div>
     </div>
 
+    <!-- Overview video trigger -->
+    <button class="intro-video-btn" onclick="openIntroVideo()">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      Watch Overview
+    </button>
+
     <!-- Left info -->
     <div class="left-panel">
       <p class="comp-category" id="compCategory"></p>
@@ -346,6 +363,22 @@ pre.code-pre{padding:16px;overflow-x:auto;font-family:'DM Mono',monospace;font-s
       </button>
     </div>
     <div class="detail-content-wrap" id="detailContent"></div>
+  </div>
+</div>
+
+<!-- INTRO VIDEO MODAL -->
+<div class="intro-video-modal" id="introVideoModal" onclick="if(event.target===this)closeIntroVideo()">
+  <div class="intro-video-modal-inner">
+    <div class="intro-video-modal-head">
+      <span class="intro-video-modal-title">Arduino Components — Overview</span>
+      <button class="btn-close-detail" onclick="closeIntroVideo()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        Close
+      </button>
+    </div>
+    <video id="introVideoPlayer" controls playsinline>
+      <source src="videos/Arduino_Components.mp4" type="video/mp4">
+    </video>
   </div>
 </div>
 
@@ -648,6 +681,16 @@ function copyCode(btn){
   navigator.clipboard.writeText(pre.innerText).then(()=>{btn.textContent='✓ Copied!';setTimeout(()=>{btn.textContent='Copy';},1800);});
 }
 
+/* ════════ INTRO VIDEO MODAL ════════ */
+function openIntroVideo(){
+  document.getElementById('introVideoModal').classList.add('open');
+}
+function closeIntroVideo(){
+  document.getElementById('introVideoModal').classList.remove('open');
+  const v=document.getElementById('introVideoPlayer');
+  v.pause();
+}
+
 /* ════════ FILTER ════════ */
 function filterComps(cat,pill){
   document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
@@ -665,6 +708,7 @@ function handleSearch(){
 
 /* ════════ KEYBOARD + SCROLL ════════ */
 document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.getElementById('introVideoModal').classList.contains('open')){closeIntroVideo();return;}
   if(detailOpen){if(e.key==='Escape')closeDetail();return;}
   if(e.key==='ArrowRight')navigate(1);
   if(e.key==='ArrowLeft')navigate(-1);
